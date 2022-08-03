@@ -1,0 +1,19 @@
+﻿{
+  "$schema": "https://raw.githubusercontent.com/bsmg/BSIPA-MetadataFileSchema/master/Schema.json",
+  "id": "MultiplayerChat",
+  "name": "MultiplayerChat",
+  "author": "LookAtHippo",
+  "version": "0.1.0",
+  "description": "Adds chat functionality to Beat Saber multiplayer lobbies.",
+  "gameVersion": "1.22.0",
+  "dependsOn": {
+    "BSIPA": "^4.2.1",
+    "BeatSaberMarkupLanguage": "^1.6.1",
+    "MultiplayerCore": "^1.0.0",
+    "SiraUtil": "^3.0.6"
+  },
+  "links": {
+    "project-source": "https://github.com/roydejong/BeatSaberMultiplayerChat"
+  },
+  "loadAfter": ["MultiplayerCore"]
+}
