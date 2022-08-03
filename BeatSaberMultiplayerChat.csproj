@@ -7,13 +7,24 @@
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
         <ProjectGuid>{C1856E3F-DA2A-46DE-98E1-B34CEEFEBC7B}</ProjectGuid>
         <OutputType>Library</OutputType>
-        <AppDesignerFolder>Properties</AppDesignerFolder>
         <RootNamespace>BeatSaberMultiplayerChat</RootNamespace>
-        <AssemblyName>BeatSaberMultiplayerChat</AssemblyName>
+        <AssemblyName>MultiplayerChat</AssemblyName>
         <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
+        <AssemblyVersion>0.1.0</AssemblyVersion>
+        <FileVersion>0.1.0</FileVersion>
+        <PackageVersion>0.1.0</PackageVersion>
+        <InformationalVersion>0.1.0</InformationalVersion>
+        <Title>BeatSaberMultiplayerChat</Title>
+        <Authors>Roy de Jong</Authors>
+        <Description>A Beat Saber mod that adds chat functionality to multiplayer lobbies.</Description>
+        <Copyright>Copyright (C) 2022 Roy de Jong</Copyright>
+        <PackageProjectUrl>https://github.com/roydejong/BeatSaberMultiplayerChat</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/roydejong/BeatSaberMultiplayerChat/LICENSE.txt</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/roydejong/BeatSaberMultiplayerChat</RepositoryUrl>
+        <NeutralLanguage>en-US</NeutralLanguage>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -95,6 +106,21 @@
         <Reference Include="System.Xaml" />
         <Reference Include="System.Xml" />
         <Reference Include="System.Xml.Linq" />
+        <Reference Include="UnityEngine">
+          <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.CoreModule">
+          <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.UI">
+          <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.UI.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.UIElementsModule">
+          <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.UIElementsModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.UIModule">
+          <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.UIModule.dll</HintPath>
+        </Reference>
         <Reference Include="Zenject">
           <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Zenject.dll</HintPath>
         </Reference>
@@ -109,21 +135,25 @@
         <Compile Include="Installers\MpcAppInstaller.cs" />
         <Compile Include="Installers\MpcMenuInstaller.cs" />
         <Compile Include="Installers\MpcMultiplayerInstaller.cs" />
+        <Compile Include="Models\ChatMessage.cs" />
         <Compile Include="Network\MpcBasePacket.cs" />
         <Compile Include="Network\MpcCapabilitiesPacket.cs" />
         <Compile Include="Network\MpcTextChatPacket.cs" />
         <Compile Include="Network\MpcVersionInfo.cs" />
         <Compile Include="Plugin.cs" />
         <Compile Include="PluginConfig.cs" />
-        <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>
     <ItemGroup>
       <Content Include="Directory.Build.targets" />
+      <Content Include="TODO.md" />
       <EmbeddedResource Include="manifest.json" />
       <Content Include="README.md" />
     </ItemGroup>
     <ItemGroup>
       <None Include="packages.config" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="UI" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
@@ -132,12 +162,9 @@
       </PropertyGroup>
       <Error Condition="!Exists('packages\BeatSaberModdingTools.Tasks.1.4.3\build\BeatSaberModdingTools.Tasks.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\BeatSaberModdingTools.Tasks.1.4.3\build\BeatSaberModdingTools.Tasks.props'))" />
     </Target>
-    <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-         Other similar extension points exist, see Microsoft.Common.targets.
-    <Target Name="BeforeBuild">
+    <Target Name="SetSourceRevisionId" BeforeTargets="InitializeSourceControlInformation">
+      <Exec Command="git describe --long --always --dirty --exclude=* --abbrev=8" ConsoleToMSBuild="True" IgnoreExitCode="False">
+        <Output PropertyName="SourceRevisionId" TaskParameter="ConsoleOutput" />
+      </Exec>
     </Target>
-    <Target Name="AfterBuild">
-    </Target>
-    -->
-
 </Project>
