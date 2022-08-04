@@ -1,5 +1,4 @@
 ﻿using LiteNetLib.Utils;
-using MultiplayerCore.Networking.Abstractions;
 
 namespace BeatSaberMultiplayerChat.Network;
 
@@ -9,21 +8,27 @@ namespace BeatSaberMultiplayerChat.Network;
 public class MpcCapabilitiesPacket : MpcBasePacket
 {
     /// <summary>
-    /// Indicates whether the client is capable of, and has enabled, text chat.
+    /// Is text chat supported and enabled?
     /// </summary>
     public bool CanTextChat;
 
     /// <summary>
-    /// Indicates whether the client is capable of, and has enabled, voice chat.
+    /// Is voice chat supported and enabled?
     /// </summary>
-    public bool CanVoiceChat;
+    public bool CanReceiveVoiceChat;
+
+    /// <summary>
+    /// Is voice chat supported and enabled, and is a valid recording device configured?
+    /// </summary>
+    public bool CanTransmitVoiceChat;
 
     public override void Serialize(NetDataWriter writer)
     {
         base.Serialize(writer);
         
         writer.Put(CanTextChat);
-        writer.Put(CanVoiceChat);
+        writer.Put(CanReceiveVoiceChat);
+        writer.Put(CanTransmitVoiceChat);
     }
 
     public override void Deserialize(NetDataReader reader)
@@ -31,6 +36,7 @@ public class MpcCapabilitiesPacket : MpcBasePacket
         base.Deserialize(reader);
         
         CanTextChat = reader.GetBool();
-        CanVoiceChat = reader.GetBool();
+        CanReceiveVoiceChat = reader.GetBool();
+        CanTransmitVoiceChat = reader.GetBool();
     }
 }
