@@ -1,21 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using BeatSaberMultiplayerChat.Models;
 using BeatSaberMultiplayerChat.UI;
 using HMUI;
 using IPA.Utilities;
 using SiraUtil.Affinity;
-using SiraUtil.Logging;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
+using Object = UnityEngine.Object;
 
 namespace BeatSaberMultiplayerChat.Core;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
 {
-    [Inject] private readonly SiraLog _log = null!;
     [Inject] private readonly DiContainer _diContainer = null!;
     [Inject] private readonly ChatManager _chatManager = null!;
     [Inject] private readonly HoverHintController _hoverHintController = null!;
@@ -23,17 +23,17 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
     private Sprite? _nativeIconSpeakerSound;
     private Sprite? _nativeIconMuted;
 
+    private Dictionary<string, MultiplayerLobbyAvatarController> _playerAvatars = null!;
     private Dictionary<string, Button> _playerListButtons = null!;
-
     private ChatBubble _centerBubble = null!;
     private Dictionary<string, ChatBubble> _perUserBubbles = null!;
 
     public void Initialize()
     {
+        _playerAvatars = new(10);
         _playerListButtons = new(10);
-
         var mainScreen = GameObject.Find("Wrapper/MenuCore/UI/ScreenSystem/ScreenContainer/MainScreen");
-        _centerBubble = ChatBubble.Create(_diContainer, mainScreen.transform);
+        _centerBubble = ChatBubble.Create(_diContainer, mainScreen.transform, ChatBubble.AlignStyle.CenterScreen);
         _perUserBubbles = new(10);
 
         _chatManager.ChatClearEvent += HandleChatClear;
@@ -46,50 +46,64 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
         _chatManager.ChatClearEvent -= HandleChatClear;
         _chatManager.ChatMessageEvent -= HandleChatMessage;
         _chatManager.ChatPlayerUpdateEvent -= HandleChatPlayerUpdate;
+        
+        _playerAvatars.Clear();
+        _playerListButtons.Clear();
+        Object.Destroy(_centerBubble);
+        foreach (var bubble in _perUserBubbles.Values)
+            Object.Destroy(bubble);
+        _perUserBubbles.Clear();
     }
 
-    #region Text chat
+    #region Text chat events
 
     private void HandleChatClear(object sender, EventArgs e)
     {
-        _log.Info("HandleChatClear");
-        
         _centerBubble.HideImmediate();
+        
+        foreach (var userBubble in _perUserBubbles.Values)
+            userBubble.HideImmediate();
     }
 
     private void HandleChatMessage(object sender, ChatMessage message)
     {
-        _log.Info("HandleChatMessage");
-        
-        string? messageText = null;
+        string? centerText = null;
 
         switch (message.Type)
         {
             case ChatMessageType.PlayerMessage:
             {
-                messageText = $"<color=#3498db>[{message.UserName}]</color> {message.Text}";
+                centerText = $"<color=#3498db>[{message.UserName}]</color> {message.Text}";
+
+                // Show bubble over user head
+                if (_perUserBubbles.TryGetValue(message.UserId, out var userBubble))
+                {
+                    if (userBubble.IsShowing)
+                        userBubble.HideImmediate();
+                    userBubble.Show(message.Text);
+                }
                 break;
             }
             case ChatMessageType.SystemMessage:
             {
-                messageText = $"<color=#f1c40f>[System]</color> <color=#ecf0f1>{message.Text}</color>";
+                centerText = $"<color=#f1c40f>[System]</color> <color=#ecf0f1>{message.Text}</color>";
                 break;
             }
         }
 
-        if (messageText == null)
+        // Show center screen bubble
+        if (centerText == null)
             return;
-        
+
         if (_centerBubble.IsShowing)
             _centerBubble.HideImmediate();
-           
-        _log.Info("HandleChatMessage -> Show");
-        _centerBubble.Show(messageText);
+
+        _centerBubble.Show(centerText);
     }
 
     private void HandleChatPlayerUpdate(object sender, ChatPlayer player)
     {
-        UpdatePlayerState(player.UserId);
+        UpdatePlayerListState(player.UserId);
     }
 
     #endregion
@@ -123,7 +137,7 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
         ____mutePlayerButton.onClick.AddListener(() => HandleMuteToggleClick(connectedPlayer.userId));
 
         // Initial state update
-        UpdatePlayerState(connectedPlayer.userId);
+        UpdatePlayerListState(connectedPlayer.userId);
     }
 
     private void HandleMuteToggleClick(string userId)
@@ -136,20 +150,20 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
         _chatManager.SendTextChat($"Mute toggle for {chatPlayer.UserName}");
 
         chatPlayer.IsMuted = !chatPlayer.IsMuted;
-        UpdatePlayerState(userId, chatPlayer);
+        UpdatePlayerListState(userId, chatPlayer);
 
         _hoverHintController.HideHintInstant();
 
         // TODO Proper mute logic (persist to config)
     }
 
-    private void UpdatePlayerState(string userId)
+    private void UpdatePlayerListState(string userId)
     {
         _chatManager.TryGetChatPlayer(userId, out var chatPlayer);
-        UpdatePlayerState(userId, chatPlayer);
+        UpdatePlayerListState(userId, chatPlayer);
     }
 
-    private void UpdatePlayerState(string userId, ChatPlayer? chatPlayer)
+    private void UpdatePlayerListState(string userId, ChatPlayer? chatPlayer)
     {
         if (!_playerListButtons.TryGetValue(userId, out var muteButton))
             return;
@@ -196,6 +210,37 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
             muteButtonIcon.sprite = _nativeIconSpeakerSound;
             muteButtonIcon.color = Color.white;
         }
+    }
+
+    #endregion
+
+    #region Lobby avatars
+
+    [AffinityPostfix]
+    [AffinityPatch(typeof(MultiplayerLobbyAvatarManager), nameof(MultiplayerLobbyAvatarManager.AddPlayer))]
+    public void PostfixLobbyAvatarAddPlayer(IConnectedPlayer connectedPlayer,
+        Dictionary<string, MultiplayerLobbyAvatarController> ____playerIdToAvatarMap)
+    {
+        if (!____playerIdToAvatarMap.TryGetValue(connectedPlayer.userId, out var playerAvatarController))
+            return;
+
+        _playerAvatars[connectedPlayer.userId] = playerAvatarController;
+        
+        // Create chat bubble
+        if (_perUserBubbles.TryGetValue(connectedPlayer.userId, out var previousBubble))
+            Object.Destroy(previousBubble);
+        
+        var avatarCaption = playerAvatarController.transform.Find("AvatarCaption");
+        var chatBubble = ChatBubble.Create(_diContainer, avatarCaption, ChatBubble.AlignStyle.LobbyAvatar);
+        
+        _perUserBubbles[connectedPlayer.userId] = chatBubble;
+        
+        // TODO Just testing, remove 
+        HMMainThreadDispatcher.instance.Enqueue(async () =>
+        {
+            await Task.Delay(100);
+            chatBubble.Show("test this is a longer message above an avatar's ugly mug");    
+        });
     }
 
     #endregion

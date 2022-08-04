@@ -10,7 +10,7 @@ Phase 1: Text. Phase 2: Voice.
 - [ ] Chat box UI in lobby
     - [ ] Lobby tab / button
     - [ ] Scrollable container
-- [ ] *Maybe:* Chat bubbles
+- [X] Chat bubbles
 - [ ] *Maybe:* Typing indicators
 - [ ] *Maybe:* Sound notification
 

@@ -9,7 +9,7 @@ namespace BeatSaberMultiplayerChat.UI;
 
 public class ChatBubble : MonoBehaviour
 {
-    public static ChatBubble Create(DiContainer container, Transform parent)
+    public static ChatBubble Create(DiContainer container, Transform parent, AlignStyle style)
     {
         // Hijack hover hint panel prefab as our base
         var hhc = container.Resolve<HoverHintController>();
@@ -21,10 +21,13 @@ public class ChatBubble : MonoBehaviour
 
         Destroy(instance.GetComponent<HoverHintPanel>());
 
-        return container.InstantiateComponent<ChatBubble>(instance.gameObject);
+        var bubble = container.InstantiateComponent<ChatBubble>(instance.gameObject);
+        bubble._style = style;
+        return bubble;
     }
 
     private InnerState _state = InnerState.Idle;
+    private AlignStyle _style = AlignStyle.CenterScreen;
     public bool IsShowing => _state != InnerState.Idle;
 
     private RectTransform? _rectTransform;
@@ -36,7 +39,8 @@ public class ChatBubble : MonoBehaviour
     private event EventHandler<EventArgs>? WasHiddenEvent;
 
     private static readonly Vector2 Padding = new(8f, 4f);
-    private const float YOffset = 60f;
+    private const float YOffsetCenterScreen = 60f;
+    private const float YOffsetPlayerAvatar = 20f;
     private const float ZOffset = -0.1f;
 
     public void Awake()
@@ -104,9 +108,30 @@ public class ChatBubble : MonoBehaviour
 
         var localPosition = _rectTransform.localPosition;
         localPosition.z = ZOffset;
-        localPosition.y = YOffset;
+        localPosition.y = _style switch
+        {
+            AlignStyle.CenterScreen => YOffsetCenterScreen,
+            AlignStyle.LobbyAvatar => YOffsetPlayerAvatar,
+            _ => localPosition.y
+        };
         _rectTransform.localPosition = localPosition;
         _localPosTarget = localPosition;
+
+        if (_style == AlignStyle.LobbyAvatar)
+        {
+            _rectTransform.localScale = new Vector3(2f, 2f, 2f);
+
+            // Steal billboard material / font
+            var parentTransform = _rectTransform.parent;
+            if (parentTransform.gameObject.name != "AvatarCaption")
+                return;
+            
+            var avatarCaptionBg = parentTransform.Find("BG").GetComponent<ImageView>();
+            _bg!.material = avatarCaptionBg.material;
+
+            var avatarCaptionText = parentTransform.Find("Name").GetComponent<CurvedTextMeshPro>();
+            _textMesh!.fontMaterial = avatarCaptionText.fontMaterial;
+        }
     }
 
     public void HideAnimated()
@@ -170,7 +195,7 @@ public class ChatBubble : MonoBehaviour
         _state = InnerState.ShowWait;
 
         yield return new WaitForSeconds(DisplayTime);
-        
+
         HideAnimated();
     }
 
@@ -205,7 +230,7 @@ public class ChatBubble : MonoBehaviour
 
         // Animated out and no longer visible, end of presentation
         yield return new WaitForEndOfFrame();
-        
+
         HideImmediate();
     }
 
@@ -219,7 +244,13 @@ public class ChatBubble : MonoBehaviour
         AnimateOut
     }
 
+    public enum AlignStyle
+    {
+        LobbyAvatar,
+        CenterScreen
+    }
+
     private const float AnimationDuration = .15f;
-    private const float AnimationOffsetY = -3f;
+    private const float AnimationOffsetY = -4f;
     private const float DisplayTime = 5f;
 }
