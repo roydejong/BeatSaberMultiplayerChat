@@ -1,28 +1,41 @@
-﻿using BeatSaberMultiplayerChat.Network;
+﻿using System;
+using System.Text.RegularExpressions;
+using BeatSaberMultiplayerChat.Network;
 
 namespace BeatSaberMultiplayerChat.Models;
 
 public class ChatMessage
 {
-    public ChatMessageType Type;
-    public string UserId;
-    public string UserName;
-    public string Text;
+    public readonly ChatMessageType Type;
+    public readonly string UserId;
+    public readonly string UserName;
+    public readonly string Text;
 
-    private ChatMessage(ChatMessageType type, string userId, string userName, string text)
+    public readonly bool SenderIsHost;
+    public readonly bool SenderIsMe;
+
+    private ChatMessage(ChatMessageType type, string userId, string userName, string text, bool senderIsHost, bool senderIsMe)
     {
         Type = type;
         UserId = userId;
-        UserName = userName;
-        Text = text;
+        UserName = StripTags(userName);
+        Text = StripTags(text);
+
+        SenderIsHost = senderIsHost;
+        SenderIsMe = senderIsMe;
     }
+    
+    private static string StripTags(string input)
+        => Regex.Replace(input, "<.*?>", String.Empty);
 
     public static ChatMessage CreateForLocalPlayer(IConnectedPlayer localPlayer, string text) => new
     (
         type: ChatMessageType.PlayerMessage,
         userId: localPlayer.userId,
         userName: localPlayer.userName,
-        text: text
+        text: text,
+        senderIsHost: localPlayer.isConnectionOwner,
+        senderIsMe: localPlayer.isMe
     );
 
     public static ChatMessage CreateFromPacket(MpcTextChatPacket packet, IConnectedPlayer sender) => new
@@ -30,7 +43,9 @@ public class ChatMessage
         type: ChatMessageType.PlayerMessage,
         userId: sender.userId,
         userName: sender.userName,
-        text: packet.Text ?? ""
+        text: packet.Text ?? "",
+        senderIsHost: sender.isConnectionOwner,
+        senderIsMe: sender.isMe
     );
 
     public static ChatMessage CreateSystemMessage(string text) => new
@@ -38,7 +53,9 @@ public class ChatMessage
         type: ChatMessageType.SystemMessage,
         userId: "system",
         userName: "System",
-        text: text
+        text: text,
+        senderIsHost: false,
+        senderIsMe: false
     );
 }
 

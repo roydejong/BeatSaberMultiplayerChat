@@ -2,6 +2,7 @@
 using System.Collections;
 using HMUI;
 using IPA.Utilities;
+using TMPro;
 using UnityEngine;
 using Zenject;
 
@@ -132,6 +133,8 @@ public class ChatBubble : MonoBehaviour
             var avatarCaptionText = parentTransform.Find("Name").GetComponent<CurvedTextMeshPro>();
             _textMesh!.fontMaterial = avatarCaptionText.fontMaterial;
         }
+
+        _textMesh.fontStyle = FontStyles.Normal;
     }
 
     public void HideAnimated()

@@ -49,9 +49,14 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
         
         _playerAvatars.Clear();
         _playerListButtons.Clear();
-        Object.Destroy(_centerBubble);
+        
+        if (_centerBubble != null)
+            Object.Destroy(_centerBubble);
+        
         foreach (var bubble in _perUserBubbles.Values)
-            Object.Destroy(bubble);
+            if (bubble != null)
+                Object.Destroy(bubble);
+        
         _perUserBubbles.Clear();
     }
 
@@ -59,10 +64,12 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
 
     private void HandleChatClear(object sender, EventArgs e)
     {
-        _centerBubble.HideImmediate();
+        if (_centerBubble != null)
+            _centerBubble.HideImmediate();
         
         foreach (var userBubble in _perUserBubbles.Values)
-            userBubble.HideImmediate();
+            if (userBubble != null)
+                userBubble.HideImmediate();
     }
 
     private void HandleChatMessage(object sender, ChatMessage message)
@@ -73,20 +80,27 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
         {
             case ChatMessageType.PlayerMessage:
             {
-                centerText = $"<color=#3498db>[{message.UserName}]</color> {message.Text}";
-
+                if (message.SenderIsMe)
+                    // No bubble
+                    return;
+                    
+                if (message.SenderIsHost)
+                    centerText = $"💬 <i><color=#2ecc71>[Server]</color> {message.Text}</i>";
+                else
+                    centerText = $"💬 <i><color=#3498db>[{message.UserName}]</color> {message.Text}</i>";
+ 
                 // Show bubble over user head
                 if (_perUserBubbles.TryGetValue(message.UserId, out var userBubble))
                 {
                     if (userBubble.IsShowing)
                         userBubble.HideImmediate();
-                    userBubble.Show(message.Text);
+                    userBubble.Show($"💬 <i>{message.Text}</i>");
                 }
                 break;
             }
             case ChatMessageType.SystemMessage:
             {
-                centerText = $"<color=#f1c40f>[System]</color> <color=#ecf0f1>{message.Text}</color>";
+                centerText = $"🔔 <i><color=#f1c40f>[System]</color> <color=#ecf0f1>{message.Text}</color></i>";
                 break;
             }
         }

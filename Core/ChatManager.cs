@@ -83,12 +83,12 @@ public class ChatManager : IInitializable, IDisposable
     /// </summary>
     public void ClearChat()
     {
-        if (!TextChatEnabled)
-            return;
-
         _log.Info("<<<<<TEMP_DEBUG>>>>> Clearing chat");
 
         ChatClearEvent?.Invoke(this, EventArgs.Empty);
+
+        if (!TextChatEnabled)
+            return;
 
         ShowSystemMessage($"MultiplayerChat v{MpcVersionInfo.AssemblyProductVersion}");
     }
@@ -98,7 +98,7 @@ public class ChatManager : IInitializable, IDisposable
     /// </summary>
     public void ShowSystemMessage(string text)
     {
-        if (!TextChatEnabled)
+        if (!TextChatEnabled || !SessionConnected)
             return;
 
         _log.Info($"<<<<<TEMP_DEBUG>>>>> Show system message: {text}");
@@ -113,7 +113,7 @@ public class ChatManager : IInitializable, IDisposable
     {
         _log.Info($"<<<<<TEMP_DEBUG>>>>> Send text: {text}");
 
-        if (SessionConnected || !TextChatEnabled)
+        if (!SessionConnected || !TextChatEnabled)
             return;
 
         // Broadcast to session
@@ -164,6 +164,8 @@ public class ChatManager : IInitializable, IDisposable
         _log.Info($"<<<<<TEMP_DEBUG>>>>> Multiplayer session disconnected (reason={reason})");
 
         SessionConnected = false;
+        
+        ClearChat();
     }
 
     private void HandleSessionPlayerConnected(IConnectedPlayer player)
