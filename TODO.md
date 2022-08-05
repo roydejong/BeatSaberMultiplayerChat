@@ -23,8 +23,8 @@ Phase 1: Text. Phase 2: Voice.
   - [ ] Can we use end-to-end unreliable send code in game? 
 - [ ] Push-to-talk / mic toggle
 - [ ] Voice activation volume
-- [ ] Mute players
-  - [ ] Player list cell integration with native UI
+- [X] Mute players
+  - [X] Player list cell integration with native UI
 - [ ] Local activity indicator
 - [ ] Remote activity indicator
 

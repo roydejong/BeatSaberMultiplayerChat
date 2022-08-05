@@ -42,6 +42,9 @@ public class ChatManager : IInitializable, IDisposable
 
     public void Initialize()
     {
+        if (_config.MutedUserIds == null)
+            _config.MutedUserIds = new();
+        
         _localCapabilities = new MpcCapabilitiesPacket()
         {
             CanTextChat = TextChatEnabled,
@@ -72,11 +75,11 @@ public class ChatManager : IInitializable, IDisposable
         _packetSerializer.UnregisterCallback<MpcTextChatPacket>();
 
         SessionConnected = false;
-        
+
         _chatPlayers.Clear();
     }
 
-    #region API
+    #region API - Text chat
 
     /// <summary>
     /// Clears the chat box.
@@ -140,16 +143,30 @@ public class ChatManager : IInitializable, IDisposable
 
     #endregion
 
+    #region API - Mute
+
+    public void SetIsPlayerMuted(string userId, bool isMuted)
+    {
+        _log.Info($"Toggle player mute (userId={userId}, isMuted={isMuted})");
+
+        if (isMuted && !_config.MutedUserIds!.Contains(userId))
+            _config.MutedUserIds.Add(userId);
+        else if (!isMuted && _config.MutedUserIds!.Contains(userId))
+            _config.MutedUserIds.Remove(userId);
+    }
+
+    public bool GetIsPlayerMuted(string userId) => _config.MutedUserIds!.Contains(userId);
+
+    #endregion
+
     #region Session events
 
     private void HandleSessionConnected()
     {
-        _log.Info("<<<<<TEMP_DEBUG>>>>> Multiplayer session connected");
-
         SessionConnected = true;
 
         ClearChat();
-        ShowSystemMessage("Connected to multiplayer session");
+        ShowSystemMessage($"Connected to {DescribeServerName()}");
 
         var localChatPlayer = new ChatPlayer(_sessionManager.localPlayer, _localCapabilities);
         _chatPlayers[_sessionManager.localPlayer.userId] = localChatPlayer;
@@ -161,10 +178,8 @@ public class ChatManager : IInitializable, IDisposable
 
     private void HandleSessionDisconnected(DisconnectedReason reason)
     {
-        _log.Info($"<<<<<TEMP_DEBUG>>>>> Multiplayer session disconnected (reason={reason})");
-
         SessionConnected = false;
-        
+
         ClearChat();
     }
 
@@ -173,9 +188,6 @@ public class ChatManager : IInitializable, IDisposable
         if (!SessionConnected)
             return;
 
-        _log.Info(
-            $"<<<<<TEMP_DEBUG>>>>> Multiplayer player connected (userId={player.userId}, userName={player.userName})");
-
         _sessionManager.SendToPlayer(_localCapabilities, player);
     }
 
@@ -183,9 +195,6 @@ public class ChatManager : IInitializable, IDisposable
     {
         if (!SessionConnected)
             return;
-
-        _log.Info(
-            $"<<<<<TEMP_DEBUG>>>>> Multiplayer player disconnected (userId={player.userId}, userName={player.userName})");
 
         _chatPlayers.Remove(player.userId);
     }
@@ -201,12 +210,13 @@ public class ChatManager : IInitializable, IDisposable
         if (!SessionConnected)
             return;
 
-        _log.Info(
-            $"<<<<<TEMP_DEBUG>>>>> Received capabilities (userId={sender.userId}, protoVersion={packet.ProtocolVersion}, canText={packet.CanTextChat}, canVoice={packet.CanTransmitVoiceChat})");
+        _log.Info($"Received capabilities (userId={sender.userId}, protoVersion={packet.ProtocolVersion}, " +
+                  $"canText={packet.CanTextChat}, canVoice={packet.CanTransmitVoiceChat})");
 
         var isNewEntry = _chatPlayers.ContainsKey(sender.userId);
 
         var chatPlayer = new ChatPlayer(sender, packet);
+        chatPlayer.IsMuted = GetIsPlayerMuted(chatPlayer.UserId);
         _chatPlayers[sender.userId] = chatPlayer;
 
         if (isNewEntry)
@@ -216,7 +226,8 @@ public class ChatManager : IInitializable, IDisposable
 
             if (packet.ProtocolVersion > MpcVersionInfo.ProtocolVersion)
                 ShowSystemMessage(
-                    $"Player {sender.userName} is using a newer version of MultiplayerChat. You should update for the best experience.");
+                    $"Player {sender.userName} is using a newer version of MultiplayerChat. " +
+                    $"You should update for the best experience.");
         }
 
         ChatPlayerUpdateEvent?.Invoke(this, chatPlayer);
@@ -227,9 +238,26 @@ public class ChatManager : IInitializable, IDisposable
         if (!SessionConnected || !TextChatEnabled)
             return;
 
-        _log.Info($"<<<<<TEMP_DEBUG>>>>> Received text chat (userId={sender.userId}, text={packet.Text})");
+        if (GetIsPlayerMuted(sender.userId))
+            return;
 
         ChatMessageEvent?.Invoke(this, ChatMessage.CreateFromPacket(packet, sender));
+    }
+
+    #endregion
+
+    #region Utils
+
+    private string DescribeServerName()
+    {
+        if (_sessionManager.connectionOwner is not null &&
+            !string.IsNullOrWhiteSpace(_sessionManager.connectionOwner.userName))
+        {
+            // Specific server name
+            return _sessionManager.connectionOwner.userName;
+        }
+
+        return "Dedicated Server";
     }
 
     #endregion

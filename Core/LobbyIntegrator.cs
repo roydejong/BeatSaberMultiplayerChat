@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using BeatSaberMultiplayerChat.Models;
 using BeatSaberMultiplayerChat.UI;
 using HMUI;
@@ -160,15 +159,17 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
 
         if (chatPlayer is null)
             return;
-
-        _chatManager.SendTextChat($"Mute toggle for {chatPlayer.UserName}");
-
+        
         chatPlayer.IsMuted = !chatPlayer.IsMuted;
+        _chatManager.SetIsPlayerMuted(userId, chatPlayer.IsMuted);
+        
         UpdatePlayerListState(userId, chatPlayer);
 
         _hoverHintController.HideHintInstant();
-
-        // TODO Proper mute logic (persist to config)
+        
+        if (chatPlayer.IsMuted && _perUserBubbles.TryGetValue(userId, out var userBubble))
+            if (userBubble != null)
+                userBubble.HideAnimated();
     }
 
     private void UpdatePlayerListState(string userId)
@@ -248,13 +249,6 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
         var chatBubble = ChatBubble.Create(_diContainer, avatarCaption, ChatBubble.AlignStyle.LobbyAvatar);
         
         _perUserBubbles[connectedPlayer.userId] = chatBubble;
-        
-        // TODO Just testing, remove 
-        HMMainThreadDispatcher.instance.Enqueue(async () =>
-        {
-            await Task.Delay(100);
-            chatBubble.Show("test this is a longer message above an avatar's ugly mug");    
-        });
     }
 
     #endregion
