@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using IPA.Config.Stores.Attributes;
 
 namespace BeatSaberMultiplayerChat;
 
@@ -11,7 +12,8 @@ public class PluginConfig
     public bool EnableTextChat = true;
 
     /// <summary>
-    /// List of User IDs that are muted.
+    /// List of User IDs that are muted. Can be toggled in the lobby player list.
     /// </summary>
+    [UseConverter]
     public List<string>? MutedUserIds = new();
 }

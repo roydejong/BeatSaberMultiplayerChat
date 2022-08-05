@@ -130,8 +130,13 @@ public class ChatBubble : MonoBehaviour
             var avatarCaptionBg = parentTransform.Find("BG").GetComponent<ImageView>();
             _bg!.material = avatarCaptionBg.material;
 
-            var avatarCaptionText = parentTransform.Find("Name").GetComponent<CurvedTextMeshPro>();
-            _textMesh!.fontMaterial = avatarCaptionText.fontMaterial;
+            var avatarCaptionText = parentTransform.Find("Name")?.GetComponent<CurvedTextMeshPro>();
+            if (avatarCaptionText == null)
+                // MpEx nests Name onto BG, see if we can find it there
+                avatarCaptionText = avatarCaptionBg.transform.Find("Name")?.GetComponent<CurvedTextMeshPro>();
+            
+            if (avatarCaptionText != null)
+                _textMesh!.fontMaterial = avatarCaptionText.fontMaterial;
         }
 
         _textMesh.fontStyle = FontStyles.Normal;
