@@ -112,6 +112,9 @@
         <Reference Include="UnityEngine">
           <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.dll</HintPath>
         </Reference>
+        <Reference Include="UnityEngine.AudioModule">
+          <HintPath>..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+        </Reference>
         <Reference Include="UnityEngine.CoreModule">
           <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
         </Reference>
@@ -130,6 +133,15 @@
         <Reference Include="UnityEngine.UIModule">
           <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.UIModule.dll</HintPath>
         </Reference>
+        <Reference Include="UnityEngine.UnityWebRequestAudioModule">
+          <HintPath>..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.UnityWebRequestAudioModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.UnityWebRequestModule">
+          <HintPath>..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.UnityWebRequestModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.UnityWebRequestWWWModule">
+          <HintPath>..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
+        </Reference>
         <Reference Include="Zenject">
           <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Zenject.dll</HintPath>
         </Reference>
@@ -138,6 +150,7 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Audio\SoundNotifier.cs" />
         <Compile Include="Core\ChatManager.cs" />
         <Compile Include="Core\GameplayIntegrator.cs" />
         <Compile Include="Core\LobbyIntegrator.cs" />
@@ -155,6 +168,7 @@
         <Compile Include="UI\ChatBubble.cs" />
     </ItemGroup>
     <ItemGroup>
+      <Content Include="Audio\Assets\ComputerChirp.ogg" />
       <Content Include="Directory.Build.targets" />
       <Content Include="TODO.md" />
       <EmbeddedResource Include="manifest.json" />

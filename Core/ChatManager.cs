@@ -169,6 +169,7 @@ public class ChatManager : IInitializable, IDisposable
         ShowSystemMessage($"Connected to {DescribeServerName()}");
 
         var localChatPlayer = new ChatPlayer(_sessionManager.localPlayer, _localCapabilities);
+        localChatPlayer.IsMuted = GetIsPlayerMuted(_sessionManager.localPlayer.userId);
         _chatPlayers[_sessionManager.localPlayer.userId] = localChatPlayer;
         ChatPlayerUpdateEvent?.Invoke(localChatPlayer.UserId, localChatPlayer);
 

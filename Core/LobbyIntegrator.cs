@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BeatSaberMultiplayerChat.Audio;
 using BeatSaberMultiplayerChat.Models;
 using BeatSaberMultiplayerChat.UI;
 using HMUI;
@@ -18,6 +19,7 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
     [Inject] private readonly DiContainer _diContainer = null!;
     [Inject] private readonly ChatManager _chatManager = null!;
     [Inject] private readonly HoverHintController _hoverHintController = null!;
+    [Inject] private readonly SoundNotifier _soundNotifier = null!;
 
     private Sprite? _nativeIconSpeakerSound;
     private Sprite? _nativeIconMuted;
@@ -112,6 +114,9 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
             _centerBubble.HideImmediate();
 
         _centerBubble.Show(centerText);
+        
+        if (message.Type == ChatMessageType.PlayerMessage)
+            _soundNotifier.Play();
     }
 
     private void HandleChatPlayerUpdate(object sender, ChatPlayer player)

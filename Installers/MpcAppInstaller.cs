@@ -6,6 +6,7 @@ namespace BeatSaberMultiplayerChat.Installers;
 /// <summary>
 /// Installer for App (global).
 /// </summary>
+// ReSharper disable once ClassNeverInstantiated.Global
 public class MpcAppInstaller : Installer
 {
     public override void InstallBindings()
