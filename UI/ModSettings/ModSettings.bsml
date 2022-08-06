@@ -1,0 +1,36 @@
+﻿<settings-container>
+
+    <!-- Text -->
+    
+    <checkbox-setting text="Enable text chat" value="EnableTextChat" bind-value="true" apply-on-change="true"
+                      hover-hint="Globally enable/disable all text chat functionality"/>
+
+    <dropdown-list-setting id="DropdownNotification" text="Notification" options="SoundNotificationOptions"
+                           value="SoundNotification" apply-on-change="true"
+                           hover-hint="Notification sound for chat messages in the lobby"/>
+
+    <!-- Voice -->
+    
+    <horizontal preferred-width="90" pad-top="2">
+        <text align="Center" font-size="5" italics="true" text="Voice" font-color="#95a5a6"/>
+    </horizontal>
+
+    <checkbox-setting text="Enable voice chat" value="EnableVoiceChat" bind-value="true" apply-on-change="true"
+                      hover-hint="Globally enable/disable all voice chat functionality"/>
+
+    <dropdown-list-setting id="DropdownMic" text="Microphone" options="MicrophoneOptions"
+                           value="RecordingDevice" apply-on-change="true"
+                           hover-hint="Select your input device for talking in voice chat"/>
+
+    <!-- Mic test -->
+    
+    <horizontal max-height="8.5" child-expand-width="true" pad-left="15">
+        <!-- Padding --> <text text="" font-size="4" preferred-width="15"/>
+        <image id="ImgTestMic" preserve-aspect="true" preferred-width="5" preferred-height="5" max-width="5"
+               max-height="5"/> 
+        <button id="BtnTestMic" text="Test mic" on-click="BtnTestMicClick" font-size="4"
+                preferred-width="35" preferred-height="8.5" align="Center"
+                hover-hint="Toggle microphone test (listen to selected device)" />
+    </horizontal>
+
+</settings-container>

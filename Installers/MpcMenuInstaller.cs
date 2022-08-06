@@ -1,5 +1,5 @@
-﻿using BeatSaberMultiplayerChat.Audio;
-using BeatSaberMultiplayerChat.Core;
+﻿using BeatSaberMultiplayerChat.Core;
+using BeatSaberMultiplayerChat.UI.ModSettings;
 using Zenject;
 
 namespace BeatSaberMultiplayerChat.Installers;
@@ -12,8 +12,10 @@ public class MpcMenuInstaller : Installer
 {
     public override void InstallBindings()
     {
-        Container.BindInterfacesAndSelfTo<SoundNotifier>().FromNewComponentOnNewGameObject().AsSingle();
-        
+        // Core
         Container.BindInterfacesAndSelfTo<LobbyIntegrator>().AsSingle();
+
+        // UI
+        Container.BindInterfacesAndSelfTo<ModSettingsController>().AsSingle();
     }
 }

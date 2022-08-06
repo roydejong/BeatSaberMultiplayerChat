@@ -11,6 +11,7 @@ public class MpcMultiplayerInstaller : Installer
 {
     public override void InstallBindings()
     {
+        // Core
         Container.BindInterfacesAndSelfTo<GameplayIntegrator>().AsSingle();
     }
 }

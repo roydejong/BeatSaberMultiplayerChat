@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeatSaberMultiplayerChat", "BeatSaberMultiplayerChat.csproj", "{C1856E3F-DA2A-46DE-98E1-B34CEEFEBC7B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiplayerChat", "MultiplayerChat.csproj", "{C1856E3F-DA2A-46DE-98E1-B34CEEFEBC7B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

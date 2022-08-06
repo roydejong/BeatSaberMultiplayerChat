@@ -10,7 +10,7 @@ namespace BeatSaberMultiplayerChat;
 public class PluginConfig
 {
     /// <summary>
-    /// If true, text chat functionality is enabled in the lobby.
+    /// Controls whether text chat features are globally enabled or not.
     /// </summary>
     public bool EnableTextChat = true;
 
@@ -32,4 +32,17 @@ public class PluginConfig
     /// Notification sounds are disabled if set to 0 or below.
     /// </summary>
     public float SoundNotificationVolume = 0.8f;
+
+    /// <summary>
+    /// Controls whether voice chat features are globally enabled or not.
+    /// Affects both incoming and outgoing voice chat.
+    /// </summary>
+    public bool EnableVoiceChat = true;
+    
+    /// <summary>
+    /// Selected recording device name for voice chat.
+    /// If set to "None", outgoing voice chat is explicitly disabled.
+    /// If set to null/empty, default device will be automatically selected. 
+    /// </summary>
+    public string? MicrophoneDevice = null;
 }

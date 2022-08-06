@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BeatSaberMultiplayerChat.Audio;
 using BeatSaberMultiplayerChat.Models;
 using BeatSaberMultiplayerChat.Network;
 using MultiplayerCore.Networking;
@@ -15,6 +16,7 @@ public class ChatManager : IInitializable, IDisposable
     [Inject] private readonly PluginConfig _config = null!;
     [Inject] private readonly IMultiplayerSessionManager _sessionManager = null!;
     [Inject] private readonly MpPacketSerializer _packetSerializer = null!;
+    [Inject] private readonly MicrophoneManager _microphoneManager = null!;
 
     private MpcCapabilitiesPacket _localCapabilities = null!;
     private Dictionary<string, ChatPlayer> _chatPlayers = null!;
@@ -22,8 +24,8 @@ public class ChatManager : IInitializable, IDisposable
     public bool SessionConnected { get; private set; }
 
     public bool TextChatEnabled => _config.EnableTextChat;
-    public bool VoiceChatEnabled => false;
-    public bool VoiceChatHasValidRecordingDevice => false;
+    public bool VoiceChatEnabled => _config.EnableVoiceChat;
+    public bool VoiceChatHasValidRecordingDevice => VoiceChatEnabled && _microphoneManager.HaveSelectedDevice;
 
     /// <summary>
     /// Invoked whenever a chat message has been received or should be presented.

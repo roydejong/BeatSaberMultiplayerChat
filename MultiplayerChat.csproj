@@ -150,7 +150,9 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Audio\MicrophoneManager.cs" />
         <Compile Include="Audio\SoundNotifier.cs" />
+        <Compile Include="Audio\VoiceManager.cs" />
         <Compile Include="Core\ChatManager.cs" />
         <Compile Include="Core\GameplayIntegrator.cs" />
         <Compile Include="Core\LobbyIntegrator.cs" />
@@ -165,12 +167,18 @@
         <Compile Include="Network\MpcVersionInfo.cs" />
         <Compile Include="Plugin.cs" />
         <Compile Include="PluginConfig.cs" />
+        <Compile Include="Sprites\Sprites.cs" />
         <Compile Include="UI\ChatBubble.cs" />
+        <Compile Include="UI\ModSettings\ModSettingsController.cs" />
     </ItemGroup>
     <ItemGroup>
       <Content Include="Audio\Assets\ComputerChirp.ogg" />
       <Content Include="Directory.Build.targets" />
+      <EmbeddedResource Include="Sprites\Assets\Keyboard.png" />
+      <EmbeddedResource Include="Sprites\Assets\MicOff.png" />
       <Content Include="TODO.md" />
+      <EmbeddedResource Include="Sprites\Assets\MicOn.png" />
+      <EmbeddedResource Include="UI\ModSettings\ModSettings.bsml" />
       <EmbeddedResource Include="manifest.json" />
       <Content Include="README.md" />
     </ItemGroup>

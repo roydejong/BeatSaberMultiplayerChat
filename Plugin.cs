@@ -30,13 +30,11 @@ namespace BeatSaberMultiplayerChat
         [OnEnable]
         public void OnEnable()
         {
-            
         }
 
         [OnDisable]
         public void OnDisable()
         {
-            
         }
     }
 }
