@@ -1,7 +1,7 @@
 ﻿using LiteNetLib.Utils;
 using MultiplayerCore.Networking.Abstractions;
 
-namespace BeatSaberMultiplayerChat.Network;
+namespace MultiplayerChat.Network;
 
 public class MpcBasePacket : MpPacket
 {

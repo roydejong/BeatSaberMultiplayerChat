@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using BeatSaberMultiplayerChat.Audio;
-using BeatSaberMultiplayerChat.Models;
-using BeatSaberMultiplayerChat.UI;
 using HMUI;
 using IPA.Utilities;
+using MultiplayerChat.Audio;
+using MultiplayerChat.Models;
+using MultiplayerChat.UI;
 using SiraUtil.Affinity;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 using Object = UnityEngine.Object;
 
-namespace BeatSaberMultiplayerChat.Core;
+namespace MultiplayerChat.Core;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 public class LobbyIntegrator : IInitializable, IDisposable, IAffinity

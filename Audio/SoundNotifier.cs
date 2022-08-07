@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Zenject;
 
-namespace BeatSaberMultiplayerChat.Audio;
+namespace MultiplayerChat.Audio;
 
 /// <summary>
 /// Utility for playing notification sounds from audio clips.

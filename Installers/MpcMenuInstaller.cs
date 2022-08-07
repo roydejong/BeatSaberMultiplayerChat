@@ -1,8 +1,8 @@
-﻿using BeatSaberMultiplayerChat.Core;
-using BeatSaberMultiplayerChat.UI.ModSettings;
+﻿using MultiplayerChat.Core;
+using MultiplayerChat.UI.ModSettings;
 using Zenject;
 
-namespace BeatSaberMultiplayerChat.Installers;
+namespace MultiplayerChat.Installers;
 
 /// <summary>
 /// Installer for Menu (lobby).

@@ -2,7 +2,7 @@
 using System.Reflection;
 using UnityEngine;
 
-namespace BeatSaberMultiplayerChat.Assets;
+namespace MultiplayerChat.Assets;
 
 internal static class Sprites
 {
@@ -16,9 +16,9 @@ internal static class Sprites
     {
         IsInitialized = true;
 
-        Keyboard = LoadSpriteFromResources("BeatSaberMultiplayerChat.Assets.Keyboard.png");
-        MicOff = LoadSpriteFromResources("BeatSaberMultiplayerChat.Assets.MicOff.png");
-        MicOn = LoadSpriteFromResources("BeatSaberMultiplayerChat.Assets.MicOn.png");
+        Keyboard = LoadSpriteFromResources("MultiplayerChat.Assets.Keyboard.png");
+        MicOff = LoadSpriteFromResources("MultiplayerChat.Assets.MicOff.png");
+        MicOn = LoadSpriteFromResources("MultiplayerChat.Assets.MicOn.png");
     }
 
     private static Sprite? LoadSpriteFromResources(string resourcePath, float pixelsPerUnit = 100.0f)

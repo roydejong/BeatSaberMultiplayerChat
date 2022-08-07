@@ -5,14 +5,14 @@ using BeatSaberMarkupLanguage;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components.Settings;
 using BeatSaberMarkupLanguage.Settings;
-using BeatSaberMultiplayerChat.Assets;
-using BeatSaberMultiplayerChat.Audio;
 using HMUI;
+using MultiplayerChat.Assets;
+using MultiplayerChat.Audio;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
-namespace BeatSaberMultiplayerChat.UI.ModSettings;
+namespace MultiplayerChat.UI.ModSettings;
 
 public class ModSettingsController : IInitializable, IDisposable
 {
@@ -28,7 +28,7 @@ public class ModSettingsController : IInitializable, IDisposable
     public void Initialize()
     {
         BSMLSettings.instance.AddSettingsMenu(SettingsMenuName, 
-            "BeatSaberMultiplayerChat.UI.ModSettings.ModSettings.bsml", this);
+            "MultiplayerChat.UI.ModSettings.ModSettings.bsml", this);
     }
     
     public void Dispose()

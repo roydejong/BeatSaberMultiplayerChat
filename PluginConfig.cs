@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using IPA.Config.Stores.Attributes;
 
-namespace BeatSaberMultiplayerChat;
+namespace MultiplayerChat;
 
 // ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable ConvertToConstant.Global

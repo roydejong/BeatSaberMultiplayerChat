@@ -1,6 +1,6 @@
-﻿using BeatSaberMultiplayerChat.Network;
+﻿using MultiplayerChat.Network;
 
-namespace BeatSaberMultiplayerChat.Models;
+namespace MultiplayerChat.Models;
 
 public class ChatPlayer
 {

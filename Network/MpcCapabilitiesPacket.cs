@@ -1,6 +1,6 @@
 ﻿using LiteNetLib.Utils;
 
-namespace BeatSaberMultiplayerChat.Network;
+namespace MultiplayerChat.Network;
 
 /// <summary>
 /// Signals MPC support with version and capabilities to other players.

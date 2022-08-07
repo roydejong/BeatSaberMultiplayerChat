@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Text.RegularExpressions;
-using BeatSaberMultiplayerChat.Network;
+using MultiplayerChat.Network;
 
-namespace BeatSaberMultiplayerChat.Models;
+namespace MultiplayerChat.Models;
 
 public class ChatMessage
 {

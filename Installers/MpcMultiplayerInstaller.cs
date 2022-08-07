@@ -1,7 +1,7 @@
-﻿using BeatSaberMultiplayerChat.Core;
+﻿using MultiplayerChat.Core;
 using Zenject;
 
-namespace BeatSaberMultiplayerChat.Installers;
+namespace MultiplayerChat.Installers;
 
 /// <summary>
 /// Installer for AlwaysMultiPlayer (local active or inactive player) for multiplayer gameplay.

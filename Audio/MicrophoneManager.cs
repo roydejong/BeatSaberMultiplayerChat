@@ -4,7 +4,7 @@ using SiraUtil.Logging;
 using UnityEngine;
 using Zenject;
 
-namespace BeatSaberMultiplayerChat.Audio;
+namespace MultiplayerChat.Audio;
 
 public class MicrophoneManager : MonoBehaviour, IInitializable, IDisposable
 {

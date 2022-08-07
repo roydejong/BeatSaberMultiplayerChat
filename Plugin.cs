@@ -1,12 +1,12 @@
-﻿using BeatSaberMultiplayerChat.Assets;
-using BeatSaberMultiplayerChat.Installers;
-using IPA;
+﻿using IPA;
 using IPA.Config.Stores;
+using MultiplayerChat.Assets;
+using MultiplayerChat.Installers;
 using SiraUtil.Web.SiraSync;
 using SiraUtil.Zenject;
 using IPALogger = IPA.Logging.Logger;
 
-namespace BeatSaberMultiplayerChat
+namespace MultiplayerChat
 {
     [Plugin(RuntimeOptions.DynamicInit)]
     // ReSharper disable once ClassNeverInstantiated.Global

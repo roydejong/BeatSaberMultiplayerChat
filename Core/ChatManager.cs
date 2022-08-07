@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using BeatSaberMultiplayerChat.Audio;
-using BeatSaberMultiplayerChat.Models;
-using BeatSaberMultiplayerChat.Network;
+using MultiplayerChat.Audio;
+using MultiplayerChat.Models;
+using MultiplayerChat.Network;
 using MultiplayerCore.Networking;
 using SiraUtil.Logging;
 using Zenject;
 
-namespace BeatSaberMultiplayerChat.Core;
+namespace MultiplayerChat.Core;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 public class ChatManager : IInitializable, IDisposable

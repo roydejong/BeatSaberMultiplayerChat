@@ -1,8 +1,8 @@
-﻿using BeatSaberMultiplayerChat.Audio;
-using BeatSaberMultiplayerChat.Core;
+﻿using MultiplayerChat.Audio;
+using MultiplayerChat.Core;
 using Zenject;
 
-namespace BeatSaberMultiplayerChat.Installers;
+namespace MultiplayerChat.Installers;
 
 /// <summary>
 /// Installer for App (global).

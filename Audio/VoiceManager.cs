@@ -1,4 +1,4 @@
-﻿namespace BeatSaberMultiplayerChat.Audio;
+﻿namespace MultiplayerChat.Audio;
 
 public class VoiceManager
 {

@@ -6,7 +6,7 @@ using TMPro;
 using UnityEngine;
 using Zenject;
 
-namespace BeatSaberMultiplayerChat.UI;
+namespace MultiplayerChat.UI;
 
 public class ChatBubble : MonoBehaviour
 {

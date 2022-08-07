@@ -2,7 +2,7 @@
 using SiraUtil.Affinity;
 using Zenject;
 
-namespace BeatSaberMultiplayerChat.Core;
+namespace MultiplayerChat.Core;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 public class GameplayIntegrator : IInitializable, IDisposable, IAffinity

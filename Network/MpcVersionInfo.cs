@@ -1,10 +1,10 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 
-namespace BeatSaberMultiplayerChat.Network;
+namespace MultiplayerChat.Network;
 
 /// <summary>
-/// Version information for BeatSaberMultiplayerChat.
+/// Version information for the MultiplayerChat mod.
 /// </summary>
 public static class MpcVersionInfo
 {
