@@ -24,6 +24,7 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
     [Inject] private readonly SoundNotifier _soundNotifier = null!;
     [Inject] private readonly ChatViewController _chatViewController = null!;
     [Inject] private readonly GameServerLobbyFlowCoordinator _lobbyFlowCoordinator = null!;
+    [Inject] private readonly ServerPlayerListViewController _serverPlayerListViewController = null!;
 
     private Sprite? _nativeIconSpeakerSound;
     private Sprite? _nativeIconMuted;
@@ -288,6 +289,12 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
             null, // Action finishedCallback
             ViewController.AnimationDirection.Horizontal,
             false // bool immediately
+        });
+
+        _lobbyFlowCoordinator.InvokeMethod<object, FlowCoordinator>("SetRightScreenViewController", new object[]
+        {
+            _serverPlayerListViewController,
+            ViewController.AnimationType.None
         });
     }
 

@@ -182,7 +182,7 @@
     </ItemGroup>
     <ItemGroup>
       <EmbeddedResource Include="Assets\Chat.png" />
-      <Content Include="Audio\Assets\ComputerChirp.ogg" />
+      <None Include="Assets\ComputerChirp.ogg" />
       <Content Include="Directory.Build.targets" />
       <Content Include="TODO.md" />
       <EmbeddedResource Include="Assets\Keyboard.png" />
