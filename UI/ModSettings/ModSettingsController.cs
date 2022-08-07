@@ -5,6 +5,7 @@ using BeatSaberMarkupLanguage;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components.Settings;
 using BeatSaberMarkupLanguage.Settings;
+using BeatSaberMultiplayerChat.Assets;
 using BeatSaberMultiplayerChat.Audio;
 using HMUI;
 using UnityEngine;
@@ -90,14 +91,14 @@ public class ModSettingsController : IInitializable, IDisposable
         {
             _btnTestMic.interactable = true;
             _btnTestMic.SetButtonText("<color=#ff3b3b>Testing mic</color>");
-            _imgTestMic.SetImage("MultiplayerChat.Sprites.Assets.MicOn.png");
+            _imgTestMic.sprite = Sprites.MicOn;
             _imgTestMic.color = Color.red;
         }
         else
         {
             _btnTestMic.interactable = EnableVoiceChat && RecordingDevice != "None";
             _btnTestMic.SetButtonText("<color=#ffffff>Test mic</color>");
-            _imgTestMic.SetImage("MultiplayerChat.Sprites.Assets.MicOff.png");
+            _imgTestMic.sprite = Sprites.MicOff;
             _imgTestMic.color = Color.white;
         }
     }

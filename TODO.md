@@ -3,7 +3,7 @@
 Phase 1: Text. Phase 2: Voice.
 
 ## General / shared
-- [ ] Settings UI
+- [X] Settings UI
 
 ## Text 
 
@@ -12,13 +12,13 @@ Phase 1: Text. Phase 2: Voice.
     - [ ] Scrollable container
 - [X] Chat bubbles
 - [ ] *Maybe:* Typing indicators
-- [ ] *Maybe:* Sound notification
+- [X] Sound notification
 
 ## Voice 
 
-- [ ] Device selection
-- [ ] Microphone capture
-- [ ] UnityOpus integration
+- [X] Device selection
+- [X] Microphone capture
+- [ ] Sample / Encode / UnityOpus 
 - [ ] Voice packets
   - [ ] Can we use end-to-end unreliable send code in game? 
 - [ ] Push-to-talk / mic toggle

@@ -1,4 +1,5 @@
-﻿using BeatSaberMultiplayerChat.Installers;
+﻿using BeatSaberMultiplayerChat.Assets;
+using BeatSaberMultiplayerChat.Installers;
 using IPA;
 using IPA.Config.Stores;
 using SiraUtil.Web.SiraSync;
@@ -30,6 +31,8 @@ namespace BeatSaberMultiplayerChat
         [OnEnable]
         public void OnEnable()
         {
+            if (!Sprites.IsInitialized)
+                Sprites.Initialize();
         }
 
         [OnDisable]

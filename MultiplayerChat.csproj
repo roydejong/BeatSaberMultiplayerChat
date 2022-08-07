@@ -118,6 +118,9 @@
         <Reference Include="UnityEngine.CoreModule">
           <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
         </Reference>
+        <Reference Include="UnityEngine.ImageConversionModule">
+          <HintPath>..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
+        </Reference>
         <Reference Include="UnityEngine.TextCoreModule">
           <HintPath>..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.TextCoreModule.dll</HintPath>
         </Reference>
@@ -139,6 +142,9 @@
         <Reference Include="UnityEngine.UnityWebRequestModule">
           <HintPath>..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.UnityWebRequestModule.dll</HintPath>
         </Reference>
+        <Reference Include="UnityEngine.UnityWebRequestTextureModule">
+          <HintPath>..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.UnityWebRequestTextureModule.dll</HintPath>
+        </Reference>
         <Reference Include="UnityEngine.UnityWebRequestWWWModule">
           <HintPath>..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
         </Reference>
@@ -150,6 +156,7 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Assets\Sprites.cs" />
         <Compile Include="Audio\MicrophoneManager.cs" />
         <Compile Include="Audio\SoundNotifier.cs" />
         <Compile Include="Audio\VoiceManager.cs" />
@@ -167,17 +174,17 @@
         <Compile Include="Network\MpcVersionInfo.cs" />
         <Compile Include="Plugin.cs" />
         <Compile Include="PluginConfig.cs" />
-        <Compile Include="Sprites\Sprites.cs" />
         <Compile Include="UI\ChatBubble.cs" />
+        <Compile Include="UI\Lobby\ChatButton.cs" />
         <Compile Include="UI\ModSettings\ModSettingsController.cs" />
     </ItemGroup>
     <ItemGroup>
       <Content Include="Audio\Assets\ComputerChirp.ogg" />
       <Content Include="Directory.Build.targets" />
-      <EmbeddedResource Include="Sprites\Assets\Keyboard.png" />
-      <EmbeddedResource Include="Sprites\Assets\MicOff.png" />
       <Content Include="TODO.md" />
-      <EmbeddedResource Include="Sprites\Assets\MicOn.png" />
+      <EmbeddedResource Include="Assets\Keyboard.png" />
+      <EmbeddedResource Include="Assets\MicOff.png" />
+      <EmbeddedResource Include="Assets\MicOn.png" />
       <EmbeddedResource Include="UI\ModSettings\ModSettings.bsml" />
       <EmbeddedResource Include="manifest.json" />
       <Content Include="README.md" />

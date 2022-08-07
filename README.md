@@ -33,6 +33,10 @@ Muted players are saved to the configuration file, so they'll stay muted between
 
 You can also mute yourself here which, for now... does nothing. :)
 
+### Settings
+
+You can configure the mod from the Mod Settings in the main menu.
+
 ## For modders
 
 ### Integrating chat features
@@ -41,7 +45,7 @@ If you use Zenject, you can depend on this mod and request the `ChatManager` ins
 ### For server developers
 You can send text chat messages using the `MpcTextChatPacket`. If the message originates from the connection owner, the mod will display it as coming from the server.
 
-This can be useful for custom game modes, informing about entitlement issues, debugging, etc.
+This can be useful for custom game modes, informing about entitlement / download issues, debugging, etc.
 
 ### Packet structure
 
@@ -53,7 +57,7 @@ Each chat packet inherits from `MpcBasePacket`.
 | `ProtocolVersion` | `VarUInt` | Protocol version. Currently always set to 1. Will be incremented if chat features change in a breaking way. See `MpcVersionInfo` class.  |
 
 #### Capabilities packet (`MpcCapabilitiesPacket`)
-This packet is sent to each player indicating that they have the mod installed, and which features they have enabled.
+Reliable packet sent to each player indicating that they have the mod installed, and specifically which features they have enabled. Could be sent as an update when already connected.
 
 | Field                  | Type   | Comment                                                                                           |
 |------------------------|--------|---------------------------------------------------------------------------------------------------|
@@ -64,6 +68,8 @@ This packet is sent to each player indicating that they have the mod installed, 
 [*] Voice chat coming soon. Maybe.
 
 #### Text message packet  (`MpcTextChatPacket`)
+
+Reliable packet containing a simple text chat message.
 
 | Field             | Type     | Comment                                                                                                                             |
 |-------------------|----------|-------------------------------------------------------------------------------------------------------------------------------------|
