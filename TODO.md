@@ -8,10 +8,9 @@ Phase 1: Text. Phase 2: Voice.
 ## Text 
 
 - [ ] Chat box UI in lobby
-    - [ ] Lobby tab / button
+    - [X] Lobby tab / button
     - [ ] Scrollable container
 - [X] Chat bubbles
-- [ ] *Maybe:* Typing indicators
 - [X] Sound notification
 
 ## Voice 
@@ -28,3 +27,7 @@ Phase 1: Text. Phase 2: Voice.
 - [ ] Local activity indicator
 - [ ] Remote activity indicator
 
+## QA
+
+- [ ] *Maybe:* Typing indicators
+- [ ] 🪲 *Bug:* Leaving MpEx settings flow coordinator will break the chat title button (activation event never triggers for the lobby setup view)

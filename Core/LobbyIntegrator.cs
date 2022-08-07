@@ -18,9 +18,12 @@ namespace MultiplayerChat.Core;
 public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
 {
     [Inject] private readonly DiContainer _diContainer = null!;
+    [Inject] private readonly PluginConfig _config = null!;
     [Inject] private readonly ChatManager _chatManager = null!;
     [Inject] private readonly HoverHintController _hoverHintController = null!;
     [Inject] private readonly SoundNotifier _soundNotifier = null!;
+    [Inject] private readonly ChatViewController _chatViewController = null!;
+    [Inject] private readonly GameServerLobbyFlowCoordinator _lobbyFlowCoordinator = null!;
 
     private Sprite? _nativeIconSpeakerSound;
     private Sprite? _nativeIconMuted;
@@ -75,58 +78,49 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
 
     private void HandleChatClear(object sender, EventArgs e)
     {
-        if (_centerBubble != null)
-            _centerBubble.HideImmediate();
-        
+        // Player bubbles
         foreach (var userBubble in _perUserBubbles.Values)
             if (userBubble != null)
                 userBubble.HideImmediate();
+        
+        // Center bubble
+        if (_centerBubble != null)
+            _centerBubble.HideImmediate();
+        
+        // Chat view
+        _chatViewController.ClearMessages();
     }
 
     private void HandleChatMessage(object sender, ChatMessage message)
     {
-        string? centerText = null;
+        // Player bubble
+        var showPlayerBubble = _config.EnablePlayerBubbles && !message.SenderIsHost && !message.SenderIsMe;
 
-        switch (message.Type)
+        if (showPlayerBubble && _perUserBubbles.TryGetValue(message.UserId, out var userBubble))
         {
-            case ChatMessageType.PlayerMessage:
-            {
-                if (message.SenderIsMe)
-                    // No bubble
-                    return;
-                    
-                if (message.SenderIsHost)
-                    centerText = $"💬 <i><color=#2ecc71>[Server]</color> {message.Text}</i>";
-                else
-                    centerText = $"💬 <i><color=#3498db>[{message.UserName}]</color> {message.Text}</i>";
- 
-                // Show bubble over user head
-                if (_perUserBubbles.TryGetValue(message.UserId, out var userBubble))
-                {
-                    if (userBubble.IsShowing)
-                        userBubble.HideImmediate();
-                    userBubble.Show($"💬 <i>{message.Text}</i>");
-                }
-                break;
-            }
-            case ChatMessageType.SystemMessage:
-            {
-                centerText = $"🔔 <i><color=#f1c40f>[System]</color> <color=#ecf0f1>{message.Text}</color></i>";
-                break;
-            }
+            if (userBubble.IsShowing)
+                userBubble.HideImmediate();
+            
+            userBubble.Show(message.FormatMessage(inPlayerBubble: true));
         }
-
-        // Show center screen bubble
-        if (centerText == null)
-            return;
-
-        if (_centerBubble.IsShowing)
-            _centerBubble.HideImmediate();
-
-        _centerBubble.Show(centerText);
         
+        // Center bubble
+        var showCenterBubble = _config.EnableCenterBubbles;
+
+        if (showCenterBubble)
+        {
+            if (_centerBubble.IsShowing)
+                _centerBubble.HideImmediate();
+            
+            _centerBubble.Show(message.FormatMessage());
+        }
+        
+        // Notification sound
         if (message.Type == ChatMessageType.PlayerMessage)
             _soundNotifier.Play();
+        
+        // Chat view
+        _chatViewController.AddMessage(message);
     }
 
     private void HandleChatPlayerUpdate(object sender, ChatPlayer player)
@@ -278,14 +272,41 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
     }
 
     [AffinityPostfix]
-    [AffinityPatch(typeof(LobbySetupViewController), "DidDeactivate")]
+    [AffinityPatch(typeof(ViewController), "DidDeactivate")]
     public void PostfixLobbySetupDeactivation()
     {
+        // This will trigger for *any* view controller because LobbySetupViewController doesn't explicitly
+        //  implement this, and Harmony will complain 
         _chatTitleButton.gameObject.SetActive(false);   
     }
 
     private void HandleChatTitleButtonClick(object sender, EventArgs e)
     {
+        _lobbyFlowCoordinator.InvokeMethod<object, FlowCoordinator>("PresentViewController", new object[]
+        {
+            _chatViewController,
+            null, // Action finishedCallback
+            ViewController.AnimationDirection.Horizontal,
+            false // bool immediately
+        });
+    }
+
+    [AffinityPrefix]
+    [AffinityPatch(typeof(GameServerLobbyFlowCoordinator), "SetTitle")]
+    private bool PrefixFlowCoordinatorSetTitle(ViewController newViewController, ViewController.AnimationType animationType)
+    {
+        if (newViewController is ChatViewController)
+        {
+            _lobbyFlowCoordinator.ShowBackButton(true);
+            _lobbyFlowCoordinator.InvokeMethod<object, FlowCoordinator>("SetTitle", new object[]
+            {
+                "Multiplayer Chat",
+                animationType
+            });
+            return false;
+        }
+
+        return true;
     }
 
     #endregion

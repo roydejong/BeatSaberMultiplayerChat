@@ -176,6 +176,7 @@
         <Compile Include="PluginConfig.cs" />
         <Compile Include="UI\ChatBubble.cs" />
         <Compile Include="UI\Lobby\ChatButton.cs" />
+        <EmbeddedResource Include="UI\Lobby\ChatViewController.bsml" />
         <Compile Include="UI\Lobby\ChatViewController.cs" />
         <Compile Include="UI\ModSettings\ModSettingsController.cs" />
     </ItemGroup>

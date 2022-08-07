@@ -1,0 +1,89 @@
+﻿<vertical pref-width="120" pref-height="60" horizontal-fit="PreferredSize" vertical-fit="PreferredSize"
+          id="ChatViewRoot">
+    <horizontal>
+        <vertical pref-width="120" pref-height="50" pad-left="3" pad-right="3" pad-top="0" pad-bottom="5">
+            <bg>
+                <scrollable-container id="MessagesContainer" size-delta-x="0" spacing="0.1" align-bottom="true">
+                    <horizontal>
+                        <text text="[Message placeholder]" font-size="4"/>
+                    </horizontal>
+                    <horizontal>
+                        <text text="[Message placeholder]" font-size="4"/>
+                    </horizontal>
+                    <horizontal>
+                        <text text="[Message placeholder]" font-size="4"/>
+                    </horizontal>
+                    <horizontal>
+                        <text text="[Message placeholder]" font-size="4"/>
+                    </horizontal>
+                    <horizontal>
+                        <text text="[Message placeholder]" font-size="4"/>
+                    </horizontal>
+                    <horizontal>
+                        <text text="[Message placeholder]" font-size="4"/>
+                    </horizontal>
+                    <horizontal>
+                        <text text="[Message placeholder]" font-size="4"/>
+                    </horizontal>
+                    <horizontal>
+                        <text text="[Message placeholder]" font-size="4"/>
+                    </horizontal>
+                    <horizontal>
+                        <text text="[Message placeholder]" font-size="4"/>
+                    </horizontal>
+                    <horizontal>
+                        <text text="[Message placeholder]" font-size="4"/>
+                    </horizontal>
+                    <horizontal>
+                        <text text="[Message placeholder]" font-size="4"/>
+                    </horizontal>
+                    <horizontal>
+                        <text text="[Message placeholder]" font-size="4"/>
+                    </horizontal>
+                    <horizontal>
+                        <text text="[Message placeholder]" font-size="4"/>
+                    </horizontal>
+                    <horizontal>
+                        <text text="[Message placeholder]" font-size="4"/>
+                    </horizontal>
+                    <horizontal>
+                        <text text="[Message placeholder]" font-size="4"/>
+                    </horizontal>
+                    <horizontal>
+                        <text text="[Message placeholder]" font-size="4"/>
+                    </horizontal>
+                    <horizontal>
+                        <text text="[Message placeholder]" font-size="4"/>
+                    </horizontal>
+                    <horizontal>
+                        <text text="[Message placeholder]" font-size="4"/>
+                    </horizontal>
+                    <horizontal>
+                        <text text="[Message placeholder]" font-size="4"/>
+                    </horizontal>
+                    <horizontal>
+                        <text text="[Message placeholder]" font-size="4"/>
+                    </horizontal>
+                    <horizontal>
+                        <text text="[Message placeholder]" font-size="4"/>
+                    </horizontal>
+                </scrollable-container>
+            </bg>
+        </vertical>
+        <vertical pref-height="50" min-width="3">
+            <page-button direction="Up" tags="PageUpFor:MessagesContainer" pref-width="3" pref-height="3"/>
+            <vertical pref-width="1.25" pref-height="11">
+                <vertical-scroll-indicator tags="IndicatorFor:MessagesContainer" handle-color="#fff"/>
+            </vertical>
+            <page-button direction="Down" tags="PageDownFor:MessagesContainer" pref-width="3" pref-height="3"/>
+        </vertical>
+    </horizontal>
+    <vertical pref-height="10" min-height="10"/> <!-- pad -->
+    <horizontal>
+        <image id="ImgTestMic" preserve-aspect="true" preferred-width="5" preferred-height="5" max-width="5"
+               max-height="5" source="MultiplayerChat.Assets.Keyboard.png"/>
+        <horizontal pref-width="1"/> <!-- pad -->
+        <string-setting font-color="#666" text="Send message"/>
+    </horizontal>
+
+</vertical>

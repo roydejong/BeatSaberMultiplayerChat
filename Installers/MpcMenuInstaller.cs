@@ -1,4 +1,5 @@
 ﻿using MultiplayerChat.Core;
+using MultiplayerChat.UI.Lobby;
 using MultiplayerChat.UI.ModSettings;
 using Zenject;
 
@@ -12,10 +13,11 @@ public class MpcMenuInstaller : Installer
 {
     public override void InstallBindings()
     {
+        // UI
+        Container.Bind<ChatViewController>().FromNewComponentAsViewController().AsSingle();
+        Container.BindInterfacesAndSelfTo<ModSettingsController>().AsSingle();
+        
         // Core
         Container.BindInterfacesAndSelfTo<LobbyIntegrator>().AsSingle();
-
-        // UI
-        Container.BindInterfacesAndSelfTo<ModSettingsController>().AsSingle();
     }
 }

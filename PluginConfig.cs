@@ -15,6 +15,16 @@ public class PluginConfig
     public bool EnableTextChat = true;
 
     /// <summary>
+    /// Controls whether player chat bubbles are enabled.
+    /// </summary>
+    public bool EnablePlayerBubbles = true;
+    
+    /// <summary>
+    /// Controls whether center screen chat bubbles are enabled.
+    /// </summary>
+    public bool EnableCenterBubbles = true;
+
+    /// <summary>
     /// List of User IDs that are muted. Can be toggled in the lobby player list.
     /// </summary>
     [UseConverter]

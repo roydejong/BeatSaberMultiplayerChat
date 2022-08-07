@@ -22,7 +22,6 @@ public class ChatButton : MonoBehaviour
     }
 
     [Inject] private readonly DiContainer _diContainer = null!;
-    [Inject] private readonly HoverHintController _hoverHintController = null!;
 
     public event EventHandler<EventArgs>? OnClick; 
 
