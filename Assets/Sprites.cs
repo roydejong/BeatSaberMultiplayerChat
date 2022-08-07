@@ -6,6 +6,7 @@ namespace MultiplayerChat.Assets;
 
 internal static class Sprites
 {
+    public static Sprite? Chat;
     public static Sprite? Keyboard;
     public static Sprite? MicOff;
     public static Sprite? MicOn;
@@ -16,6 +17,7 @@ internal static class Sprites
     {
         IsInitialized = true;
 
+        Chat = LoadSpriteFromResources("MultiplayerChat.Assets.Chat.png");
         Keyboard = LoadSpriteFromResources("MultiplayerChat.Assets.Keyboard.png");
         MicOff = LoadSpriteFromResources("MultiplayerChat.Assets.MicOff.png");
         MicOn = LoadSpriteFromResources("MultiplayerChat.Assets.MicOn.png");

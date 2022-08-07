@@ -176,9 +176,11 @@
         <Compile Include="PluginConfig.cs" />
         <Compile Include="UI\ChatBubble.cs" />
         <Compile Include="UI\Lobby\ChatButton.cs" />
+        <Compile Include="UI\Lobby\ChatViewController.cs" />
         <Compile Include="UI\ModSettings\ModSettingsController.cs" />
     </ItemGroup>
     <ItemGroup>
+      <EmbeddedResource Include="Assets\Chat.png" />
       <Content Include="Audio\Assets\ComputerChirp.ogg" />
       <Content Include="Directory.Build.targets" />
       <Content Include="TODO.md" />

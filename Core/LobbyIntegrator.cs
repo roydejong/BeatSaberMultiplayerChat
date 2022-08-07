@@ -5,6 +5,7 @@ using IPA.Utilities;
 using MultiplayerChat.Audio;
 using MultiplayerChat.Models;
 using MultiplayerChat.UI;
+using MultiplayerChat.UI.Lobby;
 using SiraUtil.Affinity;
 using UnityEngine;
 using UnityEngine.UI;
@@ -28,6 +29,8 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
     private Dictionary<string, Button> _playerListButtons = null!;
     private ChatBubble _centerBubble = null!;
     private Dictionary<string, ChatBubble> _perUserBubbles = null!;
+    
+    private ChatButton _chatTitleButton = null!;
 
     public void Initialize()
     {
@@ -40,6 +43,10 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
         _chatManager.ChatClearEvent += HandleChatClear;
         _chatManager.ChatMessageEvent += HandleChatMessage;
         _chatManager.ChatPlayerUpdateEvent += HandleChatPlayerUpdate;
+        
+        _chatTitleButton = ChatButton.Create(_diContainer);
+        _chatTitleButton.gameObject.SetActive(false);
+        _chatTitleButton.OnClick += HandleChatTitleButtonClick;
     }
 
     public void Dispose()
@@ -59,6 +66,9 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
                 Object.Destroy(bubble);
         
         _perUserBubbles.Clear();
+
+        if (_chatTitleButton != null)
+            Object.Destroy(_chatTitleButton.gameObject);
     }
 
     #region Text chat events
@@ -254,6 +264,28 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
         var chatBubble = ChatBubble.Create(_diContainer, avatarCaption, ChatBubble.AlignStyle.LobbyAvatar);
         
         _perUserBubbles[connectedPlayer.userId] = chatBubble;
+    }
+
+    #endregion
+
+    #region Lobby setup view
+
+    [AffinityPostfix]
+    [AffinityPatch(typeof(LobbySetupViewController), "DidActivate")]
+    public void PostfixLobbySetupActivation()
+    {
+        _chatTitleButton.gameObject.SetActive(true);   
+    }
+
+    [AffinityPostfix]
+    [AffinityPatch(typeof(LobbySetupViewController), "DidDeactivate")]
+    public void PostfixLobbySetupDeactivation()
+    {
+        _chatTitleButton.gameObject.SetActive(false);   
+    }
+
+    private void HandleChatTitleButtonClick(object sender, EventArgs e)
+    {
     }
 
     #endregion
