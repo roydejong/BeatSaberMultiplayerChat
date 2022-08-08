@@ -20,6 +20,7 @@ namespace MultiplayerChat.UI.Lobby;
 public class ChatViewController : BSMLAutomaticViewController
 {
     [Inject] private readonly SiraLog _log = null!;
+    [Inject] private readonly DiContainer _diContainer = null!;
     [Inject] private readonly ChatManager _chatManager = null!;
 
     [UIComponent("ChatViewBg")] private Backgroundable? _chatViewBg;
@@ -29,12 +30,14 @@ public class ChatViewController : BSMLAutomaticViewController
     private readonly List<ChatMessage> _messageBuffer;
     private Transform? _scrollableContainerContent;
     private bool _bsmlReady;
+    private bool _chatLockedToBottom;
 
     public ChatViewController() : base()
     {
         _messageBuffer = new(MaxBufferSize);
         _scrollableContainerContent = null;
         _bsmlReady = false;
+        _chatLockedToBottom = true;
     }
 
     #region Core events
@@ -46,6 +49,9 @@ public class ChatViewController : BSMLAutomaticViewController
             _scrollableContainerContent = _scrollableContainer.transform.Find("Viewport/Content Wrapper");
 
         _bsmlReady = true;
+        
+        _scrollableContainer!.PageUpButton.onClick.AddListener(HandleScrollablePageUp);
+        _scrollableContainer!.PageDownButton.onClick.AddListener(HandleScrollablePageDown);
 
         ApplyUiMutations();
         FillChat();
@@ -77,7 +83,14 @@ public class ChatViewController : BSMLAutomaticViewController
         
         _chatManager.SendTextChat(input);
     }
-    
+
+    public void Update()
+    {
+        if (_scrollableContainer != null && _chatLockedToBottom)
+            // BSML is aggressive about scrolling up, so we have to be aggressive about scrolling down...
+            _scrollableContainer.ScrollTo(float.MaxValue, false);
+    }
+
     #endregion
 
     #region Core UI
@@ -87,7 +100,7 @@ public class ChatViewController : BSMLAutomaticViewController
         if (_chatViewBg == null || _chatInput == null)
             return;   
         
-        // Remove skew from background
+        // Remove skew from main chat background
         var bgImage = _chatViewBg.GetComponent<ImageView>();
         bgImage.SetField("_skew", 0f);
         bgImage.__Refresh();
@@ -162,7 +175,7 @@ public class ChatViewController : BSMLAutomaticViewController
         foreach (var message in _messageBuffer)
             AddMessage(message, visualOnly: true);
 
-        ScrollDown();
+        _chatLockedToBottom = true;
     }
     
     public void ClearMessages(bool visualOnly = false)
@@ -212,15 +225,24 @@ public class ChatViewController : BSMLAutomaticViewController
         textComponent.fontSize = 3.4f;
         textComponent.richText = true;
 
-        ScrollDown();
+        _chatLockedToBottom = true; // this sucks but the alternative is BSML scrolling all the way to the top every msg 
     }
 
-    public void ScrollDown()
-    {
-        if (_scrollableContainer is null)
-            return;
+    #endregion
 
-        _scrollableContainer.ScrollDown(true);
+    #region Scroll pain
+    
+    private void HandleScrollablePageUp()
+    {
+        _chatLockedToBottom = false;
+    }
+
+    private void HandleScrollablePageDown()
+    {
+        if (_scrollableContainer == null)
+            return;
+        
+        _chatLockedToBottom = !_scrollableContainer.PageDownButton.interactable;
     }
 
     #endregion

@@ -90,6 +90,8 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
         
         // Chat view
         _chatViewController.ClearMessages();
+        
+        // Unread badge
         _chatTitleButton.HideUnread();
     }
 
@@ -121,9 +123,11 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
         if (!message.SenderIsMe && message.Type == ChatMessageType.PlayerMessage)
             _soundNotifier.Play();
         
-        // Chat view
+        // Chat view 
         _chatViewController.AddMessage(message);
-        if (!message.SenderIsMe && !_chatViewController.isActivated)
+        
+        // Unread badge
+        if (!message.SenderIsMe && message.Type == ChatMessageType.PlayerMessage && !_chatViewController.isActivated)
             _chatTitleButton.ShowUnread();
     }
 

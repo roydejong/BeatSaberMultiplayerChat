@@ -12,7 +12,7 @@ Phase 1: Text. Phase 2: Voice.
       - [X] "Unread" count/indicator
     - [X] Scrollable container
       - [X] Keep player list open 
-      - [ ] Fix auto scroll
+      - [X] Fix auto scroll
       - [X] Keyboard entry / send action
       - [X] Make it look decent
 - [X] Chat bubbles
