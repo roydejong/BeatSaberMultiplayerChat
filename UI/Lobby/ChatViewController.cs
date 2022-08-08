@@ -1,10 +1,16 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
+using BeatSaberMarkupLanguage.Components.Settings;
 using BeatSaberMarkupLanguage.Tags;
 using BeatSaberMarkupLanguage.ViewControllers;
+using HMUI;
+using IPA.Utilities;
+using MultiplayerChat.Core;
 using MultiplayerChat.Models;
 using SiraUtil.Logging;
+using TMPro;
 using UnityEngine;
 using Zenject;
 
@@ -14,10 +20,12 @@ namespace MultiplayerChat.UI.Lobby;
 public class ChatViewController : BSMLAutomaticViewController
 {
     [Inject] private readonly SiraLog _log = null!;
+    [Inject] private readonly ChatManager _chatManager = null!;
 
-    [UIComponent("ChatViewRoot")] private Backgroundable _chatViewRoot = null!;
+    [UIComponent("ChatViewBg")] private Backgroundable? _chatViewBg;
     [UIComponent("MessagesContainer")] private BSMLScrollableContainer? _scrollableContainer;
-
+    [UIComponent("ChatMessageInput")] private StringSetting? _chatInput;
+    
     private readonly List<ChatMessage> _messageBuffer;
     private Transform? _scrollableContainerContent;
     private bool _bsmlReady;
@@ -29,6 +37,8 @@ public class ChatViewController : BSMLAutomaticViewController
         _bsmlReady = false;
     }
 
+    #region Core events
+
     [UIAction("#post-parse")]
     private void HandlePostParse()
     {
@@ -37,7 +47,10 @@ public class ChatViewController : BSMLAutomaticViewController
 
         _bsmlReady = true;
 
+        ApplyUiMutations();
         FillChat();
+        
+        _chatInput!.modalKeyboard.keyboard.EnterPressed += HandleKeyboardInput; 
     }
 
     protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
@@ -48,8 +61,100 @@ public class ChatViewController : BSMLAutomaticViewController
             return;
         
         FillChat();
+        ResetChatInputText();
+    }
+    
+    private async void HandleKeyboardInput(string input)
+    {
+        await Task.Delay(1); // we need to run OnChange after BSML's own EnterPressed, and this, well, it works
+        
+        ResetChatInputText();
+        
+        input = input.Trim();
+
+        if (string.IsNullOrWhiteSpace(input))
+            return;
+        
+        _chatManager.SendTextChat(input);
+    }
+    
+    #endregion
+
+    #region Core UI
+    
+    private void ApplyUiMutations()
+    {
+        if (_chatViewBg == null || _chatInput == null)
+            return;   
+        
+        // Remove skew from background
+        var bgImage = _chatViewBg.GetComponent<ImageView>();
+        bgImage.SetField("_skew", 0f);
+        bgImage.__Refresh();
+        
+        // Make the keyboard input look nice
+        // > Remove the label
+        _chatInput.transform.Find("NameText")?.gameObject.SetActive(false);
+        
+        // > Stretch the input element to span the full width
+        var valuePickerRect = (_chatInput.transform.Find("ValuePicker").transform as RectTransform)!;
+        valuePickerRect.offsetMin = new Vector2(-105f, 0f);
+        
+        // > Make the background look nice
+        var buttonLeftSide = valuePickerRect.Find("DecButton") as RectTransform;
+        var buttonRightSide = valuePickerRect.Find("IncButton") as RectTransform;
+        var valueText = valuePickerRect.Find("ValueText") as RectTransform;
+        
+        var leftSideWidth = 0.05f;
+
+        buttonLeftSide!.anchorMin = new Vector2(0.0f, 0.0f);
+        buttonLeftSide.anchorMax = new Vector2(leftSideWidth, 1.0f);
+        buttonLeftSide.offsetMin = new Vector2(0.0f, 0.0f);
+        buttonLeftSide.offsetMax = new Vector2(0.0f, 0.0f);
+        buttonLeftSide.sizeDelta = new Vector2(0.0f, 0.0f);
+
+        buttonRightSide!.anchorMin = new Vector2(leftSideWidth, 0.0f);
+        buttonRightSide.anchorMax = new Vector2(1.0f, 1.0f);
+        buttonRightSide.offsetMin = new Vector2(0.0f, 0.0f);
+        buttonRightSide.offsetMax = new Vector2(0.0f, 0.0f);
+        buttonRightSide.sizeDelta = new Vector2(0.0f, 0.0f);
+
+        valueText!.anchorMin = new Vector2(0.0f, 0.0f);
+        valueText.anchorMax = new Vector2(1.0f, 1.0f);
+        valueText.offsetMin = new Vector2(0.0f, -0.33f);
+        valueText.offsetMax = new Vector2(0.0f, 0.0f);
+        valueText.sizeDelta = new Vector2(0.0f, 0.0f);
+        
+        // > Remove skew from backgrounds
+        var bgLeft = buttonLeftSide.Find("BG").GetComponent<ImageView>(); 
+        bgLeft.SetField("_skew", 0f);
+        bgLeft.__Refresh();
+        
+        var bgRight = buttonRightSide.Find("BG").GetComponent<ImageView>();
+        bgRight.SetField("_skew", 0f);
+        bgRight.__Refresh();
+
+        // > Remove ugly edit icon
+        buttonRightSide.Find("EditIcon")?.gameObject.SetActive(false);
+        
+        // > Make placeholder text look like placeholder text
+        var valueTextMesh = valueText.GetComponent<CurvedTextMeshPro>();
+        valueTextMesh.alignment = TextAlignmentOptions.Center;
+        valueTextMesh.color = Color.gray;
+        
+        ResetChatInputText();
     }
 
+    private void ResetChatInputText()
+    {
+        _chatInput!.Text = ""; // keep internal value empty
+        _chatInput.text.text = ChatInputPlaceholderText; // keep face value set to placeholder
+    }
+
+    #endregion
+
+    #region Messages data/rendering
+    
     private void FillChat()
     {
         ClearMessages(visualOnly: true);
@@ -59,9 +164,7 @@ public class ChatViewController : BSMLAutomaticViewController
 
         ScrollDown();
     }
-
-    #region Chat messages
-
+    
     public void ClearMessages(bool visualOnly = false)
     {
         if (!visualOnly)
@@ -123,4 +226,5 @@ public class ChatViewController : BSMLAutomaticViewController
     #endregion
 
     private const int MaxBufferSize = 32;
+    private const string ChatInputPlaceholderText = "Click here to type a message";
 }

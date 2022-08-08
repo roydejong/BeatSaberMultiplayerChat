@@ -106,7 +106,7 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
         }
         
         // Center bubble
-        var showCenterBubble = _config.EnableCenterBubbles;
+        var showCenterBubble = _config.EnableCenterBubbles && !message.SenderIsMe;
 
         if (showCenterBubble)
         {

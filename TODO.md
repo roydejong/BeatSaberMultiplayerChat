@@ -7,9 +7,13 @@ Phase 1: Text. Phase 2: Voice.
 
 ## Text 
 
-- [ ] Chat box UI in lobby
+- [X] Chat box UI in lobby
     - [X] Lobby tab / button
-    - [ ] Scrollable container
+    - [X] Scrollable container
+      - [X] Keep player list open 
+      - [ ] Fix auto scroll
+      - [X] Keyboard entry / send action
+      - [X] Make it look decent
 - [X] Chat bubbles
 - [X] Sound notification
 
@@ -30,4 +34,4 @@ Phase 1: Text. Phase 2: Voice.
 ## QA
 
 - [ ] *Maybe:* Typing indicators
-- [ ] 🪲 *Bug:* Leaving MpEx settings flow coordinator will break the chat title button (activation event never triggers for the lobby setup view)
+- [ ] 🪲 *Bug:* Leaving MpEx settings flow coordinator will break the chat title button (activation event never triggers for the lobby setup view?)
