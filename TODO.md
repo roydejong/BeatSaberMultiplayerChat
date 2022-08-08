@@ -9,6 +9,7 @@ Phase 1: Text. Phase 2: Voice.
 
 - [X] Chat box UI in lobby
     - [X] Lobby tab / button
+      - [X] "Unread" count/indicator
     - [X] Scrollable container
       - [X] Keep player list open 
       - [ ] Fix auto scroll

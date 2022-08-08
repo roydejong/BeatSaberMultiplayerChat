@@ -90,6 +90,7 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
         
         // Chat view
         _chatViewController.ClearMessages();
+        _chatTitleButton.HideUnread();
     }
 
     private void HandleChatMessage(object sender, ChatMessage message)
@@ -117,11 +118,13 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
         }
         
         // Notification sound
-        if (message.Type == ChatMessageType.PlayerMessage)
+        if (!message.SenderIsMe && message.Type == ChatMessageType.PlayerMessage)
             _soundNotifier.Play();
         
         // Chat view
         _chatViewController.AddMessage(message);
+        if (!message.SenderIsMe && !_chatViewController.isActivated)
+            _chatTitleButton.ShowUnread();
     }
 
     private void HandleChatPlayerUpdate(object sender, ChatPlayer player)
@@ -296,6 +299,8 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
             _serverPlayerListViewController,
             ViewController.AnimationType.None
         });
+        
+        _chatTitleButton.HideUnread();
     }
 
     [AffinityPrefix]

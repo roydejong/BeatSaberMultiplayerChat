@@ -23,6 +23,8 @@ public class ChatButton : MonoBehaviour
 
     [Inject] private readonly DiContainer _diContainer = null!;
 
+    private ImageView? _unreadBadge;
+
     public event EventHandler<EventArgs>? OnClick; 
 
     public void Awake()
@@ -34,7 +36,8 @@ public class ChatButton : MonoBehaviour
         hoverHint.text = "Multiplayer Chat";
 
         // Set icon
-        transform.Find("Icon").GetComponent<ImageView>().sprite = Sprites.Chat;
+        var icon = transform.Find("Icon").GetComponent<ImageView>();
+        icon.sprite = Sprites.Chat;
 
         // Set position
         var rectTransform = (transform as RectTransform)!;
@@ -45,5 +48,31 @@ public class ChatButton : MonoBehaviour
 
         // Bind action
         GetComponent<Button>().onClick.AddListener(() => OnClick?.Invoke(this, EventArgs.Empty));
+        
+        // Add Unread badge
+        var unreadBase = Instantiate(icon).transform;
+        unreadBase.name = "UnreadBadge";
+        unreadBase.SetParent(transform, false);
+        unreadBase.SetAsLastSibling();
+        _unreadBadge = unreadBase.gameObject.GetComponent<ImageView>();
+        _unreadBadge.sprite = Sprites.UnreadBadge;
+        unreadBase.localPosition = new Vector3(-10f, 3.33f, 0f);
+        HideUnread();
+    }
+
+    public void ShowUnread()
+    {
+        if (_unreadBadge == null)
+            return;
+        
+        _unreadBadge.gameObject.SetActive(true);
+    }
+    
+    public void HideUnread()
+    {
+        if (_unreadBadge == null)
+            return;
+        
+        _unreadBadge.gameObject.SetActive(false);
     }
 }

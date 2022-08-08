@@ -10,6 +10,7 @@ internal static class Sprites
     public static Sprite? Keyboard;
     public static Sprite? MicOff;
     public static Sprite? MicOn;
+    public static Sprite? UnreadBadge;
 
     public static bool IsInitialized { get; private set; }
 
@@ -21,6 +22,7 @@ internal static class Sprites
         Keyboard = LoadSpriteFromResources("MultiplayerChat.Assets.Keyboard.png");
         MicOff = LoadSpriteFromResources("MultiplayerChat.Assets.MicOff.png");
         MicOn = LoadSpriteFromResources("MultiplayerChat.Assets.MicOn.png");
+        UnreadBadge = LoadSpriteFromResources("MultiplayerChat.Assets.UnreadBadge.png");
     }
 
     private static Sprite? LoadSpriteFromResources(string resourcePath, float pixelsPerUnit = 100.0f)
