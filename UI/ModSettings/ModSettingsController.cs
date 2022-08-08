@@ -17,11 +17,13 @@ namespace MultiplayerChat.UI.ModSettings;
 public class ModSettingsController : IInitializable, IDisposable
 {
     [Inject] private readonly PluginConfig _config = null!;
+    [Inject] private readonly VoiceManager _voiceManager = null!;
     [Inject] private readonly MicrophoneManager _microphoneManager = null!;
     [Inject] private readonly SoundNotifier _soundNotifier = null!;
     
     [UIComponent("BtnTestMic")] private Button _btnTestMic = null!;
     [UIComponent("DropdownNotification")] private DropDownListSetting _dropdownNotification = null!;
+    [UIComponent("ToggleVoice")] private ToggleSetting _toggleVoice = null!;
     [UIComponent("DropdownMic")] private DropDownListSetting _dropdownMic = null!;
     [UIComponent("ImgTestMic")] private ImageView _imgTestMic = null!;
 
@@ -41,7 +43,7 @@ public class ModSettingsController : IInitializable, IDisposable
     [UIAction("#post-parse")]
     private void HandlePostParse()
     {
-        _microphoneManager.StopCapture();
+        _voiceManager.StopLoopbackTest();
         
         // Make dropdown bigger
         var trDropdownOuter = (RectTransform) _dropdownMic.transform;
@@ -56,22 +58,22 @@ public class ModSettingsController : IInitializable, IDisposable
     [UIAction("#apply")]
     private void HandleApply()
     {
-        _microphoneManager.StopCapture();
+        _voiceManager.StopLoopbackTest();
     }
 
     [UIAction("#cancel")]
     private void HandleCancel()
     {
-        _microphoneManager.StopCapture();
+        _voiceManager.StopLoopbackTest();
     }
 
     [UIAction("BtnTestMicClick")]
     public void HandleBtnTestMicClick()
     {
-        if (_microphoneManager.IsLoopbackTesting)
-            _microphoneManager.StopLoopbackTest();
+        if (_voiceManager.IsLoopbackTesting)
+            _voiceManager.StopLoopbackTest();
         else
-            _microphoneManager.StartLoopbackTest();
+            _voiceManager.StartLoopbackTest();
         
         RefreshInteractables();
     }
@@ -86,8 +88,9 @@ public class ModSettingsController : IInitializable, IDisposable
         _dropdownNotification.interactable = EnableTextChat;
         
         // Voice
-        _dropdownMic.interactable = EnableVoiceChat;
-        if (_microphoneManager.IsLoopbackTesting)
+        _toggleVoice.interactable = !_voiceManager.IsLoopbackTesting;
+        _dropdownMic.interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting;
+        if (_voiceManager.IsLoopbackTesting)
         {
             _btnTestMic.interactable = true;
             _btnTestMic.SetButtonText("<color=#ff3b3b>Testing mic</color>");
@@ -153,7 +156,7 @@ public class ModSettingsController : IInitializable, IDisposable
         {
             _config.EnableVoiceChat = value;
             if (!value)
-                _microphoneManager.StopCapture();
+                _voiceManager.StopLoopbackTest();
             RefreshInteractables();
         }
     }
@@ -167,6 +170,7 @@ public class ModSettingsController : IInitializable, IDisposable
             
             var list = new List<object>(availableDevices.Count() + 1);
             list.Add("None");
+            list.Add("Default");
             list.AddRange(availableDevices);
             return list;
         }
@@ -177,12 +181,8 @@ public class ModSettingsController : IInitializable, IDisposable
     {
         get
         {
-            var selectedDevice = _microphoneManager.SelectedDeviceName;
-    
-            if (selectedDevice is not null && MicrophoneOptions.Contains(selectedDevice))
-                return selectedDevice;
-    
-            return "None";
+            var selectedDevice = _microphoneManager.SelectedDeviceName ?? "Default";
+            return MicrophoneOptions.Contains(selectedDevice) ? selectedDevice : "None";
         }
         set
         {

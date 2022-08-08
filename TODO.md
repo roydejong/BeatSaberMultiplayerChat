@@ -22,9 +22,8 @@ Phase 1: Text. Phase 2: Voice.
 
 - [X] Device selection
 - [X] Microphone capture
-- [ ] Sample / Encode / UnityOpus 
-- [ ] Voice packets
-  - [ ] Can we use end-to-end unreliable send code in game? 
+- [X] Sample / Encode / UnityOpus 
+- [X] Voice packets
 - [ ] Push-to-talk / mic toggle
 - [ ] Voice activation volume
 - [X] Mute players
@@ -36,3 +35,4 @@ Phase 1: Text. Phase 2: Voice.
 
 - [ ] *Maybe:* Typing indicators
 - [ ] 🪲 *Bug:* Leaving MpEx settings flow coordinator will break the chat title button (activation event never triggers for the lobby setup view?)
+- [ ] *Less important*: Chat view will lag if *left open only* with lots of messages piling up; older game objects might need to be removed (cap to messages buffer size).

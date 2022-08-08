@@ -52,7 +52,7 @@ public class PluginConfig
     /// <summary>
     /// Selected recording device name for voice chat.
     /// If set to "None", outgoing voice chat is explicitly disabled.
-    /// If set to null/empty, default device will be automatically selected. 
+    /// If set to null, default device will be used. 
     /// </summary>
     public string? MicrophoneDevice = null;
 }

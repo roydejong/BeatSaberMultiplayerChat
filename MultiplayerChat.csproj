@@ -172,6 +172,7 @@
         <Compile Include="Network\MpcCapabilitiesPacket.cs" />
         <Compile Include="Network\MpcTextChatPacket.cs" />
         <Compile Include="Network\MpcVersionInfo.cs" />
+        <Compile Include="Network\MpcVoicePacket.cs" />
         <Compile Include="Plugin.cs" />
         <Compile Include="PluginConfig.cs" />
         <Compile Include="UI\ChatBubble.cs" />

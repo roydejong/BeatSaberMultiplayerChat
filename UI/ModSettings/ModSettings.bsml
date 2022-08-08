@@ -15,7 +15,8 @@
         <text align="Center" font-size="5" italics="true" text="Voice" font-color="#95a5a6"/>
     </horizontal>
 
-    <checkbox-setting text="Enable voice chat" value="EnableVoiceChat" bind-value="true" apply-on-change="true"
+    <checkbox-setting id="ToggleVoice" text="Enable voice chat" value="EnableVoiceChat"
+                      bind-value="true" apply-on-change="true"
                       hover-hint="Globally enable/disable all voice chat functionality"/>
 
     <dropdown-list-setting id="DropdownMic" text="Microphone" options="MicrophoneOptions"

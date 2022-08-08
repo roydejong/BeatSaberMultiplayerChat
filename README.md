@@ -74,3 +74,11 @@ Reliable packet containing a simple text chat message.
 | Field             | Type     | Comment                                                                                                                             |
 |-------------------|----------|-------------------------------------------------------------------------------------------------------------------------------------|
 | `Text`            | `String` | Raw chat message. Note: any HTML-style `<tags>` will be stripped from the message before it is displayed, to avoid rich text chaos. |
+
+#### Voice fragment packet  (`MpcVoicePacket`)
+
+Unreliable packet containing a Opus-encoded voice fragment.
+
+| Field             | Type              | Comment                                                                                        |
+|-------------------|-------------------|------------------------------------------------------------------------------------------------|
+| `Data`            | `BytesWithLength` | Opus-encoded audio fragment (48kHz, 1 channel, 96000 bitrate, up to 480 bytes per fragment).   |
