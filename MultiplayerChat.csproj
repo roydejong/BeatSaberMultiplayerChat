@@ -158,6 +158,7 @@
     <ItemGroup>
         <Compile Include="Assets\Sprites.cs" />
         <Compile Include="Audio\MicrophoneManager.cs" />
+        <Compile Include="Audio\PlayerVoicePlayer.cs" />
         <Compile Include="Audio\SoundNotifier.cs" />
         <Compile Include="Audio\VoiceManager.cs" />
         <Compile Include="Core\ChatManager.cs" />

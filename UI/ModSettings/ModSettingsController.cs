@@ -99,7 +99,7 @@ public class ModSettingsController : IInitializable, IDisposable
         }
         else
         {
-            _btnTestMic.interactable = EnableVoiceChat && RecordingDevice != "None";
+            _btnTestMic.interactable = EnableVoiceChat && _microphoneManager.HaveSelectedDevice;
             _btnTestMic.SetButtonText("<color=#ffffff>Test mic</color>");
             _imgTestMic.sprite = Sprites.MicOff;
             _imgTestMic.color = Color.white;

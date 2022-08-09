@@ -12,15 +12,12 @@ public class MpcAppInstaller : Installer
 {
     public override void InstallBindings()
     {
-        // Plugin
         Container.Bind<PluginConfig>().FromInstance(Plugin.Config).AsSingle();
         
-        // Audio
         Container.BindInterfacesAndSelfTo<MicrophoneManager>().FromNewComponentOnNewGameObject().AsSingle();
-        Container.BindInterfacesAndSelfTo<VoiceManager>().AsSingle();
         Container.BindInterfacesAndSelfTo<SoundNotifier>().FromNewComponentOnNewGameObject().AsSingle();
         
-        // Core
         Container.BindInterfacesAndSelfTo<ChatManager>().AsSingle();
+        Container.BindInterfacesAndSelfTo<VoiceManager>().AsSingle();
     }
 }

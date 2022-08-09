@@ -147,7 +147,7 @@ public class MicrophoneManager : MonoBehaviour, IInitializable, IDisposable
             return true;
         }
 
-        if (!AvailableDeviceNames.Contains(deviceName))
+        if (deviceName != null && !AvailableDeviceNames.Contains(deviceName))
         {
             _log.Error($"Requested device is not available: {deviceName}");
             return false;

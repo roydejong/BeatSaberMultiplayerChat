@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using IPA.Utilities;
+using MultiplayerChat.Core;
 using MultiplayerChat.Network;
 using MultiplayerCore.Networking;
 using SiraUtil.Logging;
@@ -14,6 +17,7 @@ public class VoiceManager : IInitializable, IDisposable
 {
     [Inject] private readonly SiraLog _log = null!;
     [Inject] private readonly PluginConfig _pluginConfig = null!;
+    [Inject] private readonly ChatManager _chatManager = null!;
     [Inject] private readonly MicrophoneManager _microphoneManager = null!;
     [Inject] private readonly IMultiplayerSessionManager _multiplayerSession = null!;
     [Inject] private readonly MpPacketSerializer _packetSerializer = null!;
@@ -37,9 +41,9 @@ public class VoiceManager : IInitializable, IDisposable
 
     public bool IsLoopbackTesting { get; private set; }
     private AudioSource? _loopbackTester;
-    private float[]? _loopbackSamples;
-    private int _loopbackWritePos;
-    private const int LoopbackClipLength = 1024 * 6;
+
+    private PlayerVoicePlayer _loopbackVoicePlayer;
+    private Dictionary<string, PlayerVoicePlayer> _voicePlayers;
 
     public VoiceManager()
     {
@@ -58,6 +62,9 @@ public class VoiceManager : IInitializable, IDisposable
         _decodeSampleBuffer = new float[Decoder.maximumPacketDuration * (int)OpusChannels];
 
         IsLoopbackTesting = false;
+
+        _loopbackVoicePlayer = new PlayerVoicePlayer();
+        _voicePlayers = new();
     }
 
     public void Initialize()
@@ -146,35 +153,24 @@ public class VoiceManager : IInitializable, IDisposable
     private void HandleVoiceFragment(int decodedLength, IConnectedPlayer? source)
     {
         _log.Info($"Receive voice fragment: {decodedLength}");
-        
-        LoopbackDecodedFragment(_decodeSampleBuffer, decodedLength);
-    }
 
-    private void LoopbackDecodedFragment(float[] data, int decodedLength)
-    {
-        if (_loopbackTester == null || _loopbackTester.clip == null)
+        if (source == null || source.isMe)
+        {
+            _loopbackVoicePlayer.HandleDecodedFragment(_decodeSampleBuffer, decodedLength);
             return;
+        }
+
+        if (_chatManager.GetIsPlayerMuted(source.userId))
+            // Player is muted
+            return;
+
+        if (!_voicePlayers.TryGetValue(source.userId, out var voicePlayer))
+        {
+            voicePlayer = new PlayerVoicePlayer();
+            _voicePlayers.Add(source.userId, voicePlayer);
+        }
         
-        if (_loopbackSamples == null || _loopbackSamples.Length != decodedLength)
-        {
-            _loopbackSamples = new float[decodedLength];
-        }
-            
-        Array.Copy(data, _loopbackSamples, decodedLength);
-        _loopbackTester.clip.SetData(_loopbackSamples, _loopbackWritePos);
-            
-        _loopbackWritePos += decodedLength;
-
-        if (!_loopbackTester.isPlaying)
-        {
-            if (_loopbackWritePos > (LoopbackClipLength / 2))
-            {
-                _loopbackTester.Play();
-                _log.Info($"Start loopback playback bruh {_loopbackWritePos}");
-            }
-        }
-
-        _loopbackWritePos %= LoopbackClipLength;
+        voicePlayer.HandleDecodedFragment(_decodeSampleBuffer, decodedLength);
     }
 
     #endregion
@@ -188,6 +184,8 @@ public class VoiceManager : IInitializable, IDisposable
             var obj = new GameObject("VoiceLoopbackTester");
             _loopbackTester = obj.AddComponent<AudioSource>();
         }
+
+        _loopbackVoicePlayer.SetCustomAudioSource(_loopbackTester);
         
         _loopbackTester.gameObject.SetActive(true);
         return _loopbackTester;
@@ -197,38 +195,42 @@ public class VoiceManager : IInitializable, IDisposable
     {
         StopLoopbackTest();
         
-        var loopback = SetupLoopback();
-        loopback.clip = AudioClip.Create("Loopback", LoopbackClipLength,
-            (int) OpusChannels, (int) OpusFrequency, false);
-        loopback.loop = true;
+        SetupLoopback();
 
         IsLoopbackTesting = true;
         _microphoneManager.StartCapture();
         
         _log.Info("Started loopback test");
-        
-        // Play() will be called in the fragment handler
     }
 
     public void StopLoopbackTest()
     {
         _microphoneManager.StopCapture();
         
-        if (_loopbackTester is not null)
-        {
-            _loopbackTester.Stop();
-            
-            if (_loopbackTester.clip != null)
-                Object.Destroy(_loopbackTester.clip);
-            
-            _loopbackTester.gameObject.SetActive(false);
-        }
+        _loopbackVoicePlayer.HandleTransmissionEnd();
 
-        if (IsLoopbackTesting)
+        if (!IsLoopbackTesting)
+            return;
+        
+        IsLoopbackTesting = false;
+        _log.Info("Stopped loopback test");
+    }
+
+    #endregion
+
+    #region Avatar integration
+
+    public void ProvideAvatarAudio(MultiplayerAvatarAudioController avatarAudio)
+    {
+        var player = avatarAudio.GetField<IConnectedPlayer, MultiplayerAvatarAudioController>("_connectedPlayer");
+        
+        if (!_voicePlayers.TryGetValue(player.userId, out var voicePlayer))
         {
-            IsLoopbackTesting = false;
-            _log.Info("Stopped loopback test");
+            voicePlayer = new PlayerVoicePlayer();
+            _voicePlayers.Add(player.userId, voicePlayer);
         }
+        
+        voicePlayer.SetMultiplayerAvatarAudioController(avatarAudio);
     }
 
     #endregion

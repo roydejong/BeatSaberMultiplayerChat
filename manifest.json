@@ -4,7 +4,7 @@
   "name": "MultiplayerChat",
   "author": "LookAtHippo",
   "version": "0.1.0",
-  "description": "Adds chat functionality to Beat Saber multiplayer lobbies.",
+  "description": "Adds Text Chat and Voice Chat to multiplayer lobbies.",
   "gameVersion": "1.22.0",
   "dependsOn": {
     "BSIPA": "^4.2.1",
