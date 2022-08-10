@@ -144,6 +144,9 @@ public class VoiceManager : IInitializable, IDisposable
 
     private void HandleVoicePacket(MpcVoicePacket packet, IConnectedPlayer? source)
     {
+        if (!_pluginConfig.EnableVoiceChat)
+            return;
+
         var dataLength = packet.Data?.Length ?? 0;
         if (dataLength > 0)
             HandleVoiceFragment(_opusDecoder.Decode(packet.Data, dataLength, _decodeSampleBuffer), source);
@@ -161,8 +164,11 @@ public class VoiceManager : IInitializable, IDisposable
         }
 
         if (_chatManager.GetIsPlayerMuted(source.userId))
+        {
             // Player is muted
+            _chatManager.SetPlayerIsSpeaking(source, false);
             return;
+        }
 
         var isEndOfTransmission = decodedLength <= 0;
 
@@ -193,11 +199,16 @@ public class VoiceManager : IInitializable, IDisposable
 
     public void StartVoiceTransmission()
     {
+        if (!_pluginConfig.EnableVoiceChat)
+            return;
+        
         if (IsTransmitting)
             return;
         
         IsTransmitting = true;
         _microphoneManager.StartCapture();
+        
+        _chatManager.SetLocalPlayerIsSpeaking(true);
 
         _log.Info("Voice: start transmit");
     }
@@ -218,6 +229,8 @@ public class VoiceManager : IInitializable, IDisposable
                 Data = null
             });
         }
+        
+        _chatManager.SetLocalPlayerIsSpeaking(false);
         
         _log.Info("Voice: stop transmit");
     }

@@ -6,6 +6,7 @@
 - [ ] Spatial playback: gameplay avatar heads
 - [ ] Activity/mute indicator - self
 - [ ] Activity indicator - connected player head
+- [ ] Voice optimization: packet / buffer pooling
 
 ### Etc
 

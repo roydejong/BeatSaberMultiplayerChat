@@ -147,8 +147,11 @@ public class ChatManager : IInitializable, IDisposable
 
     #region API - Player States
 
+    public void SetLocalPlayerIsSpeaking(bool isSpeaking)
+        => SetPlayerIsSpeaking(_sessionManager.localPlayer, isSpeaking);
+    
     public void SetPlayerIsSpeaking(IConnectedPlayer player, bool isSpeaking)
-    {
+    { 
         if (!_chatPlayers.TryGetValue(player.userId, out var chatPlayer))
             return;
 
@@ -196,6 +199,8 @@ public class ChatManager : IInitializable, IDisposable
         SessionConnected = false;
 
         ClearChat();
+
+        _chatPlayers.Clear();
     }
 
     private void HandleSessionPlayerConnected(IConnectedPlayer player)
@@ -228,10 +233,18 @@ public class ChatManager : IInitializable, IDisposable
         _log.Info($"Received capabilities (userId={sender.userId}, protoVersion={packet.ProtocolVersion}, " +
                   $"canText={packet.CanTextChat}, canVoice={packet.CanTransmitVoiceChat})");
 
-        var isNewEntry = _chatPlayers.ContainsKey(sender.userId);
+        var isNewEntry = !_chatPlayers.TryGetValue(sender.userId, out var prevChatPlayer);
 
         var chatPlayer = new ChatPlayer(sender, packet);
         chatPlayer.IsMuted = GetIsPlayerMuted(chatPlayer.UserId);
+        
+        if (prevChatPlayer != null)
+        {
+            // Keep existing state
+            chatPlayer.IsTyping = prevChatPlayer.IsTyping;
+            chatPlayer.IsSpeaking = prevChatPlayer.IsSpeaking;
+        }
+        
         _chatPlayers[sender.userId] = chatPlayer;
 
         if (isNewEntry)

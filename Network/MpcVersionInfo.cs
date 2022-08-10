@@ -15,16 +15,6 @@ public static class MpcVersionInfo
     public const uint ProtocolVersion = 1;
     
     /// <summary>
-    /// Indicates whether this MPC build supports text chat (it does).
-    /// </summary>
-    public const bool SupportsTextChat = true;
-    
-    /// <summary>
-    /// Indicates whether this MPC build supports voice chat (it doesn't - coming soon - maybe).
-    /// </summary>
-    public const bool SupportsVoiceChat = false;
-    
-    /// <summary>
     /// Gets the product version / display version for this version of MPC.
     /// </summary>
     public static string AssemblyProductVersion =>

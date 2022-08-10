@@ -215,9 +215,10 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
         if (hoverHint == null)
             hoverHint = _diContainer.InstantiateComponent<HoverHint>(muteButton.gameObject);
 
-        if (chatPlayer is null)
+        if (chatPlayer is null || !_config.EnableVoiceChat)
         {
             // This player has not sent their capabilities, they are not using this mod
+            //  (or voice chat is disabled and we don't care)
             hoverHint.text = "Not connected to chat";
             muteButtonIcon.sprite = _nativeIconMuted;
             muteButtonIcon.color = Color.gray;
@@ -231,7 +232,7 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
         if (chatPlayer.IsMuted)
         {
             // This player is muted by us
-            hoverHint.text = "Click to unmute";
+            hoverHint.text = chatPlayer.IsMe ? "Muted" : "Click to unmute";
             muteButtonIcon.sprite = _nativeIconMuted;
             muteButtonIcon.color = Color.red;
             return;
@@ -240,14 +241,14 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
         if (chatPlayer.IsSpeaking)
         {
             // This player is speaking and can be muted
-            hoverHint.text = "Speaking (click to mute)";
+            hoverHint.text = chatPlayer.IsMe ? "Speaking" : "Speaking (click to mute)";
             muteButtonIcon.sprite = _nativeIconSpeakerSound;
             muteButtonIcon.color = new Color(0.18f, 0.8f, 0.443f);
         }
         else
         {
             // This player is idle and can be muted
-            hoverHint.text = "Connected to chat (click to mute)";
+            hoverHint.text = chatPlayer.IsMe ? "Connected to chat" : "Connected to chat (click to mute)";
             muteButtonIcon.sprite = _nativeIconSpeakerSound;
             muteButtonIcon.color = Color.white;
         }
