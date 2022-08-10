@@ -59,12 +59,14 @@ public class ModSettingsController : IInitializable, IDisposable
     private void HandleApply()
     {
         _voiceManager.StopLoopbackTest();
+        RefreshInteractables();
     }
 
     [UIAction("#cancel")]
     private void HandleCancel()
     {
         _voiceManager.StopLoopbackTest();
+        RefreshInteractables();
     }
 
     [UIAction("BtnTestMicClick")]
