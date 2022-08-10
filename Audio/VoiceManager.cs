@@ -164,13 +164,27 @@ public class VoiceManager : IInitializable, IDisposable
             // Player is muted
             return;
 
+        var isEndOfTransmission = decodedLength <= 0;
+
         if (!_voicePlayers.TryGetValue(source.userId, out var voicePlayer))
         {
+            if (isEndOfTransmission)
+                return;
+        
             voicePlayer = new PlayerVoicePlayer();
             _voicePlayers.Add(source.userId, voicePlayer);
         }
-        
-        voicePlayer.HandleDecodedFragment(_decodeSampleBuffer, decodedLength);
+
+        if (!isEndOfTransmission)
+        {
+            voicePlayer.HandleDecodedFragment(_decodeSampleBuffer, decodedLength);
+            _chatManager.SetPlayerIsSpeaking(source, true);
+        }
+        else
+        {
+            voicePlayer.HandleTransmissionEnd();
+            _chatManager.SetPlayerIsSpeaking(source, false);
+        }
     }
 
     #endregion

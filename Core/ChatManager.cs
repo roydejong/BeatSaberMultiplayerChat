@@ -145,7 +145,19 @@ public class ChatManager : IInitializable, IDisposable
 
     #endregion
 
-    #region API - Mute
+    #region API - Player States
+
+    public void SetPlayerIsSpeaking(IConnectedPlayer player, bool isSpeaking)
+    {
+        if (!_chatPlayers.TryGetValue(player.userId, out var chatPlayer))
+            return;
+
+        if (chatPlayer.IsSpeaking == isSpeaking)
+            return;
+        
+        chatPlayer.IsSpeaking = isSpeaking;
+        ChatPlayerUpdateEvent?.Invoke(this, chatPlayer);
+    }
 
     public void SetIsPlayerMuted(string userId, bool isMuted)
     {

@@ -226,7 +226,7 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
         }
 
         // The player has sent capabilities, so they are connected to chat in some form, mute should be toggleable
-        muteButton.interactable = true;
+        muteButton.interactable = !chatPlayer.IsMe;
 
         if (chatPlayer.IsMuted)
         {
@@ -242,7 +242,7 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
             // This player is speaking and can be muted
             hoverHint.text = "Speaking (click to mute)";
             muteButtonIcon.sprite = _nativeIconSpeakerSound;
-            muteButtonIcon.color = Color.white;
+            muteButtonIcon.color = new Color(0.18f, 0.8f, 0.443f);
         }
         else
         {
