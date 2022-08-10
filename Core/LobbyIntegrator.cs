@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using HMUI;
 using IPA.Utilities;
 using MultiplayerChat.Audio;
+using MultiplayerChat.Config;
 using MultiplayerChat.Models;
 using MultiplayerChat.UI;
 using MultiplayerChat.UI.Lobby;

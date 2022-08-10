@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using MultiplayerChat.Audio;
+using MultiplayerChat.Config;
 using MultiplayerChat.Models;
 using MultiplayerChat.Network;
 using MultiplayerCore.Networking;
@@ -17,6 +18,7 @@ public class ChatManager : IInitializable, IDisposable
     [Inject] private readonly IMultiplayerSessionManager _sessionManager = null!;
     [Inject] private readonly MpPacketSerializer _packetSerializer = null!;
     [Inject] private readonly MicrophoneManager _microphoneManager = null!;
+    [Inject] private readonly InputManager _inputManager = null!;
 
     private MpcCapabilitiesPacket _localCapabilities = null!;
     private Dictionary<string, ChatPlayer> _chatPlayers = null!;
@@ -150,8 +152,11 @@ public class ChatManager : IInitializable, IDisposable
     public void SetLocalPlayerIsSpeaking(bool isSpeaking)
         => SetPlayerIsSpeaking(_sessionManager.localPlayer, isSpeaking);
     
-    public void SetPlayerIsSpeaking(IConnectedPlayer player, bool isSpeaking)
-    { 
+    public void SetPlayerIsSpeaking(IConnectedPlayer? player, bool isSpeaking)
+    {
+        if (player == null)
+            return;
+        
         if (!_chatPlayers.TryGetValue(player.userId, out var chatPlayer))
             return;
 
@@ -192,6 +197,9 @@ public class ChatManager : IInitializable, IDisposable
 
         // Broadcast our capabilities
         _sessionManager.Send(_localCapabilities);
+        
+        // Enable input
+        _inputManager.gameObject.SetActive(true);
     }
 
     private void HandleSessionDisconnected(DisconnectedReason reason)
@@ -201,6 +209,9 @@ public class ChatManager : IInitializable, IDisposable
         ClearChat();
 
         _chatPlayers.Clear();
+        
+        // Disable input
+        _inputManager.gameObject.SetActive(false);
     }
 
     private void HandleSessionPlayerConnected(IConnectedPlayer player)

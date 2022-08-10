@@ -148,6 +148,9 @@
         <Reference Include="UnityEngine.UnityWebRequestWWWModule">
           <HintPath>..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
         </Reference>
+        <Reference Include="UnityEngine.XRModule">
+          <HintPath>..\..\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.XRModule.dll</HintPath>
+        </Reference>
         <Reference Include="Zenject">
           <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Zenject.dll</HintPath>
         </Reference>
@@ -161,8 +164,13 @@
         <Compile Include="Audio\PlayerVoicePlayer.cs" />
         <Compile Include="Audio\SoundNotifier.cs" />
         <Compile Include="Audio\VoiceManager.cs" />
+        <Compile Include="Config\PluginConfig.cs" />
+        <Compile Include="Config\VoiceKeybind.cs" />
+        <Compile Include="Config\VoiceActivationMode.cs" />
+        <Compile Include="Config\VoiceKeybindController.cs" />
         <Compile Include="Core\ChatManager.cs" />
         <Compile Include="Core\GameplayIntegrator.cs" />
+        <Compile Include="Core\InputManager.cs" />
         <Compile Include="Core\LobbyIntegrator.cs" />
         <Compile Include="Installers\MpcAppInstaller.cs" />
         <Compile Include="Installers\MpcMenuInstaller.cs" />
@@ -175,7 +183,6 @@
         <Compile Include="Network\MpcVersionInfo.cs" />
         <Compile Include="Network\MpcVoicePacket.cs" />
         <Compile Include="Plugin.cs" />
-        <Compile Include="PluginConfig.cs" />
         <Compile Include="UI\ChatBubble.cs" />
         <Compile Include="UI\Lobby\ChatButton.cs" />
         <EmbeddedResource Include="UI\Lobby\ChatViewController.bsml" />
@@ -186,6 +193,8 @@
       <EmbeddedResource Include="Assets\Chat.png" />
       <None Include="Assets\ComputerChirp.ogg" />
       <EmbeddedResource Include="Assets\UnreadBadge.png" />
+      <None Include="Assets\MicOn.ogg" />
+      <None Include="Assets\MicOff.ogg" />
       <Content Include="Directory.Build.targets" />
       <Content Include="TODO.md" />
       <EmbeddedResource Include="Assets\Keyboard.png" />
@@ -197,9 +206,6 @@
     </ItemGroup>
     <ItemGroup>
       <None Include="packages.config" />
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Core\Input" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

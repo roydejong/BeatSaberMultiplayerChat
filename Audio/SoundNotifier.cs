@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using MultiplayerChat.Config;
 using SiraUtil.Logging;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -102,8 +103,31 @@ public class SoundNotifier : MonoBehaviour, IInitializable, IDisposable
         _audioSource.PlayOneShot(audioClip, _config.SoundNotificationVolume);
     }
 
+    public void LoadClipIfNeeded(string clipName)
+    {
+        if (!isActiveAndEnabled)
+            return;
+        
+        if (clipName == "None")
+            return;
+        
+        if (!clipName.EndsWith(".ogg"))
+            clipName += ".ogg";
+
+        if (_loadedClips.ContainsKey(clipName))
+            return;
+        
+        StartCoroutine(nameof(LoadClipRoutine), clipName);
+    }
+
     public void LoadAndPlayPreview(string clipName)
     {
+        if (!isActiveAndEnabled)
+            return;
+        
+        if (clipName == "None")
+            return;
+        
         if (!clipName.EndsWith(".ogg"))
             clipName += ".ogg";
 
@@ -123,6 +147,9 @@ public class SoundNotifier : MonoBehaviour, IInitializable, IDisposable
 
     private void LoadConfiguredClip()
     {
+        if (!isActiveAndEnabled)
+            return;
+        
         if (string.IsNullOrEmpty(_config.SoundNotification) || _config.SoundNotification == "None" ||
             _config.SoundNotificationVolume <= 0)
         {

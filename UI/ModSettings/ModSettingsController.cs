@@ -8,6 +8,7 @@ using BeatSaberMarkupLanguage.Settings;
 using HMUI;
 using MultiplayerChat.Assets;
 using MultiplayerChat.Audio;
+using MultiplayerChat.Config;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;

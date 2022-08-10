@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using IPA.Utilities;
+using MultiplayerChat.Config;
 using MultiplayerChat.Core;
 using MultiplayerChat.Network;
 using MultiplayerCore.Networking;
@@ -71,6 +72,8 @@ public class VoiceManager : IInitializable, IDisposable
 
     public void Initialize()
     {
+        _multiplayerSession.disconnectedEvent += HandleSessionDisconnected;
+        
         _microphoneManager.OnFragmentReady += HandleMicrophoneFragment;
 
         _packetSerializer.RegisterCallback<MpcVoicePacket>(HandleVoicePacket);
@@ -78,6 +81,8 @@ public class VoiceManager : IInitializable, IDisposable
 
     public void Dispose()
     {
+        _multiplayerSession.disconnectedEvent -= HandleSessionDisconnected;
+        
         if (_microphoneManager.IsCapturing)
             _microphoneManager.StopCapture();
         
@@ -89,6 +94,12 @@ public class VoiceManager : IInitializable, IDisposable
         IsLoopbackTesting = false;
         if (_loopbackTester != null)
             Object.Destroy(_loopbackTester);
+    }
+    
+    private void HandleSessionDisconnected(DisconnectedReason reason)
+    {
+        StopVoiceTransmission();
+        StopLoopbackTest();
     }
 
     #region Encode / Send
@@ -197,13 +208,16 @@ public class VoiceManager : IInitializable, IDisposable
 
     #region Talk API
 
-    public void StartVoiceTransmission()
+    public bool StartVoiceTransmission()
     {
         if (!_pluginConfig.EnableVoiceChat)
-            return;
+            return false;
         
         if (IsTransmitting)
-            return;
+            return true;
+
+        if (!_multiplayerSession.isConnected || !_multiplayerSession.isSyncTimeInitialized)
+            return false;
         
         IsTransmitting = true;
         _microphoneManager.StartCapture();
@@ -211,17 +225,18 @@ public class VoiceManager : IInitializable, IDisposable
         _chatManager.SetLocalPlayerIsSpeaking(true);
 
         _log.Info("Voice: start transmit");
+        return true;
     }
 
-    public void StopVoiceTransmission()
+    public bool StopVoiceTransmission()
     {
         if (!IsTransmitting)
-            return;
+            return true;
         
         _microphoneManager.StopCapture();
         IsTransmitting = false;
 
-        if (_multiplayerSession.isConnected && _multiplayerSession.isSyncTimeInitialized)
+        if (_multiplayerSession.isConnected)
         {
             // Empty packet to signal end of transmission 
             _multiplayerSession.SendUnreliable(new MpcVoicePacket()
@@ -233,6 +248,7 @@ public class VoiceManager : IInitializable, IDisposable
         _chatManager.SetLocalPlayerIsSpeaking(false);
         
         _log.Info("Voice: stop transmit");
+        return true;
     }
 
     public void HandlePlayerMuted(string userId)

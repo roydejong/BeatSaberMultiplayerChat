@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using MultiplayerChat.Config;
 using SiraUtil.Logging;
 using UnityEngine;
 using Zenject;

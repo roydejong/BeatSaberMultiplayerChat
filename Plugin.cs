@@ -1,6 +1,7 @@
 ﻿using IPA;
 using IPA.Config.Stores;
 using MultiplayerChat.Assets;
+using MultiplayerChat.Config;
 using MultiplayerChat.Installers;
 using SiraUtil.Web.SiraSync;
 using SiraUtil.Zenject;

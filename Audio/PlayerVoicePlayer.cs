@@ -38,7 +38,8 @@ public class PlayerVoicePlayer : IDisposable
         _audioSource.clip = _audioClip;
         _audioSource.loop = true;
         _audioSource.spatialize = true;
-        _audioSource.spatialBlend = .9f;
+        _audioSource.spatialBlend = .75f;
+        _audioSource.reverbZoneMix = 1f;
     }
 
     public void SetCustomAudioSource(AudioSource audioSource)
