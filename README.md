@@ -93,6 +93,6 @@ Reliable packet containing a simple text chat message.
 
 Unreliable packet containing a Opus-encoded voice fragment.
 
-| Field             | Type              | Comment                                          |
-|-------------------|-------------------|--------------------------------------------------|
-| `Data`            | `BytesWithLength` | Opus-encoded audio fragment (48kHz, 1 channel).  |
+| Field             | Type              | Comment                                                                                                                      |
+|-------------------|-------------------|------------------------------------------------------------------------------------------------------------------------------|
+| `Data`            | `BytesWithLength` | Opus-encoded audio fragment (48kHz, 1 channel). If the array has a length of zero, this indicates the end of a transmission. |

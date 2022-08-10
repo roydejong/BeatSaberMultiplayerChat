@@ -7,6 +7,7 @@ using BeatSaberMarkupLanguage.Tags;
 using BeatSaberMarkupLanguage.ViewControllers;
 using HMUI;
 using IPA.Utilities;
+using MultiplayerChat.Audio;
 using MultiplayerChat.Core;
 using MultiplayerChat.Models;
 using SiraUtil.Logging;
@@ -22,6 +23,7 @@ public class ChatViewController : BSMLAutomaticViewController
     [Inject] private readonly SiraLog _log = null!;
     [Inject] private readonly DiContainer _diContainer = null!;
     [Inject] private readonly ChatManager _chatManager = null!;
+    [Inject] private readonly VoiceManager _voiceManager = null!;
 
     [UIComponent("ChatViewBg")] private Backgroundable? _chatViewBg;
     [UIComponent("MessagesContainer")] private BSMLScrollableContainer? _scrollableContainer;
@@ -63,13 +65,24 @@ public class ChatViewController : BSMLAutomaticViewController
     {
         base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
         
+        // TODO Just testing
+        _voiceManager.StartVoiceTransmission();
+        
         if (!_bsmlReady || firstActivation)
             return;
         
         FillChat();
         ResetChatInputText();
     }
-    
+
+    protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
+    {
+        base.DidDeactivate(removedFromHierarchy, screenSystemDisabling);
+        
+        // TODO Just testing
+        _voiceManager.StopVoiceTransmission();
+    }
+
     private async void HandleKeyboardInput(string input)
     {
         await Task.Delay(1); // we need to run OnChange after BSML's own EnterPressed, and this, well, it works

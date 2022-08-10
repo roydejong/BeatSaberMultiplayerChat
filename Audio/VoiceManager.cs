@@ -38,6 +38,8 @@ public class VoiceManager : IInitializable, IDisposable
     public const int Bitrate = 96000;
     public const int FrameLength = 120;
     public const int FrameByteSize = FrameLength * sizeof(float);
+    
+    public bool IsTransmitting { get; private set; }
 
     public bool IsLoopbackTesting { get; private set; }
     private AudioSource? _loopbackTester;
@@ -129,8 +131,8 @@ public class VoiceManager : IInitializable, IDisposable
             return;
         }
         
-        // Normal mode: network send
-        if (!_multiplayerSession.isConnected || !_multiplayerSession.isSyncTimeInitialized)
+        // Normal mode: network send if transmitting
+        if (!_multiplayerSession.isConnected || !_multiplayerSession.isSyncTimeInitialized || !IsTransmitting)
             return;
         
         _multiplayerSession.SendUnreliable(voicePacket);
@@ -142,20 +144,18 @@ public class VoiceManager : IInitializable, IDisposable
 
     private void HandleVoicePacket(MpcVoicePacket packet, IConnectedPlayer? source)
     {
-        var decodeLength = _opusDecoder.Decode(packet.Data, packet.Data.Length, _decodeSampleBuffer);
-
-        if (decodeLength <= 0)
-            return;
-        
-        HandleVoiceFragment(decodeLength, source);
+        var dataLength = packet.Data?.Length ?? 0;
+        if (dataLength > 0)
+            HandleVoiceFragment(_opusDecoder.Decode(packet.Data, dataLength, _decodeSampleBuffer), source);
+        else
+            HandleVoiceFragment(0, source);
     }
 
     private void HandleVoiceFragment(int decodedLength, IConnectedPlayer? source)
     {
-        _log.Info($"Receive voice fragment: {decodedLength}");
-
-        if (source == null || source.isMe)
+        if (source == null)
         {
+            // This should only happen in loopback situations
             _loopbackVoicePlayer.HandleDecodedFragment(_decodeSampleBuffer, decodedLength);
             return;
         }
@@ -173,6 +173,42 @@ public class VoiceManager : IInitializable, IDisposable
         voicePlayer.HandleDecodedFragment(_decodeSampleBuffer, decodedLength);
     }
 
+    #endregion
+
+    #region Talk API
+
+    public void StartVoiceTransmission()
+    {
+        if (IsTransmitting)
+            return;
+        
+        IsTransmitting = true;
+        _microphoneManager.StartCapture();
+
+        _log.Info("Voice: start transmit");
+    }
+
+    public void StopVoiceTransmission()
+    {
+        if (!IsTransmitting)
+            return;
+        
+        _microphoneManager.StopCapture();
+        IsTransmitting = false;
+
+        if (_multiplayerSession.isConnected && _multiplayerSession.isSyncTimeInitialized)
+        {
+            // Empty packet to signal end of transmission 
+            // TODO Just testing
+            _multiplayerSession.SendUnreliable(new MpcVoicePacket()
+            {
+                Data = null
+            });
+        }
+        
+        _log.Info("Voice: stop transmit");
+    }
+    
     #endregion
 
     #region Loopback test

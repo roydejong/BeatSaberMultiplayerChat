@@ -8,6 +8,7 @@ using MultiplayerChat.UI;
 using MultiplayerChat.UI.Lobby;
 using SiraUtil.Affinity;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using Zenject;
 using Object = UnityEngine.Object;
@@ -20,6 +21,7 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
     [Inject] private readonly DiContainer _diContainer = null!;
     [Inject] private readonly PluginConfig _config = null!;
     [Inject] private readonly ChatManager _chatManager = null!;
+    [Inject] private readonly VoiceManager _voiceManager = null!;
     [Inject] private readonly HoverHintController _hoverHintController = null!;
     [Inject] private readonly SoundNotifier _soundNotifier = null!;
     [Inject] private readonly ChatViewController _chatViewController = null!;
@@ -100,7 +102,7 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
         // Player bubble
         var showPlayerBubble = _config.EnablePlayerBubbles && !message.SenderIsHost && !message.SenderIsMe;
 
-        if (showPlayerBubble && _perUserBubbles.TryGetValue(message.UserId, out var userBubble))
+        if (showPlayerBubble && _perUserBubbles.TryGetValue(message.UserId, out var userBubble) && userBubble != null)
         {
             if (userBubble.IsShowing)
                 userBubble.HideImmediate();
@@ -109,10 +111,10 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
         }
         
         // Center bubble
-        var showCenterBubble = _config.EnableCenterBubbles && !message.SenderIsMe;
+        var showCenterBubble =  _config.EnableCenterBubbles && !message.SenderIsMe;
 
-        if (showCenterBubble)
-        {
+        if (showCenterBubble && _centerBubble != null)
+        { 
             if (_centerBubble.IsShowing)
                 _centerBubble.HideImmediate();
             
@@ -162,9 +164,9 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
         }
 
         // Add click handler
-        // TODO: Better solution. Calling this twice breaks click sfx/ripple(?).
-        ____mutePlayerButton.onClick.RemoveAllListeners();
-        ____mutePlayerButton.onClick.AddListener(() => HandleMuteToggleClick(connectedPlayer.userId));
+        var callback = new UnityAction(() => HandleMuteToggleClick(connectedPlayer.userId));
+        ____mutePlayerButton.onClick.RemoveListener(callback);
+        ____mutePlayerButton.onClick.AddListener(callback);
 
         // Initial state update
         UpdatePlayerListState(connectedPlayer.userId);
@@ -266,6 +268,9 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
         var chatBubble = ChatBubble.Create(_diContainer, avatarCaption, ChatBubble.AlignStyle.LobbyAvatar);
         
         _perUserBubbles[connectedPlayer.userId] = chatBubble;
+        
+        // Register voice playback
+        _voiceManager.ProvideAvatarAudio(playerAvatarController.GetComponent<MultiplayerAvatarAudioController>());
     }
 
     #endregion

@@ -4,7 +4,7 @@ using Zenject;
 namespace MultiplayerChat.Installers;
 
 /// <summary>
-/// Installer for AlwaysMultiPlayer (local active or inactive player) for multiplayer gameplay.
+/// Installer for AlwaysMultiPlayer (all multiplayer gameplay, spectator or not).
 /// </summary>
 // ReSharper disable once ClassNeverInstantiated.Global
 public class MpcMultiplayerInstaller : Installer

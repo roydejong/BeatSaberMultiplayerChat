@@ -82,6 +82,9 @@ public class SoundNotifier : MonoBehaviour, IInitializable, IDisposable
 
     public void Play(string clipName)
     {
+        if (clipName == "None")
+            return;
+
         _previewMode = false;
 
         if (_audioSource is null)
@@ -120,7 +123,8 @@ public class SoundNotifier : MonoBehaviour, IInitializable, IDisposable
 
     private void LoadConfiguredClip()
     {
-        if (string.IsNullOrEmpty(_config.SoundNotification) || _config.SoundNotificationVolume <= 0)
+        if (string.IsNullOrEmpty(_config.SoundNotification) || _config.SoundNotification == "None" ||
+            _config.SoundNotificationVolume <= 0)
         {
             _log.Info("Sound notification is disabled in config");
             return;
@@ -134,18 +138,21 @@ public class SoundNotifier : MonoBehaviour, IInitializable, IDisposable
             .Select(path => new FileInfo(path).Name);
 
 
-    private IEnumerator LoadClipRoutine(string name)
+    private IEnumerator LoadClipRoutine(string clipName)
     {
-        if (!name.EndsWith(".ogg"))
-            name += ".ogg";
+        if (clipName == "None")
+            yield break;
+        
+        if (!clipName.EndsWith(".ogg"))
+            clipName += ".ogg";
 
-        if (_loadedClips.TryGetValue(name, out var existingClip))
+        if (_loadedClips.TryGetValue(clipName, out var existingClip))
         {
-            _log.Warn($"[LoadClipRoutine] Skipping duplicate clip: {name}");
+            _log.Warn($"[LoadClipRoutine] Skipping duplicate clip: {clipName}");
             yield break;
         }
 
-        var localPath = Path.Combine(_directoryPath, name);
+        var localPath = Path.Combine(_directoryPath, clipName);
 
         if (!File.Exists(localPath))
         {
@@ -170,11 +177,11 @@ public class SoundNotifier : MonoBehaviour, IInitializable, IDisposable
             yield break;
         }
 
-        _loadedClips[name] = audioClip;
-        _log.Info($"[LoadClipRoutine] Loaded clip: {name}");
+        _loadedClips[clipName] = audioClip;
+        _log.Info($"[LoadClipRoutine] Loaded clip: {clipName}");
 
         if (_previewMode)
-            Play(name);
+            Play(clipName);
     }
 
     #endregion

@@ -37,6 +37,8 @@ public class PlayerVoicePlayer : IDisposable
         _audioSource = avatarAudio.GetField<AudioSource, MultiplayerAvatarAudioController>("_audioSource");
         _audioSource.clip = _audioClip;
         _audioSource.loop = true;
+        _audioSource.spatialize = true;
+        _audioSource.spatialBlend = .9f;
     }
 
     public void SetCustomAudioSource(AudioSource audioSource)
@@ -48,7 +50,7 @@ public class PlayerVoicePlayer : IDisposable
 
     public void HandleDecodedFragment(float[] decodeBuffer, int decodedLength)
     {
-        if (_audioSource == null)
+        if (_audioSource == null || decodedLength <= 0)
         {
             HandleTransmissionEnd();
             return;
@@ -68,7 +70,8 @@ public class PlayerVoicePlayer : IDisposable
         {
             if (_bufferPos > (PlaybackClipLength / 2))
             {
-                _audioSource.time = 0f;
+                _audioSource.timeSamples = 0;
+                _audioSource.loop = true;
                 _audioSource.Play();
             }
         }
@@ -79,10 +82,17 @@ public class PlayerVoicePlayer : IDisposable
     public void HandleTransmissionEnd()
     {
         if (_audioSource != null)
+        {
+            _audioSource.loop = false;
             _audioSource.Stop();
+            _audioSource.timeSamples = 0;
+        }
 
         _bufferPos = 0;
+        _audioClip.SetData(EmptyClipSamples, 0);
 
         IsReceiving = false;
     }
+    
+    private static readonly float[] EmptyClipSamples = new float[PlaybackClipLength];
 }
