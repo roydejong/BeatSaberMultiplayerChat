@@ -122,6 +122,10 @@ public class ChatBubble : MonoBehaviour
         {
             _rectTransform.localScale = new Vector3(2f, 2f, 2f);
 
+            var canvas = GetComponent<Canvas>();
+            canvas.sortingOrder = 0;
+            canvas.overrideSorting = false;
+
             // Steal billboard material / font
             var parentTransform = _rectTransform.parent;
             if (parentTransform.gameObject.name != "AvatarCaption")
