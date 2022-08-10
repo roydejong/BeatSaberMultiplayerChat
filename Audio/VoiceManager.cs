@@ -199,7 +199,6 @@ public class VoiceManager : IInitializable, IDisposable
         if (_multiplayerSession.isConnected && _multiplayerSession.isSyncTimeInitialized)
         {
             // Empty packet to signal end of transmission 
-            // TODO Just testing
             _multiplayerSession.SendUnreliable(new MpcVoicePacket()
             {
                 Data = null
@@ -207,6 +206,12 @@ public class VoiceManager : IInitializable, IDisposable
         }
         
         _log.Info("Voice: stop transmit");
+    }
+
+    public void HandlePlayerMuted(string userId)
+    {
+        if (_voicePlayers.TryGetValue(userId, out var voicePlayer))
+            voicePlayer.HandleTransmissionEnd();
     }
     
     #endregion

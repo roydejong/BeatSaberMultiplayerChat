@@ -8,7 +8,6 @@ using MultiplayerChat.UI;
 using MultiplayerChat.UI.Lobby;
 using SiraUtil.Affinity;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 using Zenject;
 using Object = UnityEngine.Object;
@@ -27,6 +26,7 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
     [Inject] private readonly ChatViewController _chatViewController = null!;
     [Inject] private readonly GameServerLobbyFlowCoordinator _lobbyFlowCoordinator = null!;
     [Inject] private readonly ServerPlayerListViewController _serverPlayerListViewController = null!;
+    [Inject] private readonly MenuShockwave _menuShockwave = null!;
 
     private Sprite? _nativeIconSpeakerSound;
     private Sprite? _nativeIconMuted;
@@ -144,7 +144,8 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
 
     [AffinityPostfix]
     [AffinityPatch(typeof(GameServerPlayerTableCell), nameof(GameServerPlayerTableCell.SetData))]
-    public void PostfixPlayerCellSetData(IConnectedPlayer connectedPlayer, Button ____mutePlayerButton)
+    public void PostfixPlayerCellSetData(IConnectedPlayer connectedPlayer, Button ____mutePlayerButton,
+        ButtonBinder ____buttonBinder)
     {
         _playerListButtons[connectedPlayer.userId] = ____mutePlayerButton;
 
@@ -162,11 +163,10 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
 
             spriteSwap.enabled = false;
         }
-
-        // Add click handler
-        var callback = new UnityAction(() => HandleMuteToggleClick(connectedPlayer.userId));
-        ____mutePlayerButton.onClick.RemoveListener(callback);
-        ____mutePlayerButton.onClick.AddListener(callback);
+        
+        // Bind mute button
+        ____buttonBinder.ClearBindings();
+        ____buttonBinder.AddBinding(____mutePlayerButton, () => HandleMuteToggleClick(connectedPlayer.userId));
 
         // Initial state update
         UpdatePlayerListState(connectedPlayer.userId);
@@ -185,10 +185,17 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
         UpdatePlayerListState(userId, chatPlayer);
 
         _hoverHintController.HideHintInstant();
+
+        if (!chatPlayer.IsMuted)
+            return;
         
-        if (chatPlayer.IsMuted && _perUserBubbles.TryGetValue(userId, out var userBubble))
+        // Muted: hide bubbles
+        if (_perUserBubbles.TryGetValue(userId, out var userBubble))
             if (userBubble != null)
                 userBubble.HideAnimated();
+            
+        // Muted: cancel any ongoing voice transmission from this player
+        _voiceManager.HandlePlayerMuted(userId);
     }
 
     private void UpdatePlayerListState(string userId)

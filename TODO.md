@@ -37,3 +37,5 @@ Phase 1: Text. Phase 2: Voice.
 - [ ] 🪲 *Bug:* Leaving MpEx settings flow coordinator will break the chat title button (activation event never triggers for the lobby setup view?)
 - [ ] *Less important*: Chat view will lag if *left open only* with lots of messages piling up; older game objects might need to be removed (cap to messages buffer size).
 - [ ] Mod settings: Closing/reopening will not reset state, so e.g. mic test will appear to remain active (but isn't) if you start, close, reopen
+- [ ] Text chat roles / dev colors
+- [ ] Allow players that don't send caps to be muted anyway? Or if they send voice: automatically assume they have voice caps?
