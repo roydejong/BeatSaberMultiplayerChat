@@ -192,16 +192,11 @@ public class MicrophoneManager : MonoBehaviour, IInitializable, IDisposable
         if (_micBuffer == null || _micBuffer.Length != recordingFreq)
             _micBuffer = new float[recordingFreq];
 
-        _log.Info($"Start mic capture");
-
         IsCapturing = true;
     }
 
     public void StopCapture()
     {
-        if (IsCapturing)
-            _log.Info($"Stop mic capture");
-
         IsCapturing = false;
 
         if (_captureClip != null)

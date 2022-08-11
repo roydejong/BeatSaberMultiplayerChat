@@ -76,6 +76,9 @@ public class ChatBubble : MonoBehaviour
 
     public void Show(string text)
     {
+        if (!isActiveAndEnabled)
+            return;
+        
         if (IsShowing)
             throw new InvalidOperationException("Cannot call Show() while IsShowing is true");
 
@@ -148,6 +151,9 @@ public class ChatBubble : MonoBehaviour
 
     public void HideAnimated()
     {
+        if (!isActiveAndEnabled)
+            return;
+        
         if (_state is not InnerState.AnimateIn and not InnerState.ShowWait)
             return;
 
@@ -157,7 +163,7 @@ public class ChatBubble : MonoBehaviour
 
     public void HideImmediate()
     {
-        if (!gameObject.activeSelf)
+        if (!isActiveAndEnabled)
             return;
 
         StopAllCoroutines();

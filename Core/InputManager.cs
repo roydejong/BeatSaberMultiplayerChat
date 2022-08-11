@@ -85,8 +85,6 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
 
     private void HandleKeybindDown()
     {
-        _log.Info("Input trigger down");
-        
         switch (_pluginConfig.VoiceActivationMode)
         {
             case VoiceActivationMode.Toggle:
@@ -119,8 +117,6 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
 
     private void HandleKeybindUp()
     {
-        _log.Info("Input trigger up");
-        
         switch (_pluginConfig.VoiceActivationMode)
         {
             case VoiceActivationMode.Hold:
@@ -167,24 +163,16 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
         if (!device.isValid)
             return;
 
-        _log.Info($"Input device connected: {device.name}");
-
         if ((device.characteristics & InputDeviceCharacteristics.HeldInHand) == 0 ||
             (device.characteristics & InputDeviceCharacteristics.Controller) == 0)
             // Not a handheld controller
             return;
 
         if ((device.characteristics & InputDeviceCharacteristics.Left) != 0)
-        {
-            _log.Info($"Input device connected is LEFT: {device.name}");
             _leftController = device;
-        }
 
         if ((device.characteristics & InputDeviceCharacteristics.Right) != 0)
-        {
-            _log.Info($"Input device connected is RIGHT: {device.name}");
             _rightController = device;
-        }
     }
 
     private void HandleInputDeviceDisconnected(InputDevice device)

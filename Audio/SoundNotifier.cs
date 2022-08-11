@@ -205,7 +205,7 @@ public class SoundNotifier : MonoBehaviour, IInitializable, IDisposable
         }
 
         _loadedClips[clipName] = audioClip;
-        _log.Info($"[LoadClipRoutine] Loaded clip: {clipName}");
+        _log.Debug($"Loaded clip: {clipName}");
 
         if (_previewMode)
             Play(clipName);

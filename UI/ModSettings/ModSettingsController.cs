@@ -9,7 +9,6 @@ using HMUI;
 using MultiplayerChat.Assets;
 using MultiplayerChat.Audio;
 using MultiplayerChat.Config;
-using MultiplayerChat.Core;
 using MultiplayerChat.Models;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,16 +22,12 @@ public class ModSettingsController : IInitializable, IDisposable
     [Inject] private readonly VoiceManager _voiceManager = null!;
     [Inject] private readonly MicrophoneManager _microphoneManager = null!;
     [Inject] private readonly SoundNotifier _soundNotifier = null!;
-    [Inject] private readonly InputManager _inputManager = null!;
 
     [UIComponent("BtnTestMic")] private Button _btnTestMic = null!;
     [UIComponent("DropdownNotification")] private DropDownListSetting _dropdownNotification = null!;
     [UIComponent("ToggleVoice")] private ToggleSetting _toggleVoice = null!;
     [UIComponent("DropdownMic")] private DropDownListSetting _dropdownMic = null!;
     [UIComponent("ImgTestMic")] private ImageView _imgTestMic = null!;
-    [UIComponent("DropdownActivation")] private DropDownListSetting _dropdownActivation = null!;
-    [UIComponent("DropdownKeybind")] private DropDownListSetting _dropdownKeybind = null!;
-    [UIComponent("DropdownController")] private DropDownListSetting _dropdownController = null!;
 
     public void Initialize()
     {

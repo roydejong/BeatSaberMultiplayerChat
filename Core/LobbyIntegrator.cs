@@ -27,7 +27,6 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
     [Inject] private readonly ChatViewController _chatViewController = null!;
     [Inject] private readonly GameServerLobbyFlowCoordinator _lobbyFlowCoordinator = null!;
     [Inject] private readonly ServerPlayerListViewController _serverPlayerListViewController = null!;
-    [Inject] private readonly MenuShockwave _menuShockwave = null!;
 
     private Sprite? _nativeIconSpeakerSound;
     private Sprite? _nativeIconMuted;
@@ -307,7 +306,7 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
         _lobbyFlowCoordinator.InvokeMethod<object, FlowCoordinator>("PresentViewController", new object[]
         {
             _chatViewController,
-            null, // Action finishedCallback
+            null!, // Action finishedCallback
             ViewController.AnimationDirection.Horizontal,
             false // bool immediately
         });

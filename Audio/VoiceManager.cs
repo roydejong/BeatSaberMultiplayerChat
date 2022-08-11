@@ -5,7 +5,6 @@ using MultiplayerChat.Config;
 using MultiplayerChat.Core;
 using MultiplayerChat.Network;
 using MultiplayerCore.Networking;
-using SiraUtil.Logging;
 using UnityEngine;
 using UnityOpus;
 using Zenject;
@@ -16,7 +15,6 @@ namespace MultiplayerChat.Audio;
 // ReSharper disable once ClassNeverInstantiated.Global
 public class VoiceManager : IInitializable, IDisposable
 {
-    [Inject] private readonly SiraLog _log = null!;
     [Inject] private readonly PluginConfig _pluginConfig = null!;
     [Inject] private readonly ChatManager _chatManager = null!;
     [Inject] private readonly MicrophoneManager _microphoneManager = null!;
@@ -223,8 +221,6 @@ public class VoiceManager : IInitializable, IDisposable
         _microphoneManager.StartCapture();
         
         _chatManager.SetLocalPlayerIsSpeaking(true);
-
-        _log.Info("Voice: start transmit");
         return true;
     }
 
@@ -246,8 +242,6 @@ public class VoiceManager : IInitializable, IDisposable
         }
         
         _chatManager.SetLocalPlayerIsSpeaking(false);
-        
-        _log.Info("Voice: stop transmit");
         return true;
     }
 
@@ -283,8 +277,6 @@ public class VoiceManager : IInitializable, IDisposable
 
         IsLoopbackTesting = true;
         _microphoneManager.StartCapture();
-        
-        _log.Info("Started loopback test");
     }
 
     public void StopLoopbackTest()
@@ -297,7 +289,6 @@ public class VoiceManager : IInitializable, IDisposable
             return;
         
         IsLoopbackTesting = false;
-        _log.Info("Stopped loopback test");
     }
 
     #endregion

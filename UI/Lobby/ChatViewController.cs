@@ -7,10 +7,8 @@ using BeatSaberMarkupLanguage.Tags;
 using BeatSaberMarkupLanguage.ViewControllers;
 using HMUI;
 using IPA.Utilities;
-using MultiplayerChat.Audio;
 using MultiplayerChat.Core;
 using MultiplayerChat.Models;
-using SiraUtil.Logging;
 using TMPro;
 using UnityEngine;
 using Zenject;
@@ -20,21 +18,20 @@ namespace MultiplayerChat.UI.Lobby;
 [HotReload]
 public class ChatViewController : BSMLAutomaticViewController
 {
-    [Inject] private readonly SiraLog _log = null!;
-    [Inject] private readonly DiContainer _diContainer = null!;
     [Inject] private readonly ChatManager _chatManager = null!;
-    [Inject] private readonly VoiceManager _voiceManager = null!;
 
+#pragma warning disable CS0649
     [UIComponent("ChatViewBg")] private Backgroundable? _chatViewBg;
     [UIComponent("MessagesContainer")] private BSMLScrollableContainer? _scrollableContainer;
     [UIComponent("ChatMessageInput")] private StringSetting? _chatInput;
+#pragma warning restore CS0649
     
     private readonly List<ChatMessage> _messageBuffer;
     private Transform? _scrollableContainerContent;
     private bool _bsmlReady;
     private bool _chatLockedToBottom;
 
-    public ChatViewController() : base()
+    public ChatViewController()
     {
         _messageBuffer = new(MaxBufferSize);
         _scrollableContainerContent = null;
@@ -65,24 +62,13 @@ public class ChatViewController : BSMLAutomaticViewController
     {
         base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
         
-        // TODO Just testing
-        _voiceManager.StartVoiceTransmission();
-        
         if (!_bsmlReady || firstActivation)
             return;
         
         FillChat();
         ResetChatInputText();
     }
-
-    protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
-    {
-        base.DidDeactivate(removedFromHierarchy, screenSystemDisabling);
-        
-        // TODO Just testing
-        _voiceManager.StopVoiceTransmission();
-    }
-
+    
     private async void HandleKeyboardInput(string input)
     {
         await Task.Delay(1); // we need to run OnChange after BSML's own EnterPressed, and this, well, it works

@@ -30,6 +30,8 @@ Players who have this mod installed can talk in multiplayer lobbies and hear oth
 
 When other players speak, you'll hear spatial audio coming from their avatar's head.
 
+You can talk in the lobby and while playing, but spectators can't talk currently.
+
 #### Settings
 You can select and test your recording device and set up your Push-to-Talk keybind in the Mod Settings. I recommend reviewing your settings there before heading into a lobby.
 

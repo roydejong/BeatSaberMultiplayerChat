@@ -90,8 +90,6 @@ public class ChatManager : IInitializable, IDisposable
     /// </summary>
     public void ClearChat()
     {
-        _log.Info("<<<<<TEMP_DEBUG>>>>> Clearing chat");
-
         ChatClearEvent?.Invoke(this, EventArgs.Empty);
 
         if (!TextChatEnabled)
@@ -108,8 +106,6 @@ public class ChatManager : IInitializable, IDisposable
         if (!TextChatEnabled || !SessionConnected)
             return;
 
-        _log.Info($"<<<<<TEMP_DEBUG>>>>> Show system message: {text}");
-
         ChatMessageEvent?.Invoke(this, ChatMessage.CreateSystemMessage(text));
     }
 
@@ -118,8 +114,6 @@ public class ChatManager : IInitializable, IDisposable
     /// </summary>
     public void SendTextChat(string text)
     {
-        _log.Info($"<<<<<TEMP_DEBUG>>>>> Send text: {text}");
-
         if (!SessionConnected || !TextChatEnabled)
             return;
 
@@ -169,8 +163,6 @@ public class ChatManager : IInitializable, IDisposable
 
     public void SetIsPlayerMuted(string userId, bool isMuted)
     {
-        _log.Info($"Toggle player mute (userId={userId}, isMuted={isMuted})");
-
         if (isMuted && !_config.MutedUserIds!.Contains(userId))
             _config.MutedUserIds.Add(userId);
         else if (!isMuted && _config.MutedUserIds!.Contains(userId))
@@ -241,7 +233,7 @@ public class ChatManager : IInitializable, IDisposable
         if (!SessionConnected)
             return;
 
-        _log.Info($"Received capabilities (userId={sender.userId}, protoVersion={packet.ProtocolVersion}, " +
+        _log.Debug($"Received capabilities (userId={sender.userId}, protoVersion={packet.ProtocolVersion}, " +
                   $"canText={packet.CanTextChat}, canVoice={packet.CanTransmitVoiceChat})");
 
         var isNewEntry = !_chatPlayers.TryGetValue(sender.userId, out var prevChatPlayer);
