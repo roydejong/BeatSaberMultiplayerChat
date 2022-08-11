@@ -33,5 +33,19 @@
                 preferred-width="35" preferred-height="8.5" align="Center"
                 hover-hint="Toggle microphone test (listen to selected device)" />
     </horizontal>
+    
+    <!-- Voice activation -->
 
+    <dropdown-list-setting id="DropdownActivation" text="Activation mode" options="ActivationOptions"
+                           value="VoiceActivationMode" apply-on-change="true"
+                           hover-hint="How is outgoing voice chat activated?"/>
+
+    <dropdown-list-setting id="DropdownKeybind" text="Activation button" options="KeybindOptions"
+                           value="VoiceKeybind" apply-on-change="true"
+                           hover-hint="What button toggles or triggers voice chat?"/>
+
+    <dropdown-list-setting id="DropdownController" text="Activation controller" options="ControllerOptions"
+                           value="VoiceKeybindController" apply-on-change="true"
+                           hover-hint="What controller(s) does the voice keybind apply to?"/>
+    
 </settings-container>

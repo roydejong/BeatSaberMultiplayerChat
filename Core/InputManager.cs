@@ -57,6 +57,11 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
         _triggerConditionActive = false;
     }
 
+    public void OnEnable()
+    {
+        _triggerConditionActive = false;
+    }
+
     public void Update()
     {
         var wasActive = _triggerConditionActive;
@@ -84,7 +89,7 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
         
         switch (_pluginConfig.VoiceActivationMode)
         {
-            case VoiceActivationMode.PushToTalkToggle:
+            case VoiceActivationMode.Toggle:
             {
                 // Toggle 
                 if (_voiceManager.IsTransmitting)
@@ -99,7 +104,7 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
                 }
                 break;
             }
-            case VoiceActivationMode.PushToTalkHold:
+            case VoiceActivationMode.Hold:
             {
                 // Hold - start
                 if (!_voiceManager.IsTransmitting)
@@ -118,7 +123,7 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
         
         switch (_pluginConfig.VoiceActivationMode)
         {
-            case VoiceActivationMode.PushToTalkHold:
+            case VoiceActivationMode.Hold:
             {
                 // Hold - release
                 if (_voiceManager.IsTransmitting)
@@ -216,13 +221,13 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
     {
         switch (_pluginConfig.VoiceKeybind)
         {
-            case VoiceKeybind.PrimaryButton:
+            case VoiceKeybind.Primary:
                 return GetInputButtonIsDown(device, CommonUsages.primaryButton);
-            case VoiceKeybind.SecondaryButton:
+            case VoiceKeybind.Secondary:
                 return GetInputButtonIsDown(device, CommonUsages.secondaryButton);
-            case VoiceKeybind.GripButton:
+            case VoiceKeybind.Grip:
                 return GetInputButtonIsDown(device, CommonUsages.gripButton);
-            case VoiceKeybind.AxisButton:
+            case VoiceKeybind.StickPress:
                 return GetInputButtonIsDown(device, CommonUsages.primary2DAxisClick);
             default:
                 return false;

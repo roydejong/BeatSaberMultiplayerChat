@@ -60,12 +60,12 @@ public class PluginConfig
     /// <summary>
     /// How is outgoing voice chat activated?
     /// </summary>
-    public VoiceActivationMode VoiceActivationMode = VoiceActivationMode.PushToTalkHold;
+    public VoiceActivationMode VoiceActivationMode = VoiceActivationMode.Hold;
 
     /// <summary>
     /// What button toggles or triggers voice chat?
     /// </summary>
-    public VoiceKeybind VoiceKeybind = VoiceKeybind.SecondaryButton;
+    public VoiceKeybind VoiceKeybind = VoiceKeybind.Secondary;
     
     /// <summary>
     /// What controller(s) does the voice keybind apply to?
