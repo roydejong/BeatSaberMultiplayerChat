@@ -65,7 +65,7 @@ public class PluginConfig
     /// <summary>
     /// What button toggles or triggers voice chat?
     /// </summary>
-    public VoiceKeybind VoiceKeybind = VoiceKeybind.Secondary;
+    public VoiceKeybind VoiceKeybind = VoiceKeybind.SecondaryButton;
     
     /// <summary>
     /// What controller(s) does the voice keybind apply to?

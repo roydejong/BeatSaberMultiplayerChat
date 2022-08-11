@@ -5,15 +5,16 @@ public enum VoiceKeybind : byte
     /// <summary>
     /// Primary button (B on Index, X/A on Oculus, Sandwich on Vive, Y/B on Oculus OpenVR)
     /// </summary>
-    Primary = 0,
+    PrimaryButton = 0,
     /// <summary>
     /// Secondary button (A on Index, Y/B on Oculus, X/A on Oculus OpenVR)
+    /// Doesn't seem to actually work on Index default mapping?
     /// </summary>
-    Secondary = 1,
+    SecondaryButton = 1,
     /// <summary>
-    /// Grip/bumper button
+    /// Press down on the trigger.
     /// </summary>
-    Grip = 2,
+    Trigger = 2,
     /// <summary>
     /// Thumbstick press, joystick press or touchpad click
     /// </summary>

@@ -209,14 +209,14 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
     {
         switch (_pluginConfig.VoiceKeybind)
         {
-            case VoiceKeybind.Primary:
+            case VoiceKeybind.PrimaryButton:
                 return GetInputButtonIsDown(device, CommonUsages.primaryButton);
-            case VoiceKeybind.Secondary:
+            case VoiceKeybind.SecondaryButton:
                 return GetInputButtonIsDown(device, CommonUsages.secondaryButton);
-            case VoiceKeybind.Grip:
-                return GetInputButtonIsDown(device, CommonUsages.gripButton);
             case VoiceKeybind.StickPress:
                 return GetInputButtonIsDown(device, CommonUsages.primary2DAxisClick);
+            case VoiceKeybind.Trigger:
+                return GetInputValueThreshold(device, CommonUsages.trigger, .85f);
             default:
                 return false;
         }
@@ -228,6 +228,14 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
             return false;
 
         return inputDevice.Value.TryGetFeatureValue(usage, out var value) && value;
+    }
+    
+    private static bool GetInputValueThreshold(InputDevice? inputDevice, InputFeatureUsage<float> usage, float threshold)
+    {
+        if (inputDevice is null || !inputDevice.Value.isValid)
+            return false;
+
+        return inputDevice.Value.TryGetFeatureValue(usage, out var value) && value >= threshold;
     }
 
     #endregion
