@@ -9,19 +9,21 @@ public class PlayerVoicePlayer : IDisposable
 {
     private const int PlaybackClipLength = 1024 * 6;
 
+    private readonly float _spatialBland;
     private readonly AudioClip _audioClip;
     private float[]? _localBuffer;
     private int _bufferPos;
-    
+
     private AudioSource? _audioSource;
-    
+
     public bool IsReceiving { get; private set; }
     public bool IsPlaying => _audioSource != null && _audioSource.isPlaying;
 
-    public PlayerVoicePlayer()
+    public PlayerVoicePlayer(float spatialBland)
     {
-        _audioClip = AudioClip.Create("VoicePlayback", PlaybackClipLength, (int)VoiceManager.OpusChannels,
-            (int)VoiceManager.OpusFrequency, false);
+        _spatialBland = spatialBland;
+        _audioClip = AudioClip.Create("VoicePlayback", PlaybackClipLength, (int) VoiceManager.OpusChannels,
+            (int) VoiceManager.OpusFrequency, false);
         _localBuffer = null;
         _bufferPos = 0;
     }
@@ -32,20 +34,26 @@ public class PlayerVoicePlayer : IDisposable
         _localBuffer = null;
     }
 
-    public void SetMultiplayerAvatarAudioController(MultiplayerAvatarAudioController avatarAudio)
-    {
-        _audioSource = avatarAudio.GetField<AudioSource, MultiplayerAvatarAudioController>("_audioSource");
-        _audioSource.clip = _audioClip;
-        _audioSource.loop = true;
-        _audioSource.spatialize = true;
-        _audioSource.spatialBlend = .5f;
-    }
+    public void SetMultiplayerAvatarAudioController(MultiplayerAvatarAudioController avatarAudio) =>
+        ConfigureAudioSource(avatarAudio.GetField<AudioSource, MultiplayerAvatarAudioController>("_audioSource"));
 
-    public void SetCustomAudioSource(AudioSource audioSource)
+    public void ConfigureAudioSource(AudioSource audioSource)
     {
         _audioSource = audioSource;
         _audioSource.clip = _audioClip;
-        _audioSource.loop = true;
+        _audioSource.timeSamples = 0;
+        _audioSource.volume = 1f;
+
+        if (_spatialBland <= 0)
+        {
+            _audioSource.spatialize = false;
+            _audioSource.spatialBlend = 0;
+        }
+        else
+        {
+            _audioSource.spatialize = true;
+            _audioSource.spatialBlend = _spatialBland;
+        }
     }
 
     public void HandleDecodedFragment(float[] decodeBuffer, int decodedLength)
@@ -55,11 +63,11 @@ public class PlayerVoicePlayer : IDisposable
             HandleTransmissionEnd();
             return;
         }
-        
+
         if (_localBuffer == null || _localBuffer.Length != decodedLength)
             _localBuffer = new float[decodedLength];
 
-        IsReceiving = true;    
+        IsReceiving = true;
 
         Array.Copy(decodeBuffer, _localBuffer, decodedLength);
 
@@ -93,6 +101,6 @@ public class PlayerVoicePlayer : IDisposable
 
         IsReceiving = false;
     }
-    
+
     private static readonly float[] EmptyClipSamples = new float[PlaybackClipLength];
 }

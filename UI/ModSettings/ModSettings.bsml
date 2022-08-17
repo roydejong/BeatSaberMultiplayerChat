@@ -46,6 +46,6 @@
 
     <dropdown-list-setting id="DropdownController" text="Activation controller" options="ControllerOptions"
                            value="VoiceKeybindController" apply-on-change="true"
-                           hover-hint="What controller(s) does the voice keybind apply to?"/>
+                           hover-hint="What controller does the activation button apply to?"/>
     
 </settings-container>

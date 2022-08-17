@@ -5,6 +5,7 @@ using MultiplayerChat.Config;
 using MultiplayerChat.Core;
 using MultiplayerChat.Network;
 using MultiplayerCore.Networking;
+using SiraUtil.Logging;
 using UnityEngine;
 using UnityOpus;
 using Zenject;
@@ -15,6 +16,7 @@ namespace MultiplayerChat.Audio;
 // ReSharper disable once ClassNeverInstantiated.Global
 public class VoiceManager : IInitializable, IDisposable
 {
+    [Inject] private readonly SiraLog _log = null!;
     [Inject] private readonly PluginConfig _pluginConfig = null!;
     [Inject] private readonly ChatManager _chatManager = null!;
     [Inject] private readonly MicrophoneManager _microphoneManager = null!;
@@ -64,7 +66,7 @@ public class VoiceManager : IInitializable, IDisposable
 
         IsLoopbackTesting = false;
 
-        _loopbackVoicePlayer = new PlayerVoicePlayer();
+        _loopbackVoicePlayer = new PlayerVoicePlayer(0);
         _voicePlayers = new();
     }
 
@@ -73,6 +75,7 @@ public class VoiceManager : IInitializable, IDisposable
         _multiplayerSession.disconnectedEvent += HandleSessionDisconnected;
         
         _microphoneManager.OnFragmentReady += HandleMicrophoneFragment;
+        _microphoneManager.OnCaptureEnd += HandleMicrophoneEnd;
 
         _packetSerializer.RegisterCallback<MpcVoicePacket>(HandleVoicePacket);
     }
@@ -85,6 +88,7 @@ public class VoiceManager : IInitializable, IDisposable
             _microphoneManager.StopCapture();
         
         _microphoneManager.OnFragmentReady -= HandleMicrophoneFragment;
+        _microphoneManager.OnCaptureEnd -= HandleMicrophoneEnd;
 
         _opusEncoder.Dispose();
         _opusDecoder.Dispose();
@@ -117,6 +121,16 @@ public class VoiceManager : IInitializable, IDisposable
             );
             _encodeSampleIndex = 0;
         }
+    }
+    
+    private void HandleMicrophoneEnd()
+    {
+        _log.Error("YOOOOOOOOOOOOOOOOOOOOOOOOOOOO MY BALLS LOOOOOOOOOOOOOOOOOOOL");
+        
+        _loopbackVoicePlayer.HandleTransmissionEnd();
+        
+        Array.Clear(_encodeSampleBuffer, 0, _encodeSampleBuffer.Length);
+        Array.Clear(_encodeOutputBuffer, 0, _encodeOutputBuffer.Length);
     }
 
     private void HandleEncodedFrame(int encodedLength)
@@ -186,7 +200,7 @@ public class VoiceManager : IInitializable, IDisposable
             if (isEndOfTransmission)
                 return;
         
-            voicePlayer = new PlayerVoicePlayer();
+            voicePlayer = new PlayerVoicePlayer(_pluginConfig.SpatialBlend);
             _voicePlayers.Add(source.userId, voicePlayer);
         }
 
@@ -263,7 +277,7 @@ public class VoiceManager : IInitializable, IDisposable
             _loopbackTester = obj.AddComponent<AudioSource>();
         }
 
-        _loopbackVoicePlayer.SetCustomAudioSource(_loopbackTester);
+        _loopbackVoicePlayer.ConfigureAudioSource(_loopbackTester);
         
         _loopbackTester.gameObject.SetActive(true);
         return _loopbackTester;
@@ -301,7 +315,7 @@ public class VoiceManager : IInitializable, IDisposable
         
         if (!_voicePlayers.TryGetValue(player.userId, out var voicePlayer))
         {
-            voicePlayer = new PlayerVoicePlayer();
+            voicePlayer = new PlayerVoicePlayer(_pluginConfig.SpatialBlend);
             _voicePlayers.Add(player.userId, voicePlayer);
         }
         

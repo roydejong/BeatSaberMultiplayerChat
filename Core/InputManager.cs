@@ -207,6 +207,9 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
 
     private bool CheckTriggerCondition(InputDevice? device)
     {
+        if (_pluginConfig.DebugKeyboardMicActivation && Input.GetKeyDown(KeyCode.V))
+            return true;
+        
         switch (_pluginConfig.VoiceKeybind)
         {
             case VoiceKeybind.PrimaryButton:

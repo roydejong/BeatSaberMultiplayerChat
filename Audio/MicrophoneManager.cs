@@ -30,6 +30,7 @@ public class MicrophoneManager : MonoBehaviour, IInitializable, IDisposable
     public bool IsCapturing { get; private set; }
 
     public event Action<float[]>? OnFragmentReady;
+    public event Action? OnCaptureEnd;
 
     public MicrophoneManager()
     {
@@ -185,6 +186,7 @@ public class MicrophoneManager : MonoBehaviour, IInitializable, IDisposable
 
         var recordingFreq = GetRecordingFrequency();
 
+        Microphone.End(SelectedDeviceName);
         _captureClip = Microphone.Start(SelectedDeviceName, true, 1, recordingFreq);
 
         _micBufferPos = 0;
@@ -197,6 +199,11 @@ public class MicrophoneManager : MonoBehaviour, IInitializable, IDisposable
 
     public void StopCapture()
     {
+        if (!IsCapturing)
+            return;
+        
+        Microphone.End(SelectedDeviceName);
+        
         IsCapturing = false;
 
         if (_captureClip != null)
@@ -206,6 +213,13 @@ public class MicrophoneManager : MonoBehaviour, IInitializable, IDisposable
         }
 
         _micBufferPos = 0;
+        
+        Array.Clear(_fragmentBuffer, 0, _fragmentBuffer.Length);
+        
+        if (_micBuffer != null)
+            Array.Clear(_micBuffer, 0, _micBuffer.Length);
+        
+        OnCaptureEnd?.Invoke();
     }
 
     #endregion

@@ -3,7 +3,8 @@
 namespace MultiplayerChat.Network;
 
 /// <summary>
-/// Signals MPC support with version and capabilities to other players.
+/// Reliable packet sent to each player indicating that they have the mod, and which features are supported and enabled.
+/// Could be sent as an update when already previously sent.
 /// </summary>
 public class MpcCapabilitiesPacket : MpcBasePacket
 {

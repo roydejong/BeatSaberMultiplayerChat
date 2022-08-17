@@ -58,6 +58,13 @@ public class PluginConfig
     public string? MicrophoneDevice = null;
 
     /// <summary>
+    /// Controls spatial audio blending. Spatial audio is directional/3D and originates from avatar's heads.
+    /// Value between 0.0 and 1.0 indicating the spatial blend, where 0 = Fully 2D, 1 = Fully 3D.
+    /// Note: 3D will be significantly quieter due to distance scaling, probably *too* quiet for Beat Saber...
+    /// </summary>
+    public float SpatialBlend = .1f;
+
+    /// <summary>
     /// How is outgoing voice chat activated?
     /// </summary>
     public VoiceActivationMode VoiceActivationMode = VoiceActivationMode.Hold;
@@ -66,6 +73,12 @@ public class PluginConfig
     /// What button toggles or triggers voice chat?
     /// </summary>
     public VoiceKeybind VoiceKeybind = VoiceKeybind.SecondaryButton;
+
+    /// <summary>
+    /// When enabled, pressing "V" on the keyboard will also act like the voice keybind.
+    /// Hold/toggle setting still applies.
+    /// </summary>
+    public bool DebugKeyboardMicActivation = true;
     
     /// <summary>
     /// What controller(s) does the voice keybind apply to?

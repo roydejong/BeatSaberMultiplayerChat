@@ -28,6 +28,9 @@ public class ModSettingsController : IInitializable, IDisposable
     [UIComponent("ToggleVoice")] private ToggleSetting _toggleVoice = null!;
     [UIComponent("DropdownMic")] private DropDownListSetting _dropdownMic = null!;
     [UIComponent("ImgTestMic")] private ImageView _imgTestMic = null!;
+    [UIComponent("DropdownActivation")] private DropDownListSetting _dropdownActivation = null!;
+    [UIComponent("DropdownKeybind")] private DropDownListSetting _dropdownKeybind = null!;
+    [UIComponent("DropdownController")] private DropDownListSetting _dropdownController = null!;
 
     public void Initialize()
     {
@@ -94,6 +97,7 @@ public class ModSettingsController : IInitializable, IDisposable
         // Voice
         _toggleVoice.interactable = !_voiceManager.IsLoopbackTesting;
         _dropdownMic.interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting;
+        
         if (_voiceManager.IsLoopbackTesting)
         {
             _btnTestMic.interactable = true;
@@ -108,6 +112,10 @@ public class ModSettingsController : IInitializable, IDisposable
             _imgTestMic.sprite = Sprites.MicOff;
             _imgTestMic.color = Color.white;
         }
+
+        _dropdownActivation.interactable = EnableVoiceChat;
+        _dropdownKeybind.interactable = EnableVoiceChat;
+        _dropdownController.interactable = EnableVoiceChat;
     }
 
     #endregion

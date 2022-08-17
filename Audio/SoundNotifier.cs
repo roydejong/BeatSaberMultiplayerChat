@@ -153,7 +153,7 @@ public class SoundNotifier : MonoBehaviour, IInitializable, IDisposable
         if (string.IsNullOrEmpty(_config.SoundNotification) || _config.SoundNotification == "None" ||
             _config.SoundNotificationVolume <= 0)
         {
-            _log.Info("Sound notification is disabled in config");
+            _log.Debug("Sound notification is disabled in config");
             return;
         }
 
