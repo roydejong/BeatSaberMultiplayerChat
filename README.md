@@ -46,8 +46,9 @@ Press the <kbd>Multiplayer Chat</kbd> button in the main menu to open the settin
   - Select and test your recording device for voice
   - Select and test your voice keybind
 - **Text chat**
-    - Enable/disable
-    - Change your notification sound
+  - Enable/disable
+  - Change your notification sound
+  - Toggle chat bubbles
 
 ## Notice
 ⚠️ **Text and voice chat communications using this mod are not encrypted.**
@@ -101,3 +102,26 @@ Unreliable packet containing a Opus-encoded voice fragment.
 | Field             | Type              | Comment                                                                                                                      |
 |-------------------|-------------------|------------------------------------------------------------------------------------------------------------------------------|
 | `Data`            | `BytesWithLength` | Opus-encoded audio fragment (48kHz, 1 channel). If the array has a length of zero, this indicates the end of a transmission. |
+
+## Attribution
+
+Thanks to the authors for their original assets.
+
+### CLUBpings Sound Effects
+
+From [CLUBpings](https://freesound.org/people/zeuss/packs/1372/) by [zeuss](https://freesound.org/people/zeuss/)
+
+Licensed under the [CC Sampling+ License](http://creativecommons.org/licenses/sampling+/1.0/)
+
+- `Assets/ClubPing.ogg`
+- `Assets/ClubPing2.ogg`
+- `Assets/ClubPing3.ogg`
+
+### Google Material Design Icons
+
+Licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+
+- `Assets/Chat.png`
+- `Assets/Keyboard.png`
+- `Assets/MicOff.png`
+- `Assets/MicOn.png`

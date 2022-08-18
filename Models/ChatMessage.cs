@@ -33,7 +33,9 @@ public class ChatMessage
         else if (Type is ChatMessageType.SystemMessage)
             return $"🔔 <i><color=#f1c40f>[System]</color> <color=#ecf0f1>{Text}</color></i>";
         else if (SenderIsHost)
-            return $"💬 <i><color=#2ecc71>[Server]</color> {Text}</i>";
+            return $"📢 <i><color=#2ecc71>[Server]</color> {Text}</i>";
+        else if (SenderIsMe)
+            return $"💬 <i><color=#95a5a6>[{UserName}]</color> {Text}</i>";
         else
             return $"💬 <i><color=#3498db>[{UserName}]</color> {Text}</i>";
     }

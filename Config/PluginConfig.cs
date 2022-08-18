@@ -32,7 +32,7 @@ public class PluginConfig
     /// Must refer to a file within "./UserData/MultiplayerChat/" directory.
     /// If set to null or invalid file, no notification sound will play. 
     /// </summary>
-    public string? SoundNotification = "ComputerChirp.ogg";
+    public string? SoundNotification = "ClubPing2.ogg";
 
     /// <summary>
     /// Volume scale applied when playing the configured sound notification.

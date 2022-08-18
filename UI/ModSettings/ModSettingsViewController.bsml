@@ -64,6 +64,14 @@
                                        value="SoundNotification" apply-on-change="true"
                                        hover-hint="Notification sound for chat messages in the lobby"/>
 
+                <checkbox-setting id="TogglePlayerBubbles" text="Enable overhead bubbles"
+                                  value="EnablePlayerBubbles" bind-value="true" apply-on-change="true"
+                                  hover-hint="Show a chat bubble over an avatar's head when they send a message (lobby only)"/>
+
+                <checkbox-setting id="ToggleCenterBubbles" text="Enable center bubbles" 
+                                  value="EnableCenterBubbles" bind-value="true" apply-on-change="true"
+                                  hover-hint="Show a chat bubble over the center menu when a message is received (lobby only)"/>
+
             </vertical>
         </tab>
 

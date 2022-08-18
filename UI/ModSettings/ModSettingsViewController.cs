@@ -36,6 +36,8 @@ public class ModSettingsViewController : BSMLAutomaticViewController
     [UIComponent("DropdownKeybind")] private DropDownListSetting _dropdownKeybind = null!;
     [UIComponent("DropdownController")] private DropDownListSetting _dropdownController = null!;
     [UIComponent("ActivationText")] private CurvedTextMeshPro _activationText = null!;
+    [UIComponent("TogglePlayerBubbles")] private ToggleSetting _togglePlayerBubbles = null!;
+    [UIComponent("ToggleCenterBubbles")] private ToggleSetting _toggleCenterBubbles = null!;
 
     private bool _bsmlReady = false;
 
@@ -118,6 +120,8 @@ public class ModSettingsViewController : BSMLAutomaticViewController
 
         // Text
         _dropdownNotification.interactable = EnableTextChat;
+        _togglePlayerBubbles.interactable = EnableTextChat;
+        _toggleCenterBubbles.interactable = EnableTextChat;
 
         // Voice
         _toggleVoice.interactable = !_voiceManager.IsLoopbackTesting;
@@ -173,6 +177,28 @@ public class ModSettingsViewController : BSMLAutomaticViewController
             if (value != "None" && EnableTextChat)
                 _soundNotifier.LoadAndPlayPreview(value);
             _config.SoundNotification = value;
+            RefreshUiState();
+        }
+    }
+
+    [UIValue("EnablePlayerBubbles")]
+    public bool EnablePlayerBubbles
+    {
+        get => _config.EnablePlayerBubbles;
+        set
+        {
+            _config.EnablePlayerBubbles = value;
+            RefreshUiState();
+        }
+    }
+
+    [UIValue("EnableCenterBubbles")]
+    public bool EnableCenterBubbles
+    {
+        get => _config.EnableCenterBubbles;
+        set
+        {
+            _config.EnableCenterBubbles = value;
             RefreshUiState();
         }
     }

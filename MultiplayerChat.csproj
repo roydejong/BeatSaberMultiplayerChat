@@ -15,7 +15,7 @@
         <WarningLevel>4</WarningLevel>
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
-        <VersionType>preview</VersionType>
+        <VersionType>dev</VersionType>
         <CommitHash>local</CommitHash>
         <GitBranch>
         </GitBranch>
@@ -162,7 +162,6 @@
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Include="Assets\Chat.png" />
-        <None Include="Assets\ComputerChirp.ogg" />
         <EmbeddedResource Include="Assets\UnreadBadge.png" />
         <None Include="Assets\MicOn.ogg" />
         <None Include="Assets\MicOff.ogg" />

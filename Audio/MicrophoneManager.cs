@@ -145,7 +145,7 @@ public class MicrophoneManager : MonoBehaviour, IInitializable, IDisposable
             HaveSelectedDevice = false;
             _minFreq = 0;
             _maxFreq = 0;
-            _log.Error("Recording device selection removed, will not be able to speak");
+            _log.Warn("Recording device selection removed, will not be able to speak");
             return true;
         }
 
