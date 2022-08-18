@@ -12,7 +12,7 @@
 [**👉 Download the latest release here**](https://github.com/roydejong/BeatSaberMultiplayerChat/releases/latest)
 
 ## Features
-The chat features work on all official and unofficial servers, but only with other players that have the mod installed as well. Have fun, and remember: be nice. 😊
+The chat features work on all servers, but only with other players that have the mod installed as well. Have fun, and remember: be nice. 😊
 
 ### Text chat
 Press the <kbd>💬</kbd> button in the lobby to open the chat box where you can see and type messages.
@@ -28,25 +28,26 @@ You can change or disable the notification sound via the Mod Settings. You can a
 ### Voice chat
 Players who have this mod installed can talk in multiplayer lobbies and hear others.
 
-When other players speak, you'll hear spatial audio coming from their avatar's head.
+You can talk in the lobby and while playing, but you can currently only hear avatars that you can actually see (so not spectators).
 
-You can talk in the lobby and while playing, but spectators can't talk currently.
-
-#### Settings
-You can select and test your recording device and set up your Push-to-Talk keybind in the Mod Settings. I recommend reviewing your settings there before heading into a lobby.
+You can select and test your recording device and set up your keybind from the settings button in the main menu. I recommend reviewing your settings there before heading into a lobby.
 
 ### Muting players
 You can press the <kbd>🔇</kbd> mute button next someone in the players list. If a player is muted, you won't see their chat messages or hear their voice anymore.
 
-Muted players are saved to the configuration file, so they'll stay muted between sessions.
+Muted players are saved in the configuration file, so they'll stay muted across different lobbies.
 
 ### Mod Settings
 
-You can change the mod's settings ingame (Main Menu → <kbd>⚙️</kbd> → Mod Settings → Multiplayer Chat):
-- Enable/disable text chat
-- Change your notification sound
-- Enable/disable voice chat
-- Select and test your recording device for voice
+Press the <kbd>Multiplayer Chat</kbd> button in the main menu to open the settings screen. You can set and test your voice chat and text chat settings here.
+
+- **Voice chat**
+  - Enable/disable voice chat
+  - Select and test your recording device for voice
+  - Select and test your voice keybind
+- **Text chat**
+    - Enable/disable
+    - Change your notification sound
 
 ## Notice
 ⚠️ **Text and voice chat communications using this mod are not encrypted.**
