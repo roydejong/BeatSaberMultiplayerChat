@@ -191,6 +191,7 @@ public class ChatManager : IInitializable, IDisposable
         _sessionManager.Send(_localCapabilities);
         
         // Enable input
+        _inputManager.TestMode = false;
         _inputManager.gameObject.SetActive(true);
     }
 

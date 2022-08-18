@@ -13,9 +13,12 @@ public class MpcMenuInstaller : Installer
 {
     public override void InstallBindings()
     {
-        // UI
+        // UI - Menu
+        Container.BindInterfacesAndSelfTo<ModSettingsMenuController>().AsSingle();
+        Container.Bind<ModSettingsViewController>().FromNewComponentAsViewController().AsSingle();
+        
+        // UI - Lobby
         Container.Bind<ChatViewController>().FromNewComponentAsViewController().AsSingle();
-        Container.BindInterfacesAndSelfTo<ModSettingsController>().AsSingle();
         
         // Core
         Container.BindInterfacesAndSelfTo<LobbyIntegrator>().AsSingle();

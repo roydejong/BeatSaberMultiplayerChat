@@ -1,0 +1,71 @@
+﻿<vertical child-control-height='false'>
+    <vertical child-control-height='false' spacing="2" pad-top="1">
+
+        <tab-selector tab-tag='tabs'/>
+
+        <!-- Voice -->
+        <tab tab-name="Voice Chat" tags="tabs">
+            <vertical child-control-height='false' spacing="1" pad-top="1">
+
+                <checkbox-setting id="ToggleVoice" text="Enable voice chat" value="EnableVoiceChat"
+                                  bind-value="true" apply-on-change="true"
+                                  hover-hint="Globally enable/disable all voice chat functionality"/>
+
+                <dropdown-list-setting id="DropdownMic" text="Microphone" options="MicrophoneOptions"
+                                       value="RecordingDevice" apply-on-change="true"
+                                       hover-hint="Select your input device for talking in voice chat"/>
+
+                <!-- Mic test -->
+
+                <horizontal max-height="8.5" child-expand-width="true" pad-left="15">
+                    <!-- Padding -->
+                    <text text="" font-size="4" preferred-width="15"/>
+                    <image id="ImgTestMic" preserve-aspect="true" preferred-width="5" preferred-height="5" max-width="5"
+                           max-height="5"/>
+                    <button id="BtnTestMic" text="Test mic" on-click="BtnTestMicClick" font-size="4"
+                            preferred-width="35" preferred-height="8.5" align="Center"
+                            hover-hint="Toggle microphone test (listen to selected device)"/>
+                </horizontal>
+
+                <!-- Voice activation -->
+
+                <dropdown-list-setting id="DropdownActivation" text="Activation mode" options="ActivationOptions"
+                                       value="VoiceActivationMode" apply-on-change="true"
+                                       hover-hint="How is outgoing voice chat activated?"/>
+
+                <dropdown-list-setting id="DropdownKeybind" text="Activation button" options="KeybindOptions"
+                                       value="VoiceKeybind" apply-on-change="true"
+                                       hover-hint="What button toggles or triggers voice chat?"/>
+
+                <dropdown-list-setting id="DropdownController" text="Activation controller" options="ControllerOptions"
+                                       value="VoiceKeybindController" apply-on-change="true"
+                                       hover-hint="What controller does the activation button apply to?"/>
+
+                <!-- Voice activation explainer -->
+
+                <vertical pad-top="3">
+                    <text id="ActivationText" italics="true" text="!ActivationText!" font-color="#95a5a6" 
+                          font-size="3.5"/>
+                </vertical>
+
+            </vertical>
+        </tab>
+
+        <!-- Text -->
+        <tab tab-name="Text Chat" tags="tabs">
+            <vertical child-control-height='false' spacing="1" pad-top="1">
+
+                <checkbox-setting text="Enable text chat" value="EnableTextChat" bind-value="true"
+                                  apply-on-change="true"
+                                  hover-hint="Globally enable/disable all text chat functionality"/>
+
+                <dropdown-list-setting id="DropdownNotification" text="Notification sound"
+                                       options="SoundNotificationOptions"
+                                       value="SoundNotification" apply-on-change="true"
+                                       hover-hint="Notification sound for chat messages in the lobby"/>
+
+            </vertical>
+        </tab>
+
+    </vertical>
+</vertical>

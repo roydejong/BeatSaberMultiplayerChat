@@ -125,8 +125,6 @@ public class VoiceManager : IInitializable, IDisposable
     
     private void HandleMicrophoneEnd()
     {
-        _log.Error("YOOOOOOOOOOOOOOOOOOOOOOOOOOOO MY BALLS LOOOOOOOOOOOOOOOOOOOL");
-        
         _loopbackVoicePlayer.HandleTransmissionEnd();
         
         Array.Clear(_encodeSampleBuffer, 0, _encodeSampleBuffer.Length);
@@ -233,7 +231,7 @@ public class VoiceManager : IInitializable, IDisposable
         
         IsTransmitting = true;
         _microphoneManager.StartCapture();
-        
+
         _chatManager.SetLocalPlayerIsSpeaking(true);
         return true;
     }
@@ -254,7 +252,7 @@ public class VoiceManager : IInitializable, IDisposable
                 Data = null
             });
         }
-        
+
         _chatManager.SetLocalPlayerIsSpeaking(false);
         return true;
     }

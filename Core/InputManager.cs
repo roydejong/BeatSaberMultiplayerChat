@@ -13,7 +13,7 @@ namespace MultiplayerChat.Core;
 public class InputManager : MonoBehaviour, IInitializable, IDisposable
 {
     [Inject] private readonly SiraLog _log = null!;
-    [Inject] private readonly PluginConfig _pluginConfig = null!;
+    [Inject] private readonly PluginConfig _config = null!;
     [Inject] private readonly VoiceManager _voiceManager = null!;
     [Inject] private readonly HapticFeedbackController _hapticFeedback = null!;
     [Inject] private readonly SoundNotifier _soundNotifier = null!;
@@ -22,18 +22,23 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
     private static InputDevice? _rightController;
 
     private bool _triggerConditionActive;
+    private bool _debugKeyIsDown;
 
     private readonly HapticPresetSO _hapticPulsePreset;
 
+    /// <summary>
+    /// If enabled, the trigger will activate loopback/test mode rather than regular voice transmission.
+    /// </summary>
+    public bool TestMode;
+
+    public event Action? OnActivation;
+    public event Action? OnDeactivation;
+
     public InputManager()
     {
-        _hapticPulsePreset = ScriptableObject.CreateInstance<HapticPresetSO>();
-        _hapticPulsePreset._continuous = false;
-        _hapticPulsePreset._duration = .1f;
-        _hapticPulsePreset._frequency = .25f;
-        _hapticPulsePreset._strength = .5f;
+        _hapticPulsePreset = CreateHapticPreset();
     }
-    
+
     public void Initialize()
     {
         _leftController = InputDevices.GetDeviceAtXRNode(XRNode.LeftHand);
@@ -45,7 +50,9 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
         PreloadSounds();
 
         _triggerConditionActive = false;
-        
+        _debugKeyIsDown = false;
+
+        TestMode = false;
         gameObject.SetActive(false); // we'll be activated on session start
     }
 
@@ -55,15 +62,36 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
         InputDevices.deviceDisconnected -= HandleInputDeviceDisconnected;
 
         _triggerConditionActive = false;
+        _debugKeyIsDown = false;
+
+        TestMode = false;
     }
 
     public void OnEnable()
     {
         _triggerConditionActive = false;
+        _debugKeyIsDown = false;
+    }
+
+    public void OnDisable()
+    {
+        if (TriggerIsActive)
+            TriggerDeactivate();
+        
+        _debugKeyIsDown = false;
     }
 
     public void Update()
     {
+        if (_config.DebugKeyboardMicActivation)
+        {
+            // KeyDown/KeyUp is on the frame it is pressed/released
+            if (Input.GetKeyDown(KeyCode.V))
+                _debugKeyIsDown = true;
+            if (Input.GetKeyUp(KeyCode.V))
+                _debugKeyIsDown = false;
+        }
+        
         var wasActive = _triggerConditionActive;
         var isActive = CheckTriggerCondition();
 
@@ -81,35 +109,60 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
         }
     }
 
+    #region Activation
+
+    private bool TriggerIsActive => _voiceManager.IsTransmitting || _voiceManager.IsLoopbackTesting;
+
+    private void TriggerActivate()
+    {
+        if (!_config.EnableVoiceChat)
+            return;
+
+        if (TestMode)
+            _voiceManager.StartLoopbackTest();
+        else if (!_voiceManager.StartVoiceTransmission())
+            return;
+
+        PlayActivationEffect();
+
+        OnActivation?.Invoke();
+    }
+
+    private void TriggerDeactivate()
+    {
+        if (!TriggerIsActive)
+            return;
+
+        _voiceManager.StopLoopbackTest();
+        _voiceManager.StopVoiceTransmission();
+
+        PlayDeactivationEffect();
+
+        OnDeactivation?.Invoke();
+    }
+
+    #endregion
+
     #region Keybind activation
 
     private void HandleKeybindDown()
     {
-        switch (_pluginConfig.VoiceActivationMode)
+        switch (_config.VoiceActivationMode)
         {
             case VoiceActivationMode.Toggle:
             {
                 // Toggle 
-                if (_voiceManager.IsTransmitting)
-                {
-                    if (_voiceManager.StopVoiceTransmission())
-                        PlayDeactivationEffect();
-                }
+                if (TriggerIsActive)
+                    TriggerDeactivate();
                 else
-                {
-                    if (_voiceManager.StartVoiceTransmission())
-                        PlayActivationEffect();
-                }
+                    TriggerActivate();
                 break;
             }
             case VoiceActivationMode.Hold:
             {
                 // Hold - start
-                if (!_voiceManager.IsTransmitting)
-                {
-                    if (_voiceManager.StartVoiceTransmission())
-                        PlayActivationEffect();
-                }
+                if (!TriggerIsActive)
+                    TriggerActivate();
                 break;
             }
         }
@@ -117,16 +170,13 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
 
     private void HandleKeybindUp()
     {
-        switch (_pluginConfig.VoiceActivationMode)
+        switch (_config.VoiceActivationMode)
         {
             case VoiceActivationMode.Hold:
             {
                 // Hold - release
-                if (_voiceManager.IsTransmitting)
-                {
-                    if (_voiceManager.StopVoiceTransmission())
-                        PlayDeactivationEffect();
-                }
+                if (TriggerIsActive)
+                    TriggerDeactivate();
                 break;
             }
         }
@@ -135,22 +185,22 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
     private void PlayActivationEffect()
     {
         PlayMicOnSound();
-        
-        if (_pluginConfig.VoiceKeybindController is VoiceKeybindController.Either or VoiceKeybindController.Left)
+
+        if (_config.VoiceKeybindController is VoiceKeybindController.Either or VoiceKeybindController.Left)
             HapticPulse(XRNode.LeftHand);
-        
-        if (_pluginConfig.VoiceKeybindController is VoiceKeybindController.Either or VoiceKeybindController.Right)
+
+        if (_config.VoiceKeybindController is VoiceKeybindController.Either or VoiceKeybindController.Right)
             HapticPulse(XRNode.RightHand);
     }
 
     private void PlayDeactivationEffect()
     {
         PlayMicOffSound();
-        
-        if (_pluginConfig.VoiceKeybindController is VoiceKeybindController.Either or VoiceKeybindController.Left)
+
+        if (_config.VoiceKeybindController is VoiceKeybindController.Either or VoiceKeybindController.Left)
             HapticPulse(XRNode.LeftHand);
-        
-        if (_pluginConfig.VoiceKeybindController is VoiceKeybindController.Either or VoiceKeybindController.Right)
+
+        if (_config.VoiceKeybindController is VoiceKeybindController.Either or VoiceKeybindController.Right)
             HapticPulse(XRNode.RightHand);
     }
 
@@ -162,6 +212,8 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
     {
         if (!device.isValid)
             return;
+        
+        _log.Debug($"Input device connected: {device.name}");
 
         if ((device.characteristics & InputDeviceCharacteristics.HeldInHand) == 0 ||
             (device.characteristics & InputDeviceCharacteristics.Controller) == 0)
@@ -177,7 +229,7 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
 
     private void HandleInputDeviceDisconnected(InputDevice device)
     {
-        _log.Info($"Input device disconnected: {device.name}");
+        _log.Debug($"Input device disconnected: {device.name}");
 
         if (device == _leftController)
             _leftController = InputDevices.GetDeviceAtXRNode(XRNode.LeftHand);
@@ -189,28 +241,29 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
     #endregion
 
     #region Device states
-    
+
     private bool CheckTriggerCondition()
     {
-        switch (_pluginConfig.VoiceKeybindController)
+        if (_config.DebugKeyboardMicActivation && _debugKeyIsDown)
+            return true;
+
+        switch (_config.VoiceKeybindController)
         {
             case VoiceKeybindController.Either:
-                return CheckTriggerCondition(_leftController) || CheckTriggerCondition(_rightController);
+                return CheckTriggerConditionOnDevice(_leftController) ||
+                       CheckTriggerConditionOnDevice(_rightController);
             case VoiceKeybindController.Left:
-                return CheckTriggerCondition(_leftController);
+                return CheckTriggerConditionOnDevice(_leftController);
             case VoiceKeybindController.Right:
-                return CheckTriggerCondition(_rightController);
+                return CheckTriggerConditionOnDevice(_rightController);
             default:
                 return false;
         }
     }
 
-    private bool CheckTriggerCondition(InputDevice? device)
+    private bool CheckTriggerConditionOnDevice(InputDevice? device)
     {
-        if (_pluginConfig.DebugKeyboardMicActivation && Input.GetKeyDown(KeyCode.V))
-            return true;
-        
-        switch (_pluginConfig.VoiceKeybind)
+        switch (_config.VoiceKeybind)
         {
             case VoiceKeybind.PrimaryButton:
                 return GetInputButtonIsDown(device, CommonUsages.primaryButton);
@@ -224,7 +277,7 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
                 return false;
         }
     }
-    
+
     private static bool GetInputButtonIsDown(InputDevice? inputDevice, InputFeatureUsage<bool> usage)
     {
         if (inputDevice is null || !inputDevice.Value.isValid)
@@ -232,8 +285,9 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
 
         return inputDevice.Value.TryGetFeatureValue(usage, out var value) && value;
     }
-    
-    private static bool GetInputValueThreshold(InputDevice? inputDevice, InputFeatureUsage<float> usage, float threshold)
+
+    private static bool GetInputValueThreshold(InputDevice? inputDevice, InputFeatureUsage<float> usage,
+        float threshold)
     {
         if (inputDevice is null || !inputDevice.Value.isValid)
             return false;
@@ -259,9 +313,84 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
 
     #region Haptics
 
-    public void HapticPulse(XRNode node)
+    private HapticPresetSO CreateHapticPreset()
     {
+        var hapticPulsePreset = ScriptableObject.CreateInstance<HapticPresetSO>();
+        hapticPulsePreset._continuous = false;
+        hapticPulsePreset._duration = .1f;
+        hapticPulsePreset._frequency = .25f;
+        hapticPulsePreset._strength = .5f;
+        return hapticPulsePreset;
+    }
+
+    public void HapticPulse(XRNode node) =>
         _hapticFeedback.PlayHapticFeedback(node, _hapticPulsePreset);
+
+    #endregion
+
+    #region Settings
+
+    public string DescribeKeybindConfig()
+    {
+        if (!_config.EnableVoiceChat)
+            return "Voice chat is disabled";
+
+        string keybindVerb;
+        switch (_config.VoiceActivationMode)
+        {
+            case VoiceActivationMode.Hold:
+                keybindVerb = "Hold";
+                break;
+            case VoiceActivationMode.Toggle:
+            default:
+                keybindVerb = "Press";
+                break;
+        }
+
+        string keybindDescr;
+        switch (_config.VoiceKeybind)
+        {
+            case VoiceKeybind.PrimaryButton:
+                keybindDescr = "the primary button";
+                break;
+            case VoiceKeybind.SecondaryButton:
+                keybindDescr = "the secondary button";
+                break;
+            case VoiceKeybind.Trigger:
+                keybindDescr = "the trigger";
+                break;
+            case VoiceKeybind.StickPress:
+                keybindDescr = "the joystick down";
+                break;
+            default:
+                keybindDescr = "(Unknown button)";
+                break;
+        }
+
+        string controllerText;
+        switch (_config.VoiceKeybindController)
+        {
+            default:
+            case VoiceKeybindController.Either:
+                controllerText = "on either controller";
+                break;
+            case VoiceKeybindController.Left:
+                controllerText = "on the left controller";
+                break;
+            case VoiceKeybindController.Right:
+                controllerText = "on the right controller";
+                break;
+        }
+
+        switch (_config.VoiceActivationMode)
+        {
+            case VoiceActivationMode.Hold:
+                return $"{keybindVerb} {keybindDescr} {controllerText} to speak";
+            case VoiceActivationMode.Toggle:
+                return $"{keybindVerb} {keybindDescr} {controllerText} to unmute/mute";
+            default:
+                return "(Unknown keybind config)";
+        }
     }
 
     #endregion

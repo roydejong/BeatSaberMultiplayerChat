@@ -191,9 +191,11 @@
         <Compile Include="Plugin.cs" />
         <Compile Include="UI\ChatBubble.cs" />
         <Compile Include="UI\Lobby\ChatButton.cs" />
+        <Compile Include="UI\ModSettings\ModSettingsFlowCoordinator.cs" />
         <EmbeddedResource Include="UI\Lobby\ChatViewController.bsml" />
         <Compile Include="UI\Lobby\ChatViewController.cs" />
-        <Compile Include="UI\ModSettings\ModSettingsController.cs" />
+        <Compile Include="UI\ModSettings\ModSettingsMenuController.cs" />
+        <Compile Include="UI\ModSettings\ModSettingsViewController.cs" />
     </ItemGroup>
     <ItemGroup>
       <EmbeddedResource Include="Assets\Chat.png" />
@@ -206,7 +208,7 @@
       <EmbeddedResource Include="Assets\Keyboard.png" />
       <EmbeddedResource Include="Assets\MicOff.png" />
       <EmbeddedResource Include="Assets\MicOn.png" />
-      <EmbeddedResource Include="UI\ModSettings\ModSettings.bsml" />
+      <EmbeddedResource Include="UI\ModSettings\ModSettingsViewController.bsml" />
       <EmbeddedResource Include="manifest.json" />
       <Content Include="README.md" />
     </ItemGroup>

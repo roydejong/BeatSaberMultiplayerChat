@@ -4,11 +4,12 @@ using System.Linq;
 using BeatSaberMarkupLanguage;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components.Settings;
-using BeatSaberMarkupLanguage.Settings;
+using BeatSaberMarkupLanguage.ViewControllers;
 using HMUI;
 using MultiplayerChat.Assets;
 using MultiplayerChat.Audio;
 using MultiplayerChat.Config;
+using MultiplayerChat.Core;
 using MultiplayerChat.Models;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,12 +17,15 @@ using Zenject;
 
 namespace MultiplayerChat.UI.ModSettings;
 
-public class ModSettingsController : IInitializable, IDisposable
+[HotReload]
+// ReSharper disable once ClassNeverInstantiated.Global
+public class ModSettingsViewController : BSMLAutomaticViewController
 {
     [Inject] private readonly PluginConfig _config = null!;
     [Inject] private readonly VoiceManager _voiceManager = null!;
     [Inject] private readonly MicrophoneManager _microphoneManager = null!;
     [Inject] private readonly SoundNotifier _soundNotifier = null!;
+    [Inject] private readonly InputManager _inputManager = null!;
 
     [UIComponent("BtnTestMic")] private Button _btnTestMic = null!;
     [UIComponent("DropdownNotification")] private DropDownListSetting _dropdownNotification = null!;
@@ -31,16 +35,32 @@ public class ModSettingsController : IInitializable, IDisposable
     [UIComponent("DropdownActivation")] private DropDownListSetting _dropdownActivation = null!;
     [UIComponent("DropdownKeybind")] private DropDownListSetting _dropdownKeybind = null!;
     [UIComponent("DropdownController")] private DropDownListSetting _dropdownController = null!;
+    [UIComponent("ActivationText")] private CurvedTextMeshPro _activationText = null!;
 
-    public void Initialize()
+    private bool _bsmlReady = false;
+
+    public override void __Activate(bool addedToHierarchy, bool screenSystemEnabling)
     {
-        BSMLSettings.instance.AddSettingsMenu(SettingsMenuName,
-            "MultiplayerChat.UI.ModSettings.ModSettings.bsml", this);
+        base.__Activate(addedToHierarchy, screenSystemEnabling);
+
+        RefreshUiState();
+
+        if (addedToHierarchy)
+        {
+            _inputManager.OnActivation += HandleInputActivate;
+            _inputManager.OnDeactivation += HandleInputDeactivate;
+        }
     }
 
-    public void Dispose()
+    public override void __Deactivate(bool removedFromHierarchy, bool deactivateGameObject, bool screenSystemDisabling)
     {
-        BSMLSettings.instance.RemoveSettingsMenu(this);
+        base.__Deactivate(removedFromHierarchy, deactivateGameObject, screenSystemDisabling);
+
+        if (removedFromHierarchy)
+        {
+            _inputManager.OnActivation -= HandleInputActivate;
+            _inputManager.OnDeactivation -= HandleInputDeactivate;
+        }
     }
 
     #region Actions
@@ -48,6 +68,8 @@ public class ModSettingsController : IInitializable, IDisposable
     [UIAction("#post-parse")]
     private void HandlePostParse()
     {
+        _bsmlReady = true;
+
         _voiceManager.StopLoopbackTest();
 
         // Make dropdown bigger
@@ -57,21 +79,21 @@ public class ModSettingsController : IInitializable, IDisposable
         trDropdownText.anchorMin = new Vector2(0f, .5f);
         trDropdownText.anchorMax = new Vector2(1f, .5f);
 
-        RefreshInteractables();
+        RefreshUiState();
     }
 
     [UIAction("#apply")]
     private void HandleApply()
     {
         _voiceManager.StopLoopbackTest();
-        RefreshInteractables();
+        RefreshUiState();
     }
 
     [UIAction("#cancel")]
     private void HandleCancel()
     {
         _voiceManager.StopLoopbackTest();
-        RefreshInteractables();
+        RefreshUiState();
     }
 
     [UIAction("BtnTestMicClick")]
@@ -82,22 +104,25 @@ public class ModSettingsController : IInitializable, IDisposable
         else
             _voiceManager.StartLoopbackTest();
 
-        RefreshInteractables();
+        RefreshUiState();
     }
 
     #endregion
 
     #region UI Shared
 
-    private void RefreshInteractables()
+    public void RefreshUiState()
     {
+        if (!_bsmlReady)
+            return;
+
         // Text
         _dropdownNotification.interactable = EnableTextChat;
 
         // Voice
         _toggleVoice.interactable = !_voiceManager.IsLoopbackTesting;
         _dropdownMic.interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting;
-        
+
         if (_voiceManager.IsLoopbackTesting)
         {
             _btnTestMic.interactable = true;
@@ -116,6 +141,13 @@ public class ModSettingsController : IInitializable, IDisposable
         _dropdownActivation.interactable = EnableVoiceChat;
         _dropdownKeybind.interactable = EnableVoiceChat;
         _dropdownController.interactable = EnableVoiceChat;
+
+        // Activation text
+        if (_config.EnableVoiceChat)
+            _activationText.text = "While the settings are open, you can test your keybind to control the mic test" +
+                                   "\r\n" + _inputManager.DescribeKeybindConfig();
+        else
+            _activationText.text = "";
     }
 
     #endregion
@@ -129,7 +161,7 @@ public class ModSettingsController : IInitializable, IDisposable
         set
         {
             _config.EnableTextChat = value;
-            RefreshInteractables();
+            RefreshUiState();
         }
     }
 
@@ -142,7 +174,7 @@ public class ModSettingsController : IInitializable, IDisposable
             if (value != "None" && EnableTextChat)
                 _soundNotifier.LoadAndPlayPreview(value);
             _config.SoundNotification = value;
-            RefreshInteractables();
+            RefreshUiState();
         }
     }
 
@@ -155,7 +187,7 @@ public class ModSettingsController : IInitializable, IDisposable
             _config.EnableVoiceChat = value;
             if (!value)
                 _voiceManager.StopLoopbackTest();
-            RefreshInteractables();
+            RefreshUiState();
         }
     }
 
@@ -171,7 +203,7 @@ public class ModSettingsController : IInitializable, IDisposable
         {
             _microphoneManager.TrySelectDevice(value);
             _config.MicrophoneDevice = value;
-            RefreshInteractables();
+            RefreshUiState();
         }
     }
 
@@ -179,22 +211,34 @@ public class ModSettingsController : IInitializable, IDisposable
     public string VoiceActivationMode
     {
         get => _config.VoiceActivationMode.ToString();
-        set => _config.VoiceActivationMode = (VoiceActivationMode) Enum.Parse(typeof(VoiceActivationMode), value);
+        set
+        {
+            _config.VoiceActivationMode = (VoiceActivationMode) Enum.Parse(typeof(VoiceActivationMode), value);
+            RefreshUiState();
+        }
     }
 
     [UIValue("VoiceKeybind")]
     public string VoiceKeybind
     {
         get => _config.VoiceKeybind.ToString();
-        set => _config.VoiceKeybind = (VoiceKeybind) Enum.Parse(typeof(VoiceKeybind), value);
+        set
+        {
+            _config.VoiceKeybind = (VoiceKeybind) Enum.Parse(typeof(VoiceKeybind), value);
+            RefreshUiState();
+        }
     }
 
     [UIValue("VoiceKeybindController")]
     public string VoiceKeybindController
     {
         get => _config.VoiceKeybindController.ToString();
-        set => _config.VoiceKeybindController =
-            (VoiceKeybindController) Enum.Parse(typeof(VoiceKeybindController), value);
+        set
+        {
+            _config.VoiceKeybindController =
+                (VoiceKeybindController) Enum.Parse(typeof(VoiceKeybindController), value);
+            RefreshUiState();
+        }
     }
 
     #endregion
@@ -241,6 +285,13 @@ public class ModSettingsController : IInitializable, IDisposable
     [UIValue("ControllerOptions")]
     public List<object> ControllerOptions =>
         Enum.GetNames(typeof(VoiceKeybindController)).ToList<object>();
+
+    #endregion
+
+    #region Input events
+
+    private void HandleInputActivate() => RefreshUiState();
+    private void HandleInputDeactivate() => RefreshUiState();
 
     #endregion
 
