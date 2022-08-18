@@ -118,6 +118,9 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
         if (!_config.EnableVoiceChat)
             return;
 
+        if (_config.MicrophoneDevice == "None")
+            return;
+
         if (TestMode)
             _voiceManager.StartLoopbackTest();
         else if (!_voiceManager.StartVoiceTransmission())
@@ -269,10 +272,10 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
                 return GetInputButtonIsDown(device, CommonUsages.primaryButton);
             case VoiceKeybind.SecondaryButton:
                 return GetInputButtonIsDown(device, CommonUsages.secondaryButton);
-            case VoiceKeybind.StickPress:
-                return GetInputButtonIsDown(device, CommonUsages.primary2DAxisClick);
             case VoiceKeybind.Trigger:
                 return GetInputValueThreshold(device, CommonUsages.trigger, .85f);
+            case VoiceKeybind.StickPress:
+                return GetInputButtonIsDown(device, CommonUsages.primary2DAxisClick);
             default:
                 return false;
         }
@@ -293,6 +296,29 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
             return false;
 
         return inputDevice.Value.TryGetFeatureValue(usage, out var value) && value >= threshold;
+    }
+
+    private static bool GetInputValueVector(InputDevice? inputDevice, InputFeatureUsage<Vector2> usage,
+        float? minX = null, float? minY = null, float? maxX = null, float? maxY = null)
+    {
+        if (inputDevice is null || !inputDevice.Value.isValid)
+            return false;
+
+        if (!inputDevice.Value.TryGetFeatureValue(usage, out var value))
+            return false;
+
+        Console.WriteLine($"vector2 = {value.x}, {value.y}");
+        
+        if (minX.HasValue && value.x < minX.Value)
+            return false;
+        if (minY.HasValue && value.y < minY.Value)
+            return false;
+        if (maxX.HasValue && value.x > maxX.Value)
+            return false;
+        if (maxY.HasValue && value.y > maxY.Value)
+            return false;
+
+        return true;
     }
 
     #endregion

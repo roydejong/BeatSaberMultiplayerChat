@@ -37,6 +37,7 @@ public class PluginConfig
     /// <summary>
     /// Volume scale applied when playing the configured sound notification.
     /// Notification sounds are disabled if set to 0 or below.
+    /// Currently affects mic activation/deactivation sound volume as well.
     /// </summary>
     public float SoundNotificationVolume = 0.8f;
 
@@ -72,18 +73,18 @@ public class PluginConfig
     /// <summary>
     /// What button toggles or triggers voice chat?
     /// </summary>
-    public VoiceKeybind VoiceKeybind = VoiceKeybind.SecondaryButton;
+    public VoiceKeybind VoiceKeybind = VoiceKeybind.PrimaryButton;
+    
+    /// <summary>
+    /// What controller(s) does the voice keybind apply to?
+    /// </summary>
+    public VoiceKeybindController VoiceKeybindController = VoiceKeybindController.Either;
 
     /// <summary>
     /// When enabled, pressing "V" on the keyboard will also act like the voice keybind.
     /// Hold/toggle setting still applies.
     /// </summary>
     public bool DebugKeyboardMicActivation = true;
-    
-    /// <summary>
-    /// What controller(s) does the voice keybind apply to?
-    /// </summary>
-    public VoiceKeybindController VoiceKeybindController = VoiceKeybindController.Either;
     
     #endregion
 

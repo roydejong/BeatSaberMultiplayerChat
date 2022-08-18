@@ -5,7 +5,6 @@ using MultiplayerChat.Config;
 using MultiplayerChat.Core;
 using MultiplayerChat.Network;
 using MultiplayerCore.Networking;
-using SiraUtil.Logging;
 using UnityEngine;
 using UnityOpus;
 using Zenject;
@@ -16,7 +15,6 @@ namespace MultiplayerChat.Audio;
 // ReSharper disable once ClassNeverInstantiated.Global
 public class VoiceManager : IInitializable, IDisposable
 {
-    [Inject] private readonly SiraLog _log = null!;
     [Inject] private readonly PluginConfig _pluginConfig = null!;
     [Inject] private readonly ChatManager _chatManager = null!;
     [Inject] private readonly MicrophoneManager _microphoneManager = null!;

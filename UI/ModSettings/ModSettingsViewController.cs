@@ -122,6 +122,9 @@ public class ModSettingsViewController : BSMLAutomaticViewController
         // Voice
         _toggleVoice.interactable = !_voiceManager.IsLoopbackTesting;
         _dropdownMic.interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting;
+        _dropdownActivation.interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting;
+        _dropdownKeybind.interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting;
+        _dropdownController.interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting;
 
         if (_voiceManager.IsLoopbackTesting)
         {
@@ -138,14 +141,10 @@ public class ModSettingsViewController : BSMLAutomaticViewController
             _imgTestMic.color = Color.white;
         }
 
-        _dropdownActivation.interactable = EnableVoiceChat;
-        _dropdownKeybind.interactable = EnableVoiceChat;
-        _dropdownController.interactable = EnableVoiceChat;
-
         // Activation text
-        if (_config.EnableVoiceChat)
+        if (_config.EnableVoiceChat && _config.MicrophoneDevice != "None")
             _activationText.text = "While the settings are open, you can test your keybind to control the mic test" +
-                                   "\r\n" + _inputManager.DescribeKeybindConfig();
+                                   $"\r\n<color=#3498db>{_inputManager.DescribeKeybindConfig()}</color>";
         else
             _activationText.text = "";
     }
