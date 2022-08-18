@@ -42,7 +42,7 @@ public class PlayerVoicePlayer : IDisposable
         _audioSource = audioSource;
         _audioSource.clip = _audioClip;
         _audioSource.timeSamples = 0;
-        _audioSource.volume = 1f;
+        _audioSource.volume = 0f;
 
         if (_spatialBland <= 0)
         {
@@ -74,9 +74,19 @@ public class PlayerVoicePlayer : IDisposable
         _audioClip.SetData(_localBuffer, _bufferPos);
         _bufferPos += decodedLength;
 
-        if (_audioSource != null && !_audioSource.isPlaying)
+        if (_audioSource != null)
         {
-            if (_bufferPos > (PlaybackClipLength / 2))
+            if (_audioSource.isPlaying)
+            {
+                if (_audioSource.volume < 1f)
+                {
+                    if (_audioSource.volume >= .99f || Mathf.Approximately(_audioSource.volume, 1f))
+                        _audioSource.volume = 1f;
+                    else
+                        _audioSource.volume = Mathf.Lerp(_audioSource.volume, 1f, .035f);
+                }
+            }
+            else if (_bufferPos > (PlaybackClipLength / 2))
             {
                 _audioSource.timeSamples = 0;
                 _audioSource.loop = true;
@@ -94,6 +104,7 @@ public class PlayerVoicePlayer : IDisposable
             _audioSource.loop = false;
             _audioSource.Stop();
             _audioSource.timeSamples = 0;
+            _audioSource.volume = 0f;
         }
 
         _bufferPos = 0;

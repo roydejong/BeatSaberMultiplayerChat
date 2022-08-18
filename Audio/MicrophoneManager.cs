@@ -160,7 +160,7 @@ public class MicrophoneManager : MonoBehaviour, IInitializable, IDisposable
         
         Microphone.GetDeviceCaps(deviceName, out _minFreq, out _maxFreq);
         
-        _log.Info($"Selected recording device: {deviceName} (frequency={GetRecordingFrequency()})");
+        _log.Info($"Selected recording device: {deviceName ?? "(Default)"} (frequency={GetRecordingFrequency()})");
         return true;
     }
 
