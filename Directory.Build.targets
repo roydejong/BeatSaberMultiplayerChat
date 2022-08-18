@@ -27,8 +27,8 @@
             <AssemblyVersion>$(PluginVersion)</AssemblyVersion>
         </PropertyGroup>
         <!--<GetAssemblyInfo FailOnError="$(ErrorOnMismatchedVersions)" Condition="'$(AssemblyVersion)' == ''">
-      <Output TaskParameter="AssemblyVersion" PropertyName="AssemblyVersion" />
-    </GetAssemblyInfo>-->
+          <Output TaskParameter="AssemblyVersion" PropertyName="AssemblyVersion" />
+        </GetAssemblyInfo>-->
         <CompareVersions PluginVersion="$(PluginVersion)" AssemblyVersion="$(AssemblyVersion)" ErrorOnMismatch="$(ErrorOnMismatchedVersions)" />
         <GetCommitInfo ProjectDir="$(ProjectDir)">
             <Output TaskParameter="CommitHash" PropertyName="CommitHash" />

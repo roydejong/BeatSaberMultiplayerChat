@@ -13,9 +13,14 @@ public static class MpcVersionInfo
     /// This will be incremented whenever there is a change to networked features.
     /// </summary>
     public const uint ProtocolVersion = 1;
-    
+
     /// <summary>
     /// Gets the product version / display version for this version of MPC.
+    /// </summary>
+    public static string AssemblyVersion => Assembly.GetExecutingAssembly().GetName().Version.ToString();
+
+    /// <summary>
+    /// Gets the product version / informational version for this version of MPC.
     /// </summary>
     public static string AssemblyProductVersion =>
         FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductVersion;

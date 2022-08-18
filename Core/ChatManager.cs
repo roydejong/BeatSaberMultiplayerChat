@@ -95,7 +95,8 @@ public class ChatManager : IInitializable, IDisposable
         if (!TextChatEnabled)
             return;
 
-        ShowSystemMessage($"MultiplayerChat v{MpcVersionInfo.AssemblyProductVersion}");
+        ShowSystemMessage($"MultiplayerChat v{MpcVersionInfo.AssemblyVersion} " +
+                          $"<color=#95a5a6>({MpcVersionInfo.AssemblyProductVersion})</color>");
     }
 
     /// <summary>
@@ -105,6 +106,8 @@ public class ChatManager : IInitializable, IDisposable
     {
         if (!TextChatEnabled || !SessionConnected)
             return;
+        
+        _log.Debug(text);
 
         ChatMessageEvent?.Invoke(this, ChatMessage.CreateSystemMessage(text));
     }

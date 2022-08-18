@@ -14,12 +14,13 @@ public class ChatMessage
     public readonly bool SenderIsHost;
     public readonly bool SenderIsMe;
 
-    private ChatMessage(ChatMessageType type, string userId, string userName, string text, bool senderIsHost, bool senderIsMe)
+    private ChatMessage(ChatMessageType type, string userId, string userName, string text, bool senderIsHost, 
+        bool senderIsMe, bool stripTags = true)
     {
         Type = type;
         UserId = userId;
-        UserName = StripTags(userName);
-        Text = StripTags(text);
+        UserName = stripTags ? StripTags(userName) : userName;
+        Text = stripTags ? StripTags(text) : text;
 
         SenderIsHost = senderIsHost;
         SenderIsMe = senderIsMe;
@@ -47,7 +48,8 @@ public class ChatMessage
         userName: localPlayer.userName,
         text: text,
         senderIsHost: localPlayer.isConnectionOwner,
-        senderIsMe: localPlayer.isMe
+        senderIsMe: localPlayer.isMe,
+        stripTags: true
     );
 
     public static ChatMessage CreateFromPacket(MpcTextChatPacket packet, IConnectedPlayer sender) => new
@@ -57,7 +59,8 @@ public class ChatMessage
         userName: sender.userName,
         text: packet.Text ?? "",
         senderIsHost: sender.isConnectionOwner,
-        senderIsMe: sender.isMe
+        senderIsMe: sender.isMe,
+        stripTags: true
     );
 
     public static ChatMessage CreateSystemMessage(string text) => new
@@ -67,7 +70,8 @@ public class ChatMessage
         userName: "System",
         text: text,
         senderIsHost: false,
-        senderIsMe: false
+        senderIsMe: false,
+        stripTags: false
     );
 }
 
