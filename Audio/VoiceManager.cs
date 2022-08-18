@@ -133,28 +133,32 @@ public class VoiceManager : IInitializable, IDisposable
     {
         if (encodedLength <= 0)
             return;
-        
-        // Broadcast unreliable voice frame
-        var sendBuffer = new byte[encodedLength];
-        Array.Copy(_encodeOutputBuffer, sendBuffer, encodedLength);
-        
-        var voicePacket = new MpcVoicePacket()
-        {
-            Data = sendBuffer
-        };
 
-        if (IsLoopbackTesting)
+        var voicePacket = MpcVoicePacket.Obtain();
+        
+        try
         {
-            // Loopback test only - do not actually send, instead loop as if it was just received
-            HandleVoicePacket(voicePacket, null);
-            return;
+            // Broadcast unreliable voice frame
+            voicePacket.AllocatePooledBuffer(encodedLength);
+            Buffer.BlockCopy(_encodeOutputBuffer, 0, voicePacket.Data!, 0, encodedLength);
+
+            if (IsLoopbackTesting)
+            {
+                // Loopback test only - do not actually send, instead loop as if it was just received
+                HandleVoicePacket(voicePacket, null);
+                return;
+            }
+
+            // Normal mode: network send if transmitting
+            if (!_multiplayerSession.isConnected || !_multiplayerSession.isSyncTimeInitialized || !IsTransmitting)
+                return;
+
+            _multiplayerSession.SendUnreliable(voicePacket);
         }
-        
-        // Normal mode: network send if transmitting
-        if (!_multiplayerSession.isConnected || !_multiplayerSession.isSyncTimeInitialized || !IsTransmitting)
-            return;
-        
-        _multiplayerSession.SendUnreliable(voicePacket);
+        finally
+        {
+            voicePacket.Release();
+        }
     }
 
     #endregion
@@ -166,11 +170,18 @@ public class VoiceManager : IInitializable, IDisposable
         if (!_pluginConfig.EnableVoiceChat)
             return;
 
-        var dataLength = packet.Data?.Length ?? 0;
-        if (dataLength > 0)
-            HandleVoiceFragment(_opusDecoder.Decode(packet.Data, dataLength, _decodeSampleBuffer), source);
-        else
-            HandleVoiceFragment(0, source);
+        try
+        {
+            var dataLength = packet.DataLength;
+            if (dataLength > 0)
+                HandleVoiceFragment(_opusDecoder.Decode(packet.Data, dataLength, _decodeSampleBuffer), source);
+            else
+                HandleVoiceFragment(0, source);
+        }
+        finally
+        {
+            packet.Release();   
+        }
     }
 
     private void HandleVoiceFragment(int decodedLength, IConnectedPlayer? source)
@@ -245,10 +256,17 @@ public class VoiceManager : IInitializable, IDisposable
         if (_multiplayerSession.isConnected)
         {
             // Empty packet to signal end of transmission 
-            _multiplayerSession.SendUnreliable(new MpcVoicePacket()
+            var endPacket = MpcVoicePacket.Obtain();
+
+            try
             {
-                Data = null
-            });
+                endPacket.Data = null;
+                _multiplayerSession.SendUnreliable(endPacket);
+            }
+            finally
+            {
+                endPacket.Release();
+            }
         }
 
         _chatManager.SetLocalPlayerIsSpeaking(false);
