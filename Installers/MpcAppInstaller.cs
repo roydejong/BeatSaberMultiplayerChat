@@ -1,4 +1,5 @@
 ﻿using MultiplayerChat.Audio;
+using MultiplayerChat.Audio.VoIP;
 using MultiplayerChat.Config;
 using MultiplayerChat.Core;
 using Zenject;
@@ -19,6 +20,8 @@ public class MpcAppInstaller : Installer
         Container.BindInterfacesAndSelfTo<SoundNotifier>().FromNewComponentOnNewGameObject().AsSingle();
         
         Container.BindInterfacesAndSelfTo<InputManager>().FromNewComponentOnNewGameObject().AsSingle();
+        
+        Container.BindInterfacesAndSelfTo<OpusDecodeThread>().AsSingle();
         
         Container.BindInterfacesAndSelfTo<ChatManager>().AsSingle();
         Container.BindInterfacesAndSelfTo<VoiceManager>().AsSingle();

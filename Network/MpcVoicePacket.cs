@@ -1,6 +1,5 @@
-﻿using System;
-using LiteNetLib.Utils;
-using MultiplayerChat.Audio;
+﻿using LiteNetLib.Utils;
+using MultiplayerChat.Audio.VoIP;
 using Zenject;
 
 namespace MultiplayerChat.Network;
@@ -20,6 +19,7 @@ public class MpcVoicePacket : MpcBasePacket, IPoolablePacket
     private int? _bufferContentSize;
 
     public int DataLength => _bufferContentSize ?? Data?.Length ?? 0;
+    public bool IsEndOfTransmission => DataLength == 0;
 
     public override void Serialize(NetDataWriter writer)
     {
@@ -43,7 +43,7 @@ public class MpcVoicePacket : MpcBasePacket, IPoolablePacket
 
     #region Packet Pool
     
-    protected static PacketPool<MpcVoicePacket> Pool => ThreadStaticPacketPool<MpcVoicePacket>.pool;
+    private static PacketPool<MpcVoicePacket> Pool => ThreadStaticPacketPool<MpcVoicePacket>.pool;
 
     public static MpcVoicePacket Obtain() => Pool.Obtain();
     
@@ -63,17 +63,13 @@ public class MpcVoicePacket : MpcBasePacket, IPoolablePacket
 
     #region Byte Pool
 
-    protected static readonly ArrayPool<byte> BytePool = ArrayPool<byte>.GetPool(VoiceManager.FrameByteSize);
-    // each individual frame *should* be smaller than FrameByteSize, because that refers to unencoded data...
+    private static readonly ArrayPool<byte> BytePool = ArrayPool<byte>.GetPool(OpusConstants.FrameByteLength);
 
     public void AllocatePooledBuffer(int encodedSize)
     {
         ReturnPooledBuffer();
         
         Data = BytePool.Spawn();
-
-        if (Data.Length < encodedSize)
-            throw new InvalidOperationException("this should never happen: rented buffer is too smol");
         
         _isRentedBuffer = true;
         _bufferContentSize = encodedSize;

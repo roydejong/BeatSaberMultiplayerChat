@@ -1,5 +1,7 @@
 ﻿using System;
 using IPA.Utilities;
+using MultiplayerChat.Audio.VoIP;
+using MultiplayerChat.Network;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -9,29 +11,27 @@ public class PlayerVoicePlayer : IDisposable
 {
     private const int PlaybackClipLength = 1024 * 6;
 
+    private readonly JitterBuffer _jitterBuffer;
     private readonly float _spatialBland;
     private readonly AudioClip _audioClip;
-    private float[]? _localBuffer;
-    private int _bufferPos;
 
     private AudioSource? _audioSource;
 
     public bool IsReceiving { get; private set; }
     public bool IsPlaying => _audioSource != null && _audioSource.isPlaying;
 
-    public PlayerVoicePlayer(float spatialBland)
+    public PlayerVoicePlayer(OpusDecodeThread decodeThread, float spatialBland)
     {
+        _jitterBuffer = new JitterBuffer(decodeThread);
         _spatialBland = spatialBland;
-        _audioClip = AudioClip.Create("VoicePlayback", PlaybackClipLength, (int) VoiceManager.OpusChannels,
-            (int) VoiceManager.OpusFrequency, false);
-        _localBuffer = null;
-        _bufferPos = 0;
+        _audioClip = AudioClip.Create("VoicePlayback", PlaybackClipLength, (int) OpusConstants.Channels,
+            (int) OpusConstants.Frequency, true, pcmreadercallback: HandlePcmRead);
     }
 
     public void Dispose()
     {
         Object.Destroy(_audioClip);
-        _localBuffer = null;
+        _jitterBuffer.Dispose();
     }
 
     public void SetMultiplayerAvatarAudioController(MultiplayerAvatarAudioController avatarAudio) =>
@@ -56,45 +56,18 @@ public class PlayerVoicePlayer : IDisposable
         }
     }
 
-    public void HandleDecodedFragment(float[] decodeBuffer, int decodedLength)
+    public void HandleVoicePacket(MpcVoicePacket voicePacket)
     {
-        if (_audioSource == null || decodedLength <= 0)
-        {
-            HandleTransmissionEnd();
+        _jitterBuffer.Feed(voicePacket);
+
+        // Reset & start playback if not yet playing
+        if (voicePacket.IsEndOfTransmission || _audioSource is null || _audioSource.isPlaying)
             return;
-        }
-
-        if (_localBuffer == null || _localBuffer.Length != decodedLength)
-            _localBuffer = new float[decodedLength];
-
-        IsReceiving = true;
-
-        Array.Copy(decodeBuffer, _localBuffer, decodedLength);
-
-        _audioClip.SetData(_localBuffer, _bufferPos);
-        _bufferPos += decodedLength;
-
-        if (_audioSource != null)
-        {
-            if (_audioSource.isPlaying)
-            {
-                if (_audioSource.volume < 1f)
-                {
-                    if (_audioSource.volume >= .99f || Mathf.Approximately(_audioSource.volume, 1f))
-                        _audioSource.volume = 1f;
-                    else
-                        _audioSource.volume = Mathf.Lerp(_audioSource.volume, 1f, .035f);
-                }
-            }
-            else if (_bufferPos > (PlaybackClipLength / 2))
-            {
-                _audioSource.timeSamples = 0;
-                _audioSource.loop = true;
-                _audioSource.Play();
-            }
-        }
-
-        _bufferPos %= PlaybackClipLength;
+        
+        _audioSource.timeSamples = 0;
+        _audioSource.loop = true;
+        _audioSource.volume = 0f;
+        _audioSource.Play();
     }
 
     public void HandleTransmissionEnd()
@@ -107,11 +80,36 @@ public class PlayerVoicePlayer : IDisposable
             _audioSource.volume = 0f;
         }
 
-        _bufferPos = 0;
-        _audioClip.SetData(EmptyClipSamples, 0);
-
         IsReceiving = false;
     }
 
-    private static readonly float[] EmptyClipSamples = new float[PlaybackClipLength];
+    private void HandlePcmRead(float[] data)
+    {
+        bool isEndOfTransmission;
+        bool isSilence;
+        
+        _jitterBuffer.ReadNext(data, out isEndOfTransmission, out isSilence, out var logText);
+
+        Console.WriteLine($"HandlePcmRead [data={data.Length}, logText={logText}]");
+        
+        if (_audioSource != null)
+        {
+            if (isSilence)
+            {
+                // Reset volume if frame was fully silent (buffer delay or buffer empty)
+                _audioSource.volume = 0f;
+            }
+            else if (_audioSource.volume < 1f)
+            {
+                // Ramp up volume (helps prevents bad noise at start of a transmission)
+                if (_audioSource.volume >= .99f || Mathf.Approximately(_audioSource.volume, 1f))
+                    _audioSource.volume = 1f;
+                else
+                    _audioSource.volume = Mathf.Lerp(_audioSource.volume, 1f, .035f);
+            }
+        }
+
+        if (isEndOfTransmission)
+            HandleTransmissionEnd();
+    }
 }

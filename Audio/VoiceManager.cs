@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using IPA.Utilities;
+using MultiplayerChat.Audio.VoIP;
 using MultiplayerChat.Config;
 using MultiplayerChat.Core;
 using MultiplayerChat.Network;
 using MultiplayerCore.Networking;
+using SiraUtil.Logging;
 using UnityEngine;
 using UnityOpus;
 using Zenject;
@@ -15,61 +17,50 @@ namespace MultiplayerChat.Audio;
 // ReSharper disable once ClassNeverInstantiated.Global
 public class VoiceManager : IInitializable, IDisposable
 {
+    [Inject] private readonly SiraLog _log = null!;
     [Inject] private readonly PluginConfig _pluginConfig = null!;
     [Inject] private readonly ChatManager _chatManager = null!;
     [Inject] private readonly MicrophoneManager _microphoneManager = null!;
     [Inject] private readonly IMultiplayerSessionManager _multiplayerSession = null!;
     [Inject] private readonly MpPacketSerializer _packetSerializer = null!;
+    [Inject] private readonly OpusDecodeThread _opusDecodeThread = null!;
 
     private readonly Encoder _opusEncoder;
-    private readonly Decoder _opusDecoder;
 
     private readonly float[] _encodeSampleBuffer;
     private readonly byte[] _encodeOutputBuffer;
     private int _encodeSampleIndex;
 
-    private readonly float[] _decodeSampleBuffer;
-
-    public const NumChannels OpusChannels = NumChannels.Mono;
-    public static readonly SamplingFrequency OpusFrequency = SamplingFrequency.Frequency_48000;
-    public const int OpusComplexity = 10;
-
-    public const int Bitrate = 96000;
-    public const int FrameLength = 120;
-    public const int FrameByteSize = FrameLength * sizeof(float);
-    
     public bool IsTransmitting { get; private set; }
 
     public bool IsLoopbackTesting { get; private set; }
     private AudioSource? _loopbackTester;
 
-    private PlayerVoicePlayer _loopbackVoicePlayer;
+    private PlayerVoicePlayer _loopbackVoicePlayer = null!;
     private Dictionary<string, PlayerVoicePlayer> _voicePlayers;
 
     public VoiceManager()
     {
-        _opusEncoder = new(OpusFrequency, OpusChannels, OpusApplication.VoIP)
+        _opusEncoder = new(OpusConstants.Frequency, OpusConstants.Channels, OpusApplication.VoIP)
         {
-            Bitrate = Bitrate,
-            Complexity = OpusComplexity,
-            Signal = OpusSignal.Voice
+            Bitrate = OpusConstants.Bitrate,
+            Complexity = OpusConstants.Complexity,
+            Signal = OpusConstants.Signal
         };
-        _opusDecoder = new(OpusFrequency, OpusChannels);
 
-        _encodeSampleBuffer = new float[FrameLength];
-        _encodeOutputBuffer = new byte[FrameByteSize];
+        _encodeSampleBuffer = new float[OpusConstants.FrameSampleLength];
+        _encodeOutputBuffer = new byte[OpusConstants.FrameByteLength];
         _encodeSampleIndex = 0;
-
-        _decodeSampleBuffer = new float[Decoder.maximumPacketDuration * (int)OpusChannels];
 
         IsLoopbackTesting = false;
 
-        _loopbackVoicePlayer = new PlayerVoicePlayer(0);
         _voicePlayers = new();
     }
 
     public void Initialize()
     {
+        _loopbackVoicePlayer = new PlayerVoicePlayer(_opusDecodeThread, 0);
+        
         _multiplayerSession.disconnectedEvent += HandleSessionDisconnected;
         
         _microphoneManager.OnFragmentReady += HandleMicrophoneFragment;
@@ -89,7 +80,6 @@ public class VoiceManager : IInitializable, IDisposable
         _microphoneManager.OnCaptureEnd -= HandleMicrophoneEnd;
 
         _opusEncoder.Dispose();
-        _opusDecoder.Dispose();
         
         IsLoopbackTesting = false;
         if (_loopbackTester != null)
@@ -110,14 +100,21 @@ public class VoiceManager : IInitializable, IDisposable
         {
             _encodeSampleBuffer[_encodeSampleIndex++] = sample;
 
-            if (_encodeSampleIndex != FrameLength)
+            if (_encodeSampleIndex != OpusConstants.FrameSampleLength)
+                // Collect samples until we have a full frame
                 continue;
-            
-            HandleEncodedFrame
-            (
-                _opusEncoder.Encode(_encodeSampleBuffer, FrameLength, _encodeOutputBuffer)
-            );
-            _encodeSampleIndex = 0;
+
+            try
+            {
+                HandleEncodedFrame
+                (
+                    _opusEncoder.Encode(_encodeSampleBuffer, OpusConstants.FrameSampleLength, _encodeOutputBuffer)
+                );
+            }
+            finally
+            {
+                _encodeSampleIndex = 0;   
+            }
         }
     }
     
@@ -170,29 +167,20 @@ public class VoiceManager : IInitializable, IDisposable
         if (!_pluginConfig.EnableVoiceChat)
             return;
 
-        try
+        var dataLength = packet.DataLength;
+        if (dataLength > OpusConstants.FrameByteLength)
         {
-            var dataLength = packet.DataLength;
-            if (dataLength > 0)
-                HandleVoiceFragment(_opusDecoder.Decode(packet.Data, dataLength, _decodeSampleBuffer), source);
-            else
-                HandleVoiceFragment(0, source);
-        }
-        finally
-        {
-            packet.Release();   
-        }
-    }
-
-    private void HandleVoiceFragment(int decodedLength, IConnectedPlayer? source)
-    {
-        if (source == null)
-        {
-            // This should only happen in loopback situations
-            _loopbackVoicePlayer.HandleDecodedFragment(_decodeSampleBuffer, decodedLength);
+            _log.Warn($"Dropping oversized voice frame (dataLength={dataLength}, FrameByteSize={OpusConstants.FrameByteLength})");
             return;
         }
 
+        if (source == null)
+        {
+            // Loopback test
+            _loopbackVoicePlayer.HandleVoicePacket(packet);
+            return;
+        }
+        
         if (_chatManager.GetIsPlayerMuted(source.userId))
         {
             // Player is muted
@@ -200,27 +188,18 @@ public class VoiceManager : IInitializable, IDisposable
             return;
         }
 
-        var isEndOfTransmission = decodedLength <= 0;
-
+        // Get or initialize player entry
         if (!_voicePlayers.TryGetValue(source.userId, out var voicePlayer))
         {
-            if (isEndOfTransmission)
+            if (packet.IsEndOfTransmission)
                 return;
         
-            voicePlayer = new PlayerVoicePlayer(_pluginConfig.SpatialBlend);
+            voicePlayer = new PlayerVoicePlayer(_opusDecodeThread, _pluginConfig.SpatialBlend);
             _voicePlayers.Add(source.userId, voicePlayer);
         }
-
-        if (!isEndOfTransmission)
-        {
-            voicePlayer.HandleDecodedFragment(_decodeSampleBuffer, decodedLength);
-            _chatManager.SetPlayerIsSpeaking(source, true);
-        }
-        else
-        {
-            voicePlayer.HandleTransmissionEnd();
-            _chatManager.SetPlayerIsSpeaking(source, false);
-        }
+        
+        // Push it
+        voicePlayer.HandleVoicePacket(packet);
     }
 
     #endregion
@@ -329,7 +308,7 @@ public class VoiceManager : IInitializable, IDisposable
         
         if (!_voicePlayers.TryGetValue(player.userId, out var voicePlayer))
         {
-            voicePlayer = new PlayerVoicePlayer(_pluginConfig.SpatialBlend);
+            voicePlayer = new PlayerVoicePlayer(_opusDecodeThread, _pluginConfig.SpatialBlend);
             _voicePlayers.Add(player.userId, voicePlayer);
         }
         
