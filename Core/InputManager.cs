@@ -26,13 +26,23 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
 
     private readonly HapticPresetSO _hapticPulsePreset;
 
+    private bool _testMode;
     /// <summary>
     /// If enabled, the trigger will activate loopback/test mode rather than regular voice transmission.
     /// </summary>
-    public bool TestMode;
+    public bool TestMode
+    {
+        get => _testMode;
+        set
+        {
+            _testMode = value;
+            TestModeChangedEvent?.Invoke();
+        }
+    }
 
-    public event Action? OnActivation;
-    public event Action? OnDeactivation;
+    public event Action? ActivatedEvent;
+    public event Action? DeactivatedEvent;
+    public event Action? TestModeChangedEvent;
 
     public InputManager()
     {
@@ -128,7 +138,7 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
 
         PlayActivationEffect();
 
-        OnActivation?.Invoke();
+        ActivatedEvent?.Invoke();
     }
 
     private void TriggerDeactivate()
@@ -141,7 +151,7 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
 
         PlayDeactivationEffect();
 
-        OnDeactivation?.Invoke();
+        DeactivatedEvent?.Invoke();
     }
 
     #endregion

@@ -1,4 +1,5 @@
 ﻿using MultiplayerChat.Core;
+using MultiplayerChat.UI.Hud;
 using MultiplayerChat.UI.Lobby;
 using MultiplayerChat.UI.ModSettings;
 using Zenject;
@@ -22,5 +23,8 @@ public class MpcMenuInstaller : Installer
         
         // Core
         Container.BindInterfacesAndSelfTo<LobbyIntegrator>().AsSingle();
+        
+        // HUD
+        Container.BindInterfacesAndSelfTo<HudVoiceIndicator>().FromNewComponentOnNewGameObject().AsSingle();
     }
 }

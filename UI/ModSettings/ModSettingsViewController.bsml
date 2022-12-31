@@ -75,5 +75,16 @@
             </vertical>
         </tab>
 
+        <!-- HUD -->
+        <tab tab-name="HUD" tags="tabs">
+            <vertical child-control-height='false' spacing="1" pad-top="1">
+
+                <checkbox-setting id="ToggleHud" text="Enable microphone indicator" value="EnableHud" bind-value="true"
+                                  apply-on-change="true"
+                                  hover-hint="Enable floating microphone indicator HUD while in multiplayer"/>
+
+            </vertical>
+        </tab>
+
     </vertical>
 </vertical>

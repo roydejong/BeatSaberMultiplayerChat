@@ -37,7 +37,7 @@ public class VoiceManager : IInitializable, IDisposable
     public const int Bitrate = 96000;
     public const int FrameLength = 120;
     public const int FrameByteSize = FrameLength * sizeof(float);
-    
+
     public bool IsTransmitting { get; private set; }
 
     public bool IsLoopbackTesting { get; private set; }
@@ -45,6 +45,9 @@ public class VoiceManager : IInitializable, IDisposable
 
     private PlayerVoicePlayer _loopbackVoicePlayer;
     private Dictionary<string, PlayerVoicePlayer> _voicePlayers;
+
+    public event Action? StartedTransmittingEvent;
+    public event Action? StoppedTransmittingEvent;
 
     public VoiceManager()
     {
@@ -60,7 +63,7 @@ public class VoiceManager : IInitializable, IDisposable
         _encodeOutputBuffer = new byte[FrameByteSize];
         _encodeSampleIndex = 0;
 
-        _decodeSampleBuffer = new float[Decoder.maximumPacketDuration * (int)OpusChannels];
+        _decodeSampleBuffer = new float[Decoder.maximumPacketDuration * (int) OpusChannels];
 
         IsLoopbackTesting = false;
 
@@ -71,7 +74,7 @@ public class VoiceManager : IInitializable, IDisposable
     public void Initialize()
     {
         _multiplayerSession.disconnectedEvent += HandleSessionDisconnected;
-        
+
         _microphoneManager.OnFragmentReady += HandleMicrophoneFragment;
         _microphoneManager.OnCaptureEnd += HandleMicrophoneEnd;
 
@@ -81,21 +84,21 @@ public class VoiceManager : IInitializable, IDisposable
     public void Dispose()
     {
         _multiplayerSession.disconnectedEvent -= HandleSessionDisconnected;
-        
+
         if (_microphoneManager.IsCapturing)
             _microphoneManager.StopCapture();
-        
+
         _microphoneManager.OnFragmentReady -= HandleMicrophoneFragment;
         _microphoneManager.OnCaptureEnd -= HandleMicrophoneEnd;
 
         _opusEncoder.Dispose();
         _opusDecoder.Dispose();
-        
+
         IsLoopbackTesting = false;
         if (_loopbackTester != null)
             Object.Destroy(_loopbackTester);
     }
-    
+
     private void HandleSessionDisconnected(DisconnectedReason reason)
     {
         StopVoiceTransmission();
@@ -112,7 +115,7 @@ public class VoiceManager : IInitializable, IDisposable
 
             if (_encodeSampleIndex != FrameLength)
                 continue;
-            
+
             HandleEncodedFrame
             (
                 _opusEncoder.Encode(_encodeSampleBuffer, FrameLength, _encodeOutputBuffer)
@@ -120,11 +123,11 @@ public class VoiceManager : IInitializable, IDisposable
             _encodeSampleIndex = 0;
         }
     }
-    
+
     private void HandleMicrophoneEnd()
     {
         _loopbackVoicePlayer.HandleTransmissionEnd();
-        
+
         Array.Clear(_encodeSampleBuffer, 0, _encodeSampleBuffer.Length);
         Array.Clear(_encodeOutputBuffer, 0, _encodeOutputBuffer.Length);
     }
@@ -135,7 +138,7 @@ public class VoiceManager : IInitializable, IDisposable
             return;
 
         var voicePacket = MpcVoicePacket.Obtain();
-        
+
         try
         {
             // Broadcast unreliable voice frame
@@ -180,7 +183,7 @@ public class VoiceManager : IInitializable, IDisposable
         }
         finally
         {
-            packet.Release();   
+            packet.Release();
         }
     }
 
@@ -206,7 +209,7 @@ public class VoiceManager : IInitializable, IDisposable
         {
             if (isEndOfTransmission)
                 return;
-        
+
             voicePlayer = new PlayerVoicePlayer(_pluginConfig.SpatialBlend);
             _voicePlayers.Add(source.userId, voicePlayer);
         }
@@ -227,21 +230,22 @@ public class VoiceManager : IInitializable, IDisposable
 
     #region Talk API
 
+    public bool CanTransmit => _pluginConfig.EnableVoiceChat &&
+                               _multiplayerSession is {isConnected: true, isSyncTimeInitialized: true};
+
     public bool StartVoiceTransmission()
     {
-        if (!_pluginConfig.EnableVoiceChat)
+        if (!CanTransmit)
             return false;
         
         if (IsTransmitting)
             return true;
 
-        if (!_multiplayerSession.isConnected || !_multiplayerSession.isSyncTimeInitialized)
-            return false;
-        
         IsTransmitting = true;
         _microphoneManager.StartCapture();
 
         _chatManager.SetLocalPlayerIsSpeaking(true);
+        StartedTransmittingEvent?.Invoke();
         return true;
     }
 
@@ -249,7 +253,7 @@ public class VoiceManager : IInitializable, IDisposable
     {
         if (!IsTransmitting)
             return true;
-        
+
         _microphoneManager.StopCapture();
         IsTransmitting = false;
 
@@ -270,6 +274,7 @@ public class VoiceManager : IInitializable, IDisposable
         }
 
         _chatManager.SetLocalPlayerIsSpeaking(false);
+        StoppedTransmittingEvent?.Invoke();
         return true;
     }
 
@@ -278,7 +283,7 @@ public class VoiceManager : IInitializable, IDisposable
         if (_voicePlayers.TryGetValue(userId, out var voicePlayer))
             voicePlayer.HandleTransmissionEnd();
     }
-    
+
     #endregion
 
     #region Loopback test
@@ -292,7 +297,7 @@ public class VoiceManager : IInitializable, IDisposable
         }
 
         _loopbackVoicePlayer.ConfigureAudioSource(_loopbackTester);
-        
+
         _loopbackTester.gameObject.SetActive(true);
         return _loopbackTester;
     }
@@ -300,7 +305,7 @@ public class VoiceManager : IInitializable, IDisposable
     public void StartLoopbackTest()
     {
         StopLoopbackTest();
-        
+
         SetupLoopback();
 
         IsLoopbackTesting = true;
@@ -310,12 +315,12 @@ public class VoiceManager : IInitializable, IDisposable
     public void StopLoopbackTest()
     {
         _microphoneManager.StopCapture();
-        
+
         _loopbackVoicePlayer.HandleTransmissionEnd();
 
         if (!IsLoopbackTesting)
             return;
-        
+
         IsLoopbackTesting = false;
     }
 
@@ -326,13 +331,13 @@ public class VoiceManager : IInitializable, IDisposable
     public void ProvideAvatarAudio(MultiplayerAvatarAudioController avatarAudio)
     {
         var player = avatarAudio.GetField<IConnectedPlayer, MultiplayerAvatarAudioController>("_connectedPlayer");
-        
+
         if (!_voicePlayers.TryGetValue(player.userId, out var voicePlayer))
         {
             voicePlayer = new PlayerVoicePlayer(_pluginConfig.SpatialBlend);
             _voicePlayers.Add(player.userId, voicePlayer);
         }
-        
+
         voicePlayer.SetMultiplayerAvatarAudioController(avatarAudio);
     }
 

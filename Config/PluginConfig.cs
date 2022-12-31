@@ -88,6 +88,20 @@ public class PluginConfig
     
     #endregion
 
+    #region HUD
+
+    /// <summary>
+    /// Controls whether the mic indicator HUD is enabled in multiplayer.
+    /// </summary>
+    public bool EnableHud = true;
+
+    /// <summary>
+    /// Controls maximum HUD opacity.
+    /// </summary>
+    public float HudOpacity = .75f;
+
+    #endregion
+    
     #region Shared
     
     /// <summary>

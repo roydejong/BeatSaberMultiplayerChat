@@ -38,6 +38,7 @@ public class ModSettingsViewController : BSMLAutomaticViewController
     [UIComponent("ActivationText")] private CurvedTextMeshPro _activationText = null!;
     [UIComponent("TogglePlayerBubbles")] private ToggleSetting _togglePlayerBubbles = null!;
     [UIComponent("ToggleCenterBubbles")] private ToggleSetting _toggleCenterBubbles = null!;
+    [UIComponent("ToggleHud")] private ToggleSetting _toggleHud = null!;
 
     private bool _bsmlReady = false;
 
@@ -49,8 +50,8 @@ public class ModSettingsViewController : BSMLAutomaticViewController
 
         if (addedToHierarchy)
         {
-            _inputManager.OnActivation += HandleInputActivate;
-            _inputManager.OnDeactivation += HandleInputDeactivate;
+            _inputManager.ActivatedEvent += HandleInputActivate;
+            _inputManager.DeactivatedEvent += HandleInputDeactivate;
         }
     }
 
@@ -60,8 +61,8 @@ public class ModSettingsViewController : BSMLAutomaticViewController
 
         if (removedFromHierarchy)
         {
-            _inputManager.OnActivation -= HandleInputActivate;
-            _inputManager.OnDeactivation -= HandleInputDeactivate;
+            _inputManager.ActivatedEvent -= HandleInputActivate;
+            _inputManager.DeactivatedEvent -= HandleInputDeactivate;
         }
     }
 
@@ -135,14 +136,14 @@ public class ModSettingsViewController : BSMLAutomaticViewController
             _btnTestMic.interactable = true;
             _btnTestMic.SetButtonText("<color=#ff3b3b>Testing mic</color>");
             _imgTestMic.sprite = Sprites.MicOn;
-            _imgTestMic.color = Color.red;
+            _imgTestMic.color = MpcColors.Green;
         }
         else
         {
             _btnTestMic.interactable = EnableVoiceChat && _microphoneManager.HaveSelectedDevice;
             _btnTestMic.SetButtonText("<color=#ffffff>Test mic</color>");
             _imgTestMic.sprite = Sprites.MicOff;
-            _imgTestMic.color = Color.white;
+            _imgTestMic.color = Color.gray;
         }
 
         // Activation text
@@ -151,6 +152,9 @@ public class ModSettingsViewController : BSMLAutomaticViewController
                                    $"\r\n<color=#3498db>{_inputManager.DescribeKeybindConfig()}</color>";
         else
             _activationText.text = "";
+        
+        // HUD
+        _toggleHud.interactable = EnableVoiceChat;
     }
 
     #endregion
@@ -262,6 +266,17 @@ public class ModSettingsViewController : BSMLAutomaticViewController
         {
             _config.VoiceKeybindController =
                 (VoiceKeybindController) Enum.Parse(typeof(VoiceKeybindController), value);
+            RefreshUiState();
+        }
+    }
+
+    [UIValue("EnableHud")]
+    public bool EnableHud
+    {
+        get => _config.EnableHud;
+        set
+        {
+            _config.EnableHud = value;
             RefreshUiState();
         }
     }
