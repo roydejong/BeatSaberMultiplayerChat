@@ -39,6 +39,11 @@ public class ModSettingsViewController : BSMLAutomaticViewController
     [UIComponent("TogglePlayerBubbles")] private ToggleSetting _togglePlayerBubbles = null!;
     [UIComponent("ToggleCenterBubbles")] private ToggleSetting _toggleCenterBubbles = null!;
     [UIComponent("ToggleHud")] private ToggleSetting _toggleHud = null!;
+    [UIComponent("SliderHudOpacity")] private SliderSetting _sliderHudOpacity = null!;
+    [UIComponent("SliderHudOffsetCamX")] private SliderSetting _sliderHudOffsetCamX = null!;
+    [UIComponent("SliderHudOffsetCamY")] private SliderSetting _sliderHudOffsetCamY = null!;
+    [UIComponent("SliderHudOffsetCamZ")] private SliderSetting _sliderHudOffsetCamZ = null!;
+    [UIComponent("BtnResetHudOffset")] private Button _btnResetHudOffset = null!;
 
     private bool _bsmlReady = false;
 
@@ -110,6 +115,19 @@ public class ModSettingsViewController : BSMLAutomaticViewController
         RefreshUiState();
     }
 
+    [UIAction("BtnResetHudOffsetClick")]
+    public void HandleBtnResetHudOffsetClick()
+    {
+        EnableHud = true;
+        
+        HudOpacity = PluginConfig.DefaultHudOpacity;
+        HudOffsetCamX = PluginConfig.DefaultHudOffsetCamX;
+        HudOffsetCamY = PluginConfig.DefaultHudOffsetCamY;
+        HudOffsetCamZ = PluginConfig.DefaultHudOffsetCamZ;
+        
+        RefreshUiState();
+    }
+
     #endregion
 
     #region UI Shared
@@ -155,6 +173,14 @@ public class ModSettingsViewController : BSMLAutomaticViewController
         
         // HUD
         _toggleHud.interactable = EnableVoiceChat;
+
+        var canSetHudOptions = EnableVoiceChat && EnableHud; 
+        
+        _sliderHudOpacity.interactable = canSetHudOptions;
+        _sliderHudOffsetCamX.interactable = canSetHudOptions;
+        _sliderHudOffsetCamY.interactable = canSetHudOptions;
+        _sliderHudOffsetCamZ.interactable = canSetHudOptions;
+        _btnResetHudOffset.interactable = canSetHudOptions;
     }
 
     #endregion
@@ -281,6 +307,54 @@ public class ModSettingsViewController : BSMLAutomaticViewController
         }
     }
 
+    [UIValue("HudOpacity")]
+    public float HudOpacity
+    {
+        get => _config.HudOpacity;
+        set
+        {
+            _config.HudOpacity = value;
+            NotifyPropertyChanged();
+            RefreshUiState();
+        }
+    }
+
+    [UIValue("HudOffsetCamX")]
+    public float HudOffsetCamX
+    {
+        get => _config.HudOffsetCamX;
+        set
+        {
+            _config.HudOffsetCamX = value;
+            NotifyPropertyChanged();
+            RefreshUiState();
+        }
+    }
+
+    [UIValue("HudOffsetCamY")]
+    public float HudOffsetCamY
+    {
+        get => _config.HudOffsetCamY;
+        set
+        {
+            _config.HudOffsetCamY = value;
+            NotifyPropertyChanged();
+            RefreshUiState();
+        }
+    }
+
+    [UIValue("HudOffsetCamZ")]
+    public float HudOffsetCamZ
+    {
+        get => _config.HudOffsetCamZ;
+        set
+        {
+            _config.HudOffsetCamZ = value;
+            NotifyPropertyChanged();
+            RefreshUiState();
+        }
+    }
+
     #endregion
 
     #region Option lists
@@ -334,6 +408,4 @@ public class ModSettingsViewController : BSMLAutomaticViewController
     private void HandleInputDeactivate() => RefreshUiState();
 
     #endregion
-
-    private const string SettingsMenuName = "Multiplayer Chat";
 }

@@ -98,8 +98,28 @@ public class PluginConfig
     /// <summary>
     /// Controls maximum HUD opacity.
     /// </summary>
-    public float HudOpacity = .75f;
+    public float HudOpacity = DefaultHudOpacity;
 
+    /// <summary>
+    /// Camera offset for the HUD: X.
+    /// </summary>
+    public float HudOffsetCamX = DefaultHudOffsetCamX;
+
+    /// <summary>
+    /// Camera offset for the HUD: Y.
+    /// </summary>
+    public float HudOffsetCamY = DefaultHudOffsetCamY;
+
+    /// <summary>
+    /// Camera offset for the HUD: Z.
+    /// </summary>
+    public float HudOffsetCamZ = DefaultHudOffsetCamZ;
+
+    public const float DefaultHudOpacity = .75f;
+    public const float DefaultHudOffsetCamX = .3f;
+    public const float DefaultHudOffsetCamY = .4f;
+    public const float DefaultHudOffsetCamZ = .5f;
+    
     #endregion
     
     #region Shared

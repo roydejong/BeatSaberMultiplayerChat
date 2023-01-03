@@ -133,6 +133,14 @@ public class HudVoiceIndicator : MonoBehaviour, IInitializable
 
     #region UI Update
 
+    private float HudOffsetCamX => _config.HudOffsetCamX;
+    private float HudOffsetCamY => _config.HudOffsetCamY;
+    private float HudOffsetCamZ => _config.HudOffsetCamZ;
+    
+    private static readonly Quaternion BaseRotation = Quaternion.Euler(15f, -15f, 0f);
+    
+    private const float TransitionLerp = .1f;
+
     public void Update()
     {
         if (_inputManager.TestMode)
@@ -147,11 +155,11 @@ public class HudVoiceIndicator : MonoBehaviour, IInitializable
         {
             // Stick to main cam
             var selfTransform = transform;
-            selfTransform.position = _mainCamera.ViewportToWorldPoint(new Vector3(OffsetCamX, OffsetCamY, OffsetCamZ));
+            selfTransform.position = _mainCamera.ViewportToWorldPoint(new Vector3(HudOffsetCamX, HudOffsetCamY, HudOffsetCamZ));
             selfTransform.rotation = _mainCamera.transform.rotation * BaseRotation;
         }
 
-        if (_currentDisplayState == _targetDisplayState)
+        if (!_inputManager.TestMode && _currentDisplayState == _targetDisplayState)
             // No transition needed
             return;
 
@@ -188,7 +196,7 @@ public class HudVoiceIndicator : MonoBehaviour, IInitializable
         if (_canvasGroup != null)
         {
             // Fade to target opacity
-            _canvasGroup.alpha = Mathf.Lerp(_canvasGroup.alpha, targetOpacity, AlphaLerp);
+            _canvasGroup.alpha = Mathf.Lerp(_canvasGroup.alpha, targetOpacity, TransitionLerp);
             if (Mathf.Approximately(_canvasGroup.alpha, targetOpacity))
                 opacityOk = true;
         }
@@ -196,7 +204,7 @@ public class HudVoiceIndicator : MonoBehaviour, IInitializable
         if (_bgImage != null)
         {
             // Fade to target color
-            _bgImage.color = Color.Lerp(_bgImage.color, targetColor, AlphaLerp);
+            _bgImage.color = Color.Lerp(_bgImage.color, targetColor, TransitionLerp);
             if (IsColorVeryCloseToColor(_bgImage.color, targetColor))
                 colorOk = true;
 
@@ -213,12 +221,6 @@ public class HudVoiceIndicator : MonoBehaviour, IInitializable
             _currentDisplayState = _targetDisplayState;
         }
     }
-
-    public float OffsetCamX = .3f;
-    public float OffsetCamY = .4f;
-    public float OffsetCamZ = .5f;
-    public Quaternion BaseRotation = Quaternion.Euler(15f, -15f, 0f);
-    public const float AlphaLerp = .1f;
 
     #endregion
 
