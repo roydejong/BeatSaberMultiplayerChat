@@ -31,7 +31,8 @@ public class ModSettingsMenuController : IInitializable, IDisposable
     {
         if (_menuButton != null)
         {
-            MenuButtons.instance.UnregisterButton(_menuButton);
+            if (MenuButtons.instance != null)
+                MenuButtons.instance.UnregisterButton(_menuButton);
             _menuButton = null;
         }
 

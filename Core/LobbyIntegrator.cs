@@ -299,7 +299,8 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
     {
         // This will trigger for *any* view controller because LobbySetupViewController doesn't explicitly
         //  implement this, and Harmony will complain 
-        _chatTitleButton.gameObject.SetActive(false);   
+        if (_chatTitleButton != null)
+            _chatTitleButton.gameObject.SetActive(false);   
     }
 
     private void HandleChatTitleButtonClick(object sender, EventArgs e)
