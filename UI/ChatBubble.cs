@@ -76,11 +76,11 @@ public class ChatBubble : MonoBehaviour
 
     public void Show(string text)
     {
+        if (!isActiveAndEnabled || _rectTransform is null || _canvasGroup is null || _textMesh is null)
+            return;
+    
         if (IsShowing)
             throw new InvalidOperationException("Cannot call Show() while IsShowing is true");
-        
-        if (_rectTransform is null || _canvasGroup is null || _textMesh is null)
-            return;
 
         _rectTransform.localScale = Vector3.one;
         _rectTransform.localRotation = Quaternion.identity;
