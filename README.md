@@ -1,11 +1,11 @@
 ﻿# Beat Saber Multiplayer Chat (PC)
 
-💬 **Adds Text Chat and Voice Chat to Beat Saber multiplayer lobbies.**
+🎙️ **Voice & text chat mod for Beat Saber multiplayer**
 
 ## Installation
 
 ### Requirements
-- Beat Saber 1.24 or compatible
+- Beat Saber 1.28 or compatible
 - [MultiplayerCore](https://github.com/Goobwabber/MultiplayerCore#readme) mod and its dependencies
 
 ### Download
@@ -26,11 +26,11 @@ A notification sound is played whenever someone sends a chat message.
 You can change or disable the notification sound via the Mod Settings. You can add your own sounds by placing `.ogg` files in `Beat Saber\UserData\MultiplayerChat`.
 
 ### Voice chat
-Players who have this mod installed can talk in multiplayer lobbies and hear others.
+Players who have this mod installed can talk in multiplayer lobbies and hear others!
 
-You can talk in the lobby and while playing, but you can currently only hear avatars that you can actually see (so not spectators).
+You can talk in the lobby and while playing, but you can currently only hear avatars that you can actually see. *(You can't hear spectators, and you can't talk during loading screens.)*
 
-You can select and test your recording device and set up your keybind from the settings button in the main menu. I recommend reviewing your settings there before heading into a lobby.
+⚙️ Set up and test your microphone and keybind from the **settings button in the main menu**. I recommend reviewing your settings there before heading into a lobby.
 
 ### Muting players
 You can press the <kbd>🔇</kbd> mute button next someone in the players list. If a player is muted, you won't see their chat messages or hear their voice anymore.
@@ -99,9 +99,9 @@ Reliable packet containing a simple text chat message.
 
 Unreliable packet containing a Opus-encoded voice fragment.
 
-| Field             | Type              | Comment                                                                                                                      |
-|-------------------|-------------------|------------------------------------------------------------------------------------------------------------------------------|
-| `Data`            | `BytesWithLength` | Opus-encoded audio fragment (48kHz, 1 channel). If the array has a length of zero, this indicates the end of a transmission. |
+| Field             | Type              | Comment                                                                                                                                                                                  |
+|-------------------|-------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Data`            | `BytesWithLength` | Opus-encoded audio fragment (48kHz, 1 channel). Each fragment represents a frame with 960 samples (20ms). If the array has a length of zero, this indicates the end of a transmission.   |
 
 ## Attribution
 

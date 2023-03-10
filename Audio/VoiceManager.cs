@@ -13,7 +13,7 @@ using Object = UnityEngine.Object;
 namespace MultiplayerChat.Audio;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class VoiceManager : IInitializable, IDisposable
+public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
 {
     [Inject] private readonly PluginConfig _pluginConfig = null!;
     [Inject] private readonly ChatManager _chatManager = null!;
@@ -35,7 +35,7 @@ public class VoiceManager : IInitializable, IDisposable
     public const int OpusComplexity = 10;
 
     public const int Bitrate = 96000;
-    public const int FrameLength = 120;
+    public const int FrameLength = 960; // 20ms
     public const int FrameByteSize = FrameLength * sizeof(float);
 
     public bool IsTransmitting { get; private set; }
@@ -79,6 +79,13 @@ public class VoiceManager : IInitializable, IDisposable
         _microphoneManager.OnCaptureEnd += HandleMicrophoneEnd;
 
         _packetSerializer.RegisterCallback<MpcVoicePacket>(HandleVoicePacket);
+    }
+
+    public void Update()
+    {
+        _loopbackVoicePlayer.Update();
+        foreach (var vp in _voicePlayers.Values)
+            vp.Update();
     }
 
     public void Dispose()
@@ -126,7 +133,7 @@ public class VoiceManager : IInitializable, IDisposable
 
     private void HandleMicrophoneEnd()
     {
-        _loopbackVoicePlayer.HandleTransmissionEnd();
+        _loopbackVoicePlayer.StopImmediate();
 
         Array.Clear(_encodeSampleBuffer, 0, _encodeSampleBuffer.Length);
         Array.Clear(_encodeOutputBuffer, 0, _encodeOutputBuffer.Length);
@@ -176,6 +183,7 @@ public class VoiceManager : IInitializable, IDisposable
         try
         {
             var dataLength = packet.DataLength;
+            Console.WriteLine($"RCV voice packet with length = {dataLength}");
             if (dataLength > 0)
                 HandleVoiceFragment(_opusDecoder.Decode(packet.Data, dataLength, _decodeSampleBuffer), source);
             else
@@ -221,7 +229,7 @@ public class VoiceManager : IInitializable, IDisposable
         }
         else
         {
-            voicePlayer.HandleTransmissionEnd();
+            voicePlayer.StopImmediate();
             _chatManager.SetPlayerIsSpeaking(source, false);
         }
     }
@@ -281,7 +289,7 @@ public class VoiceManager : IInitializable, IDisposable
     public void HandlePlayerMuted(string userId)
     {
         if (_voicePlayers.TryGetValue(userId, out var voicePlayer))
-            voicePlayer.HandleTransmissionEnd();
+            voicePlayer.StopImmediate();
     }
 
     #endregion
@@ -316,7 +324,7 @@ public class VoiceManager : IInitializable, IDisposable
     {
         _microphoneManager.StopCapture();
 
-        _loopbackVoicePlayer.HandleTransmissionEnd();
+        _loopbackVoicePlayer.StopImmediate();
 
         if (!IsLoopbackTesting)
             return;

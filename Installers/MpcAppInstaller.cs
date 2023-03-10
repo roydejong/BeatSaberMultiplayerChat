@@ -21,6 +21,6 @@ public class MpcAppInstaller : Installer
         Container.BindInterfacesAndSelfTo<InputManager>().FromNewComponentOnNewGameObject().AsSingle();
         
         Container.BindInterfacesAndSelfTo<ChatManager>().AsSingle();
-        Container.BindInterfacesAndSelfTo<VoiceManager>().AsSingle();
+        Container.BindInterfacesAndSelfTo<VoiceManager>().FromNewComponentOnNewGameObject().AsSingle();
     }
 }

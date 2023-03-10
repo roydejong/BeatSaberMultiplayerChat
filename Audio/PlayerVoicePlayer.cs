@@ -1,37 +1,32 @@
 ﻿using System;
 using IPA.Utilities;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace MultiplayerChat.Audio;
 
 public class PlayerVoicePlayer : IDisposable
 {
-    private const int PlaybackClipLength = 1024 * 6;
+    private const int JitterBufferMs = 120;
 
-    private readonly float _spatialBland;
-    private readonly AudioClip _audioClip;
-    private float[]? _localBuffer;
-    private int _bufferPos;
+    private readonly float _spatialBlend;
+    private readonly JitterBufferClip _bufferedClip;
 
     private AudioSource? _audioSource;
 
-    public bool IsReceiving { get; private set; }
-    public bool IsPlaying => _audioSource != null && _audioSource.isPlaying;
+    public bool IsPlaying { get; private set; }
 
-    public PlayerVoicePlayer(float spatialBland)
+    public PlayerVoicePlayer(float spatialBlend)
     {
-        _spatialBland = spatialBland;
-        _audioClip = AudioClip.Create("VoicePlayback", PlaybackClipLength, (int) VoiceManager.OpusChannels,
-            (int) VoiceManager.OpusFrequency, false);
-        _localBuffer = null;
-        _bufferPos = 0;
+        _spatialBlend = spatialBlend;
+        _bufferedClip = new JitterBufferClip(JitterBufferMs);
+
+        IsPlaying = false;
     }
 
     public void Dispose()
     {
-        Object.Destroy(_audioClip);
-        _localBuffer = null;
+        _bufferedClip.Dispose();
+        IsPlaying = false;
     }
 
     public void SetMultiplayerAvatarAudioController(MultiplayerAvatarAudioController avatarAudio) =>
@@ -40,11 +35,11 @@ public class PlayerVoicePlayer : IDisposable
     public void ConfigureAudioSource(AudioSource audioSource)
     {
         _audioSource = audioSource;
-        _audioSource.clip = _audioClip;
+        _audioSource.clip = _bufferedClip.AudioClip;
         _audioSource.timeSamples = 0;
         _audioSource.volume = 0f;
 
-        if (_spatialBland <= 0)
+        if (_spatialBlend <= 0)
         {
             _audioSource.spatialize = false;
             _audioSource.spatialBlend = 0;
@@ -52,52 +47,38 @@ public class PlayerVoicePlayer : IDisposable
         else
         {
             _audioSource.spatialize = true;
-            _audioSource.spatialBlend = _spatialBland;
+            _audioSource.spatialBlend = _spatialBlend;
         }
     }
 
-    public void HandleDecodedFragment(float[] decodeBuffer, int decodedLength)
+    #region Audio Stream
+
+    public void Update()
     {
-        if (_audioSource == null || decodedLength <= 0)
-        {
-            HandleTransmissionEnd();
+        _bufferedClip.Update();
+            
+        if (_audioSource == null)
             return;
-        }
 
-        if (_localBuffer == null || _localBuffer.Length != decodedLength)
-            _localBuffer = new float[decodedLength];
-
-        IsReceiving = true;
-
-        Array.Copy(decodeBuffer, _localBuffer, decodedLength);
-
-        _audioClip.SetData(_localBuffer, _bufferPos);
-        _bufferPos += decodedLength;
-
-        if (_audioSource != null)
+        if (!IsPlaying && _bufferedClip.IsActive)
         {
-            if (_audioSource.isPlaying)
-            {
-                if (_audioSource.volume < 1f)
-                {
-                    if (_audioSource.volume >= .99f || Mathf.Approximately(_audioSource.volume, 1f))
-                        _audioSource.volume = 1f;
-                    else
-                        _audioSource.volume = Mathf.Lerp(_audioSource.volume, 1f, .035f);
-                }
-            }
-            else if (_bufferPos > (PlaybackClipLength / 2))
-            {
-                _audioSource.timeSamples = 0;
-                _audioSource.loop = true;
-                _audioSource.Play();
-            }
+            _audioSource.timeSamples = 0;
+            _audioSource.loop = true;
+            _audioSource.volume = 1f;
+            _audioSource.Play();
+            IsPlaying = true;
         }
-
-        _bufferPos %= PlaybackClipLength;
+        else if (IsPlaying && !_bufferedClip.IsActive)
+        {
+            StopImmediate();
+            IsPlaying = false;
+        }
     }
+    
+    public void HandleDecodedFragment(float[] decodeBuffer, int decodedLength) =>
+        _bufferedClip.FeedFragment(decodeBuffer, decodedLength);
 
-    public void HandleTransmissionEnd()
+    public void StopImmediate()
     {
         if (_audioSource != null)
         {
@@ -107,11 +88,9 @@ public class PlayerVoicePlayer : IDisposable
             _audioSource.volume = 0f;
         }
 
-        _bufferPos = 0;
-        _audioClip.SetData(EmptyClipSamples, 0);
-
-        IsReceiving = false;
+        _bufferedClip.Reset();
+        IsPlaying = false;
     }
-
-    private static readonly float[] EmptyClipSamples = new float[PlaybackClipLength];
+    
+    #endregion
 }
