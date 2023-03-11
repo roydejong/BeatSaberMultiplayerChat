@@ -147,14 +147,14 @@ public class ChatManager : IInitializable, IDisposable
     #region API - Player States
 
     public void SetLocalPlayerIsSpeaking(bool isSpeaking)
-        => SetPlayerIsSpeaking(_sessionManager.localPlayer, isSpeaking);
+        => SetPlayerIsSpeaking(_sessionManager.localPlayer.userId, isSpeaking);
     
-    public void SetPlayerIsSpeaking(IConnectedPlayer? player, bool isSpeaking)
+    public void SetPlayerIsSpeaking(string? userId, bool isSpeaking)
     {
-        if (player == null)
+        if (userId == null)
             return;
         
-        if (!_chatPlayers.TryGetValue(player.userId, out var chatPlayer))
+        if (!_chatPlayers.TryGetValue(userId, out var chatPlayer))
             return;
 
         if (chatPlayer.IsSpeaking == isSpeaking)

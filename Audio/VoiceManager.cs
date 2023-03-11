@@ -15,6 +15,7 @@ namespace MultiplayerChat.Audio;
 // ReSharper disable once ClassNeverInstantiated.Global
 public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
 {
+    
     [Inject] private readonly PluginConfig _pluginConfig = null!;
     [Inject] private readonly ChatManager _chatManager = null!;
     [Inject] private readonly MicrophoneManager _microphoneManager = null!;
@@ -33,9 +34,8 @@ public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
     public const NumChannels OpusChannels = NumChannels.Mono;
     public static readonly SamplingFrequency OpusFrequency = SamplingFrequency.Frequency_48000;
     public const int OpusComplexity = 10;
-
     public const int Bitrate = 96000;
-    public const int FrameLength = 960; // 20ms
+    public const int FrameLength = 960; // = 20ms per voice fragment
     public const int FrameByteSize = FrameLength * sizeof(float);
 
     public bool IsTransmitting { get; private set; }
@@ -43,8 +43,8 @@ public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
     public bool IsLoopbackTesting { get; private set; }
     private AudioSource? _loopbackTester;
 
-    private PlayerVoicePlayer _loopbackVoicePlayer;
-    private Dictionary<string, PlayerVoicePlayer> _voicePlayers;
+    private readonly PlayerVoicePlayer _loopbackVoicePlayer;
+    private readonly Dictionary<string, PlayerVoicePlayer> _voicePlayers;
 
     public event Action? StartedTransmittingEvent;
     public event Action? StoppedTransmittingEvent;
@@ -67,7 +67,7 @@ public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
 
         IsLoopbackTesting = false;
 
-        _loopbackVoicePlayer = new PlayerVoicePlayer(0);
+        _loopbackVoicePlayer = new PlayerVoicePlayer("loopback", jitterBufferMs: 250, spatialBlend: 0);
         _voicePlayers = new();
     }
 
@@ -84,6 +84,7 @@ public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
     public void Update()
     {
         _loopbackVoicePlayer.Update();
+        
         foreach (var vp in _voicePlayers.Values)
             vp.Update();
     }
@@ -183,7 +184,6 @@ public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
         try
         {
             var dataLength = packet.DataLength;
-            Console.WriteLine($"RCV voice packet with length = {dataLength}");
             if (dataLength > 0)
                 HandleVoiceFragment(_opusDecoder.Decode(packet.Data, dataLength, _decodeSampleBuffer), source);
             else
@@ -200,38 +200,19 @@ public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
         if (source == null)
         {
             // This should only happen in loopback situations
-            _loopbackVoicePlayer.HandleDecodedFragment(_decodeSampleBuffer, decodedLength);
+            _loopbackVoicePlayer.FeedFragment(_decodeSampleBuffer, decodedLength);
             return;
         }
 
         if (_chatManager.GetIsPlayerMuted(source.userId))
         {
-            // Player is muted
-            _chatManager.SetPlayerIsSpeaking(source, false);
+            // Player is muted, ignore
+            _chatManager.SetPlayerIsSpeaking(source.userId, false);
             return;
         }
 
-        var isEndOfTransmission = decodedLength <= 0;
-
-        if (!_voicePlayers.TryGetValue(source.userId, out var voicePlayer))
-        {
-            if (isEndOfTransmission)
-                return;
-
-            voicePlayer = new PlayerVoicePlayer(_pluginConfig.SpatialBlend);
-            _voicePlayers.Add(source.userId, voicePlayer);
-        }
-
-        if (!isEndOfTransmission)
-        {
-            voicePlayer.HandleDecodedFragment(_decodeSampleBuffer, decodedLength);
-            _chatManager.SetPlayerIsSpeaking(source, true);
-        }
-        else
-        {
-            voicePlayer.StopImmediate();
-            _chatManager.SetPlayerIsSpeaking(source, false);
-        }
+        var voicePlayer = EnsurePlayerVoicePlayer(source.userId);
+        voicePlayer.FeedFragment(_decodeSampleBuffer, decodedLength);
     }
 
     #endregion
@@ -334,18 +315,42 @@ public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
 
     #endregion
 
-    #region Avatar integration
+    #region VoicePlayers & Avatars
+
+    private PlayerVoicePlayer EnsurePlayerVoicePlayer(string playerUserId)
+    {
+        if (!_voicePlayers.TryGetValue(playerUserId, out var voicePlayer))
+        {
+            voicePlayer = new PlayerVoicePlayer(
+                playerUserId,
+                _pluginConfig.JitterBufferMs, 
+                _pluginConfig.SpatialBlend
+            );
+            
+            voicePlayer.StartPlaybackEvent += HandleVoicePlaybackStart;
+            voicePlayer.StopPlaybackEvent += HandleVoicePlaybackStop;
+            
+            _voicePlayers.Add(playerUserId, voicePlayer);
+        }
+
+        return voicePlayer;
+    }
+
+    private void HandleVoicePlaybackStart(object sender, EventArgs e)
+    {
+        _chatManager.SetPlayerIsSpeaking(((PlayerVoicePlayer)sender).PlayerUserId, true);
+    }
+
+    private void HandleVoicePlaybackStop(object sender, EventArgs e)
+    {
+        _chatManager.SetPlayerIsSpeaking(((PlayerVoicePlayer)sender).PlayerUserId, false);
+    }
 
     public void ProvideAvatarAudio(MultiplayerAvatarAudioController avatarAudio)
     {
         var player = avatarAudio.GetField<IConnectedPlayer, MultiplayerAvatarAudioController>("_connectedPlayer");
-
-        if (!_voicePlayers.TryGetValue(player.userId, out var voicePlayer))
-        {
-            voicePlayer = new PlayerVoicePlayer(_pluginConfig.SpatialBlend);
-            _voicePlayers.Add(player.userId, voicePlayer);
-        }
-
+        
+        var voicePlayer = EnsurePlayerVoicePlayer(player.userId);
         voicePlayer.SetMultiplayerAvatarAudioController(avatarAudio);
     }
 

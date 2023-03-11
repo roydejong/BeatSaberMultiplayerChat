@@ -3,17 +3,16 @@ Core things are done, these are mostly ideas / things to explore on how to impro
 
 ### Text
 
+- [ ] I broke the chat bubbles
 - [ ] Text chat roles / dev colors
 
 ### Voice
 
 - [ ] Activity indicator above heads
-- [ ] Per-player volume settings
+- [ ] Volume gain
 
 ### VoIP Improvements
 
-- [ ] Quality: Extra cutoff time on transmission end
-- [ ] Optimization: Jitter buffer on receiving end
 - [ ] Optimization: Move encode/decode to their own threads, off Unity main?
 
 ### Polish / minor bugs

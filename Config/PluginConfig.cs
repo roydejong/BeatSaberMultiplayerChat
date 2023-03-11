@@ -59,6 +59,13 @@ public class PluginConfig
     public string? MicrophoneDevice = null;
 
     /// <summary>
+    /// Controls the jitter buffer time in milliseconds. 
+    /// Incoming voice fragments will be held until the buffer is filled to this duration before voice playback begins.
+    /// This is typically set to 30 - 50ms. It should generally not exceed 200ms. 
+    /// </summary>
+    public int JitterBufferMs = 50;
+
+    /// <summary>
     /// Controls spatial audio blending. Spatial audio is directional/3D and originates from avatar's heads.
     /// Value between 0.0 and 1.0 indicating the spatial blend, where 0 = Fully 2D, 1 = Fully 3D.
     /// Note: 3D will be significantly quieter due to distance scaling, probably *too* quiet for Beat Saber...
