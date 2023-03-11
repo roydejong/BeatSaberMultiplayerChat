@@ -76,7 +76,7 @@ public class ChatBubble : MonoBehaviour
 
     public void Show(string text)
     {
-        if (gameObject == null || _rectTransform == null || _canvasGroup == null || _textMesh == null)
+        if (_rectTransform == null || _canvasGroup == null || _textMesh == null)
             return;
 
         _rectTransform.localScale = Vector3.one;
@@ -86,6 +86,10 @@ public class ChatBubble : MonoBehaviour
 
         gameObject.SetActive(true);
 
+        if (!gameObject.activeInHierarchy)
+            // Parent object (e.g. avatar, menu) is probably not enabled, this happens during gameplay/transitions
+            return;
+        
         _textMesh.text = text;
 
         RefreshSize();
