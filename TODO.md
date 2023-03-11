@@ -3,7 +3,6 @@ Core things are done, these are mostly ideas / things to explore on how to impro
 
 ### Text
 
-- [ ] I broke the chat bubbles
 - [ ] Text chat roles / dev colors
 
 ### Voice
