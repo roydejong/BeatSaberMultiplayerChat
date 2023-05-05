@@ -145,8 +145,7 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
 
     [AffinityPostfix]
     [AffinityPatch(typeof(GameServerPlayerTableCell), nameof(GameServerPlayerTableCell.SetData))]
-    public void PostfixPlayerCellSetData(IConnectedPlayer connectedPlayer, Button ____mutePlayerButton,
-        ButtonBinder ____buttonBinder)
+    public void PostfixPlayerCellSetData(IConnectedPlayer connectedPlayer, Button ____mutePlayerButton)
     {
         _playerListButtons[connectedPlayer.userId] = ____mutePlayerButton;
 
@@ -166,8 +165,8 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
         }
         
         // Bind mute button
-        ____buttonBinder.ClearBindings();
-        ____buttonBinder.AddBinding(____mutePlayerButton, () => HandleMuteToggleClick(connectedPlayer.userId));
+        ____mutePlayerButton.onClick.RemoveAllListeners();
+        ____mutePlayerButton.onClick.AddListener(() => HandleMuteToggleClick(connectedPlayer.userId));
 
         // Initial state update
         UpdatePlayerListState(connectedPlayer.userId);
