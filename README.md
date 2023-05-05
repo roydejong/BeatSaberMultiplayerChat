@@ -5,7 +5,7 @@
 ## Installation
 
 ### Requirements
-- Beat Saber 1.28 or compatible
+- Beat Saber 1.29 or compatible
 - [MultiplayerCore](https://github.com/Goobwabber/MultiplayerCore#readme) mod and its dependencies
 
 ### Download
