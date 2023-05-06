@@ -168,7 +168,7 @@ public class ModSettingsViewController : BSMLAutomaticViewController
         if (!_config.EnableVoiceChat)
             _activationText.text = "Voice chat is completely disabled. You won't be able to speak or hear others.";
         else if (!_microphoneManager.HaveSelectedDevice) 
-            _activationText.text = "No microphone selected, voice activation is disabled. You'll still be able to hear others.";
+            _activationText.text = "No microphone selected. You can't speak, but will be able to hear others.";
         else if (_config.EnableVoiceChat)
             _activationText.text = "While the settings are open, you can test your keybind to control the mic test" +
                                    $"\r\n<color=#3498db>{_inputManager.DescribeKeybindConfig()}</color>";
@@ -253,6 +253,9 @@ public class ModSettingsViewController : BSMLAutomaticViewController
     {
         get
         {
+            if (_config.MicrophoneDevice == "None" && (_microphoneManager.SelectedDeviceName is null or "None"))
+                return "None";
+            
             var selectedDevice = _microphoneManager.SelectedDeviceName ?? "Default";
             return MicrophoneOptions.Contains(selectedDevice) ? selectedDevice : "None";
         }
