@@ -145,9 +145,9 @@ public class ModSettingsViewController : BSMLAutomaticViewController
         // Voice
         _toggleVoice.interactable = !_voiceManager.IsLoopbackTesting;
         _dropdownMic.interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting;
-        _dropdownActivation.interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting;
-        _dropdownKeybind.interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting;
-        _dropdownController.interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting;
+        _dropdownActivation.interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting && _microphoneManager.HaveSelectedDevice;
+        _dropdownKeybind.interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting && _microphoneManager.HaveSelectedDevice;
+        _dropdownController.interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting && _microphoneManager.HaveSelectedDevice;
 
         if (_voiceManager.IsLoopbackTesting)
         {
@@ -165,11 +165,13 @@ public class ModSettingsViewController : BSMLAutomaticViewController
         }
 
         // Activation text
-        if (_config.EnableVoiceChat && _config.MicrophoneDevice != "None")
+        if (!_config.EnableVoiceChat)
+            _activationText.text = "Voice chat is completely disabled. You won't be able to speak or hear others.";
+        else if (!_microphoneManager.HaveSelectedDevice) 
+            _activationText.text = "No microphone selected, voice activation is disabled. You'll still be able to hear others.";
+        else if (_config.EnableVoiceChat)
             _activationText.text = "While the settings are open, you can test your keybind to control the mic test" +
                                    $"\r\n<color=#3498db>{_inputManager.DescribeKeybindConfig()}</color>";
-        else
-            _activationText.text = "";
         
         // HUD
         _toggleHud.interactable = EnableVoiceChat;
