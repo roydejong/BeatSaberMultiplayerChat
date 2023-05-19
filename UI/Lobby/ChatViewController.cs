@@ -232,7 +232,7 @@ public class ChatViewController : BSMLAutomaticViewController
         var layoutGo = layoutTag.CreateObject(_scrollableContainerContent);
 
         var imageTag = new ImageTag();
-        var imageGo = layoutTag.CreateObject(layoutGo.transform);
+        var imageGo = imageTag.CreateObject(layoutGo.transform);
         var imageRect = imageGo.transform as RectTransform;
         imageRect.pivot = new Vector2(0, 1);
         imageRect.anchorMin = new Vector2(0, 1);
