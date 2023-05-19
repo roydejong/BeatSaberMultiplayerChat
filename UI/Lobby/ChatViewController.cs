@@ -218,7 +218,7 @@ public class ChatViewController : BSMLAutomaticViewController
 
         var (textComponent, icon) = AddMessageObject();
 
-        textComponent.Data = message.FormatMessage(inChatList: true);
+        textComponent.Data = message.FormatMessage(extraIconSpacing: true);
         textComponent.RefreshText();
 
         icon.sprite = message.SpriteForMessage();

@@ -38,10 +38,10 @@ public class ChatMessage
         SenderIsMe = senderIsMe;
     }
 
-    public string FormatMessage(bool inPlayerBubble = false, bool inChatList = false)
+    public string FormatMessage(bool inPlayerBubble = false, bool extraIconSpacing = false)
     {
         // extra spacing used when a sprite is used for the icon
-        var spacing = inChatList ? "\t" : "";
+        var spacing = extraIconSpacing ? "\t" : "";
         if (inPlayerBubble)
             return $"{spacing}<i>{Text}</i>";
         else if (Type is ChatMessageType.SystemMessage)
