@@ -41,7 +41,7 @@ public class ChatMessage
     public string FormatMessage(bool inPlayerBubble = false, bool inChatList = false)
     {
         // extra spacing used when a sprite is used for the icon
-        var spacing = inChatList ? "" : "\t";
+        var spacing = inChatList ? "\t" : "";
         if (inPlayerBubble)
             return $"{spacing}<i>{Text}</i>";
         else if (Type is ChatMessageType.SystemMessage)
