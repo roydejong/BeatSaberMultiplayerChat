@@ -13,7 +13,7 @@ public class MicrophoneManager : MonoBehaviour, IInitializable, IDisposable
     [Inject] private readonly SiraLog _log = null!;
     [Inject] private readonly PluginConfig _config = null!;
 
-    public const int TargetFrequency = 44100;
+    public const int TargetFrequency = 48000;
     public const int SamplesPerFragment = 512;
 
     public string? SelectedDeviceName { get; private set; }
