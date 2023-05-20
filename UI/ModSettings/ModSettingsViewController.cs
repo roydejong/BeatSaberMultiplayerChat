@@ -35,6 +35,7 @@ public class ModSettingsViewController : BSMLAutomaticViewController
     [UIComponent("DropdownActivation")] private DropDownListSetting _dropdownActivation = null!;
     [UIComponent("DropdownKeybind")] private DropDownListSetting _dropdownKeybind = null!;
     [UIComponent("DropdownController")] private DropDownListSetting _dropdownController = null!;
+    [UIComponent("DropdownControllerAlt")] private DropDownListSetting _dropdownControllerAlt = null!;
     [UIComponent("ActivationText")] private CurvedTextMeshPro _activationText = null!;
     [UIComponent("TogglePlayerBubbles")] private ToggleSetting _togglePlayerBubbles = null!;
     [UIComponent("ToggleCenterBubbles")] private ToggleSetting _toggleCenterBubbles = null!;
@@ -148,6 +149,20 @@ public class ModSettingsViewController : BSMLAutomaticViewController
         _dropdownActivation.interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting && _microphoneManager.HaveSelectedDevice;
         _dropdownKeybind.interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting && _microphoneManager.HaveSelectedDevice;
         _dropdownController.interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting && _microphoneManager.HaveSelectedDevice;
+        _dropdownControllerAlt.interactable = _dropdownController.interactable;
+        
+        // [#6] In trigger mode, you can get stuck in settings - only allow binding to one controller, not both
+        // "Alt" dropdown only has two controller options
+        if (_config.VoiceKeybind == Models.VoiceKeybind.Trigger)
+        {
+            _dropdownController.transform.parent.gameObject.SetActive(false);
+            _dropdownControllerAlt.transform.parent.gameObject.SetActive(true);
+        }
+        else
+        {
+            _dropdownController.transform.parent.gameObject.SetActive(true);
+            _dropdownControllerAlt.transform.parent.gameObject.SetActive(false);
+        }
 
         if (_voiceManager.IsLoopbackTesting)
         {
@@ -285,6 +300,14 @@ public class ModSettingsViewController : BSMLAutomaticViewController
         set
         {
             _config.VoiceKeybind = (VoiceKeybind) Enum.Parse(typeof(VoiceKeybind), value);
+
+            if (_config.VoiceKeybind == Models.VoiceKeybind.Trigger &&
+                _config.VoiceKeybindController == Models.VoiceKeybindController.Either)
+            {
+                // [#6] In trigger mode, you must select a specific controller
+                VoiceKeybindController = Models.VoiceKeybindController.Left.ToString();
+            }
+
             RefreshUiState();
         }
     }
@@ -297,7 +320,12 @@ public class ModSettingsViewController : BSMLAutomaticViewController
         {
             _config.VoiceKeybindController =
                 (VoiceKeybindController) Enum.Parse(typeof(VoiceKeybindController), value);
+            
             RefreshUiState();
+            NotifyPropertyChanged();
+            
+            _dropdownController.ReceiveValue();
+            _dropdownControllerAlt.ReceiveValue();
         }
     }
 
@@ -404,6 +432,17 @@ public class ModSettingsViewController : BSMLAutomaticViewController
     [UIValue("ControllerOptions")]
     public List<object> ControllerOptions =>
         Enum.GetNames(typeof(VoiceKeybindController)).ToList<object>();
+
+    [UIValue("ControllerOptionsAlt")]
+    public List<object> ControllerOptionsAlt
+    {
+        get
+        {
+            var list = Enum.GetNames(typeof(VoiceKeybindController)).ToList<object>();
+            list.Remove(Models.VoiceKeybindController.Either.ToString());
+            return list;
+        }
+    }
 
     #endregion
 
