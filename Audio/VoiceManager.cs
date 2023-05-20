@@ -117,6 +117,8 @@ public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
 
     private void HandleMicrophoneFragment(float[] samples)
     {
+        AudioGain.Apply(samples, _pluginConfig.MicrophoneGain);
+        
         foreach (var sample in samples)
         {
             _encodeSampleBuffer[_encodeSampleIndex++] = sample;

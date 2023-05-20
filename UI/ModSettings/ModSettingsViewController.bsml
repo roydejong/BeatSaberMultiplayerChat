@@ -8,13 +8,12 @@
             <vertical child-control-height='false' spacing="1" pad-top="1">
 
                 <checkbox-setting id="ToggleVoice" text="Enable voice chat" value="EnableVoiceChat"
-                                  bind-value="true" apply-on-change="true"
-                                  hover-hint="Globally enable/disable all voice chat functionality"/>
+                    bind-value="true" apply-on-change="true"
+                    hover-hint="Globally enable/disable all voice chat functionality"/>
 
                 <dropdown-list-setting id="DropdownMic" text="Microphone" options="MicrophoneOptions"
-                                       value="RecordingDevice" apply-on-change="true"
-                                       hover-hint="Select your input device for talking in voice chat"/>
-
+                    value="RecordingDevice" apply-on-change="true"
+                    hover-hint="Select your input device for talking in voice chat"/>
                 <!-- Mic test -->
 
                 <horizontal max-height="8.5" child-expand-width="true" pad-left="15">
@@ -26,6 +25,10 @@
                             preferred-width="35" preferred-height="8.5" align="Center"
                             hover-hint="Toggle microphone test (listen to selected device)"/>
                 </horizontal>
+
+                <slider-setting id="SliderMicGain" text="Microphone gain" value="MicGain"
+                                hover-hint="Microphone volume gain"
+                                min="0.1" max="5.0" increment="0.1" bind-value="true" apply-on-change="true"/>
 
                 <!-- Voice activation -->
 

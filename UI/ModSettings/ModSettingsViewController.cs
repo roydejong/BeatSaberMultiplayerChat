@@ -31,6 +31,7 @@ public class ModSettingsViewController : BSMLAutomaticViewController
     [UIComponent("DropdownNotification")] private DropDownListSetting _dropdownNotification = null!;
     [UIComponent("ToggleVoice")] private ToggleSetting _toggleVoice = null!;
     [UIComponent("DropdownMic")] private DropDownListSetting _dropdownMic = null!;
+    [UIComponent("SliderMicGain")] private SliderSetting _sliderMicGain = null!;
     [UIComponent("ImgTestMic")] private ImageView _imgTestMic = null!;
     [UIComponent("DropdownActivation")] private DropDownListSetting _dropdownActivation = null!;
     [UIComponent("DropdownKeybind")] private DropDownListSetting _dropdownKeybind = null!;
@@ -146,6 +147,7 @@ public class ModSettingsViewController : BSMLAutomaticViewController
         // Voice
         _toggleVoice.interactable = !_voiceManager.IsLoopbackTesting;
         _dropdownMic.interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting;
+        _sliderMicGain.interactable = EnableVoiceChat;
         _dropdownActivation.interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting && _microphoneManager.HaveSelectedDevice;
         _dropdownKeybind.interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting && _microphoneManager.HaveSelectedDevice;
         _dropdownController.interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting && _microphoneManager.HaveSelectedDevice;
@@ -278,6 +280,18 @@ public class ModSettingsViewController : BSMLAutomaticViewController
         {
             _microphoneManager.TrySelectDevice(value);
             _config.MicrophoneDevice = value;
+            RefreshUiState();
+        }
+    }
+    
+    [UIValue("MicGain")]
+    public float MicGain
+    {
+        get => _config.MicrophoneGain;
+        set
+        {
+            _config.MicrophoneGain = value;
+            NotifyPropertyChanged();
             RefreshUiState();
         }
     }

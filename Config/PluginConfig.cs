@@ -59,6 +59,11 @@ public class PluginConfig
     public string? MicrophoneDevice = null;
 
     /// <summary>
+    /// Gain to apply to outgoing mic audio.
+    /// </summary>
+    public float MicrophoneGain = 2.0f;
+
+    /// <summary>
     /// Controls the jitter buffer time in milliseconds. 
     /// Incoming voice fragments will be held until the buffer is filled to this duration before voice playback begins.
     /// This is typically set to 30 - 50ms. It should generally not exceed 200ms. 
