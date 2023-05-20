@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.Components.Settings;
@@ -11,6 +13,7 @@ using MultiplayerChat.Core;
 using MultiplayerChat.Models;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using Zenject;
 
 namespace MultiplayerChat.UI.Lobby;
@@ -213,24 +216,52 @@ public class ChatViewController : BSMLAutomaticViewController
         if (scrollableContent is null)
             return;
 
+        var (textComponent, icon) = AddMessageObject();
+
+        textComponent.Data = message.FormatMessage(extraIconSpacing: true);
+        textComponent.RefreshText();
+
+        icon.sprite = message.SpriteForMessage();
+
+        _chatLockedToBottom = true; // this sucks but the alternative is BSML scrolling all the way to the top every msg 
+    }
+
+    private Tuple<FormattableText, ImageView> AddMessageObject()
+    {
         var layoutTag = new HorizontalLayoutTag();
-        var layoutGo = layoutTag.CreateObject(scrollableContent.transform);
+        var layoutGo = layoutTag.CreateObject(_scrollableContainerContent);
+
+        var imageTag = new ImageTag();
+        var imageGo = imageTag.CreateObject(layoutGo.transform);
+        var imageRect = imageGo.transform as RectTransform;
+        imageRect.pivot = new Vector2(0, 1);
+        imageRect.anchorMin = new Vector2(0, 1);
+        imageRect.anchorMax = new Vector2(0, 1);
+        imageRect.sizeDelta = new Vector2(5, 5);
+
+        var layoutElement = imageGo.GetComponent<LayoutElement>();
+        layoutElement.ignoreLayout = true;
+
+        var imageView = imageGo.GetComponent<ImageView>();
+        imageView.preserveAspect = true;
+        imageView.SetField("_skew", 0f);
+        imageView.__Refresh();
 
         var textTag = new TextTag();
         var textGo = textTag.CreateObject(layoutGo.transform);
         var textComponent = textGo.GetComponent<FormattableText>();
-        textComponent.Data = message.FormatMessage();
-        textComponent.RefreshText();
+        textComponent.text = "";
         textComponent.fontSize = 3.4f;
         textComponent.richText = true;
+        textComponent.enableWordWrapping = true;
 
-        _chatLockedToBottom = true; // this sucks but the alternative is BSML scrolling all the way to the top every msg 
+        return new(textComponent, imageView);
     }
 
     #endregion
 
     #region Scroll pain
-    
+
     private void HandleScrollablePageUp()
     {
         _chatLockedToBottom = false;

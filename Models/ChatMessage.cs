@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using MultiplayerChat.Network;
+using BeatSaberMarkupLanguage;
+using UnityEngine;
+using System.Linq;
 
 namespace MultiplayerChat.Models;
 
@@ -14,6 +17,15 @@ public class ChatMessage
     public readonly bool SenderIsHost;
     public readonly bool SenderIsMe;
 
+    private static Sprite? _playerIcon = null;
+    public static Sprite PlayerIcon => _playerIcon ?? (_playerIcon = Resources.FindObjectsOfTypeAll<Sprite>().First(x => x.name == "PlayerIcon"));
+
+    private static Sprite? _noFailIcon = null;
+    public static Sprite NoFailIcon => _noFailIcon ?? (_noFailIcon = Resources.FindObjectsOfTypeAll<Sprite>().First(x => x.name == "NoFailIcon"));
+
+    private static Sprite? _globalIcon = null;
+    public static Sprite GlobalIcon => _globalIcon ?? (_globalIcon = Resources.FindObjectsOfTypeAll<Sprite>().First(x => x.name == "GlobalIcon"));
+
     private ChatMessage(ChatMessageType type, string userId, string userName, string text, bool senderIsHost, 
         bool senderIsMe, bool stripTags = true)
     {
@@ -26,18 +38,34 @@ public class ChatMessage
         SenderIsMe = senderIsMe;
     }
 
-    public string FormatMessage(bool inPlayerBubble = false)
+    public string FormatMessage(bool inPlayerBubble = false, bool extraIconSpacing = false)
+    {
+        // extra spacing used when a sprite is used for the icon
+        var spacing = extraIconSpacing ? "\t" : "";
+        if (inPlayerBubble)
+            return $"{spacing}<i>{Text}</i>";
+        else if (Type is ChatMessageType.SystemMessage)
+            return $"{spacing}<i><color=#f1c40f>[System]</color> <color=#ecf0f1>{Text}</color></i>";
+        else if (SenderIsHost)
+            return $"{spacing}<i><color=#2ecc71>[Server]</color> {Text}</i>";
+        else if (SenderIsMe)
+            return $"{spacing}<i><color=#95a5a6>[{UserName}]</color> {Text}</i>";
+        else
+            return $"{spacing}<i><color=#3498db>[{UserName}]</color> {Text}</i>";
+    }
+
+    public Sprite SpriteForMessage(bool inPlayerBubble = false)
     {
         if (inPlayerBubble)
-            return $"💬 <i>{Text}</i>";
+            return PlayerIcon;
         else if (Type is ChatMessageType.SystemMessage)
-            return $"🔔 <i><color=#f1c40f>[System]</color> <color=#ecf0f1>{Text}</color></i>";
+            return NoFailIcon;
         else if (SenderIsHost)
-            return $"📢 <i><color=#2ecc71>[Server]</color> {Text}</i>";
+            return GlobalIcon;
         else if (SenderIsMe)
-            return $"💬 <i><color=#95a5a6>[{UserName}]</color> {Text}</i>";
+            return PlayerIcon;
         else
-            return $"💬 <i><color=#3498db>[{UserName}]</color> {Text}</i>";
+            return PlayerIcon;
     }
     
     private static string StripTags(string input)
