@@ -4,7 +4,7 @@
         <OutputType>Library</OutputType>
         <AppDesignerFolder>Properties</AppDesignerFolder>
         <AssemblyName>MultiplayerChat</AssemblyName>
-        <AssemblyVersion>1.0.1</AssemblyVersion>
+        <AssemblyVersion>0.2.0</AssemblyVersion>
         <TargetFramework>net472</TargetFramework>
         <DebugSymbols>true</DebugSymbols>
         <DebugType>portable</DebugType>
@@ -24,11 +24,13 @@
         <Title>BeatSaberMultiplayerChat</Title>
         <Authors>LookAtHippo</Authors>
         <Description>A Beat Saber mod that adds chat functionality to multiplayer lobbies.</Description>
-        <Copyright>Copyright (C) 2022 Roy de Jong</Copyright>
+        <Copyright>Copyright (C) 2023 Roy de Jong</Copyright>
         <PackageProjectUrl>https://github.com/roydejong/BeatSaberMultiplayerChat</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/roydejong/BeatSaberMultiplayerChat/LICENSE.txt</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/roydejong/BeatSaberMultiplayerChat</RepositoryUrl>
         <NeutralLanguage>en-US</NeutralLanguage>
+        <Version>0.2.0</Version>
+        <FileVersion>0.2.0</FileVersion>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
         <Optimize>false</Optimize>

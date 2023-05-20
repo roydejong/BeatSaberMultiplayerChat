@@ -3,9 +3,9 @@
   "id": "MultiplayerChat",
   "name": "MultiplayerChat",
   "author": "LookAtHippo",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Adds Text Chat and Voice Chat to multiplayer lobbies.",
-  "gameVersion": "1.29.0",
+  "gameVersion": "1.29.4",
   "dependsOn": {
     "BSIPA": "^4.2.2",
     "BeatSaberMarkupLanguage": "^1.6.10",
