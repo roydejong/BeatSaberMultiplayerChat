@@ -95,6 +95,8 @@ Reliable packet containing a simple text chat message.
 |-------------------|----------|-------------------------------------------------------------------------------------------------------------------------------------|
 | `Text`            | `String` | Raw chat message. Note: any HTML-style `<tags>` will be stripped from the message before it is displayed, to avoid rich text chaos. |
 
+Text messages that start with `/` are reserved for commands. They will only be sent to the server, and not seen by other players in the session.
+
 #### Voice fragment packet  (`MpcVoicePacket`)
 
 Unreliable packet containing a Opus-encoded voice fragment.

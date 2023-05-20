@@ -13,6 +13,8 @@ namespace MultiplayerChat.Core;
 // ReSharper disable once ClassNeverInstantiated.Global
 public class ChatManager : IInitializable, IDisposable
 {
+    public const char CommandPrefix = '/';
+    
     [Inject] private readonly SiraLog _log = null!;
     [Inject] private readonly PluginConfig _config = null!;
     [Inject] private readonly IMultiplayerSessionManager _sessionManager = null!;
@@ -117,15 +119,27 @@ public class ChatManager : IInitializable, IDisposable
     /// </summary>
     public void SendTextChat(string text)
     {
-        if (!SessionConnected || !TextChatEnabled)
+        if (!SessionConnected || !TextChatEnabled || string.IsNullOrWhiteSpace(text))
             return;
 
-        // Broadcast to session
-        _sessionManager.Send(new MpcTextChatPacket()
+        var chatPacket = new MpcTextChatPacket()
         {
             Text = text
-        });
+        };
+        
+        var isCommand = (text[0] == CommandPrefix);
 
+        if (isCommand)
+        {
+            // Command - send to server only
+            _sessionManager.SendToPlayer(chatPacket, _sessionManager.connectionOwner);
+        }
+        else
+        {
+            // Regular message - broadcast to session
+            _sessionManager.Send(chatPacket);
+        }
+            
         // Show our own message locally
         ChatMessageEvent?.Invoke(this, ChatMessage.CreateForLocalPlayer(_sessionManager.localPlayer, text));
     }
