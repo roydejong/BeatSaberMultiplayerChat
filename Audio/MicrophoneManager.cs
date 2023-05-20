@@ -29,8 +29,8 @@ public class MicrophoneManager : MonoBehaviour, IInitializable, IDisposable
 
     public bool IsCapturing { get; private set; }
 
-    public event Action<float[]>? OnFragmentReady;
-    public event Action? OnCaptureEnd;
+    public event Action<float[], int>? FragmentReadyEvent;
+    public event Action? CaptureEndEvent;
 
     public MicrophoneManager()
     {
@@ -85,7 +85,7 @@ public class MicrophoneManager : MonoBehaviour, IInitializable, IDisposable
                 Array.Copy(_micBuffer, _micBufferPos, _fragmentBuffer, 0, SamplesPerFragment);
             }
             
-            OnFragmentReady?.Invoke(_fragmentBuffer);
+            FragmentReadyEvent?.Invoke(_fragmentBuffer, _captureClip.frequency);
 
             _micBufferPos += SamplesPerFragment;
             
@@ -219,7 +219,7 @@ public class MicrophoneManager : MonoBehaviour, IInitializable, IDisposable
         if (_micBuffer != null)
             Array.Clear(_micBuffer, 0, _micBuffer.Length);
         
-        OnCaptureEnd?.Invoke();
+        CaptureEndEvent?.Invoke();
     }
 
     #endregion

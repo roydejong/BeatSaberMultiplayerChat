@@ -24,7 +24,8 @@ public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
 
     private readonly Encoder _opusEncoder;
     private readonly Decoder _opusDecoder;
-
+    
+    private readonly float[] _resampleBuffer;
     private readonly float[] _encodeSampleBuffer;
     private readonly byte[] _encodeOutputBuffer;
     private int _encodeSampleIndex;
@@ -59,6 +60,7 @@ public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
         };
         _opusDecoder = new(OpusFrequency, OpusChannels);
 
+        _resampleBuffer = new float[FrameLength];
         _encodeSampleBuffer = new float[FrameLength];
         _encodeOutputBuffer = new byte[FrameByteSize];
         _encodeSampleIndex = 0;
@@ -75,8 +77,8 @@ public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
     {
         _multiplayerSession.disconnectedEvent += HandleSessionDisconnected;
 
-        _microphoneManager.OnFragmentReady += HandleMicrophoneFragment;
-        _microphoneManager.OnCaptureEnd += HandleMicrophoneEnd;
+        _microphoneManager.FragmentReadyEvent += HandleMicrophoneFragment;
+        _microphoneManager.CaptureEndEvent += HandleMicrophoneEnd;
 
         _packetSerializer.RegisterCallback<MpcVoicePacket>(HandleVoicePacket);
     }
@@ -96,8 +98,8 @@ public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
         if (_microphoneManager.IsCapturing)
             _microphoneManager.StopCapture();
 
-        _microphoneManager.OnFragmentReady -= HandleMicrophoneFragment;
-        _microphoneManager.OnCaptureEnd -= HandleMicrophoneEnd;
+        _microphoneManager.FragmentReadyEvent -= HandleMicrophoneFragment;
+        _microphoneManager.CaptureEndEvent -= HandleMicrophoneEnd;
 
         _opusEncoder.Dispose();
         _opusDecoder.Dispose();
@@ -115,13 +117,33 @@ public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
 
     #region Encode / Send
 
-    private void HandleMicrophoneFragment(float[] samples)
+    private void HandleMicrophoneFragment(float[] samples, int captureFrequency)
     {
+        // Apply gain
         AudioGain.Apply(samples, _pluginConfig.MicrophoneGain);
         
-        foreach (var sample in samples)
+        // If frequency does not match target, resample audio
+        var outputFrequency = (int)OpusFrequency;
+
+        float[] copySourceBuffer;
+        int copySourceLength;
+
+        if (captureFrequency == outputFrequency)
         {
-            _encodeSampleBuffer[_encodeSampleIndex++] = sample;
+            copySourceBuffer = samples;
+            copySourceLength = samples.Length;
+        }
+        else
+        {
+            copySourceBuffer = _resampleBuffer;
+            copySourceLength = AudioResample.Resample(samples, _resampleBuffer,
+                captureFrequency, outputFrequency);
+        }
+
+        // Continuously write to encode buffer until it reaches the target frame length, then encode
+        for (var i = 0; i < copySourceLength; i++)
+        {
+            _encodeSampleBuffer[_encodeSampleIndex++] = copySourceBuffer[i];
 
             if (_encodeSampleIndex != FrameLength)
                 continue;

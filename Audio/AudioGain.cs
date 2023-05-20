@@ -1,6 +1,6 @@
 ﻿namespace MultiplayerChat.Audio;
 
-public class AudioGain
+public static class AudioGain
 {
     public static void Apply(float[] samples, float gain)
     {
