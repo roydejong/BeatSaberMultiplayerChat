@@ -35,7 +35,7 @@ public static class AudioResample
 {
     public static int ResampledSampleCount(int sampleCount, int sourceFrequency, int targetFrequency)
     {
-        return sampleCount * targetFrequency / sourceFrequency;
+        return (int)((float)sampleCount * (float)targetFrequency / (float)sourceFrequency);
     }
 
     public static int Resample(float[] source, float[] target, int sourceFrequency, int targetFrequency)
@@ -49,7 +49,7 @@ public static class AudioResample
         float sampleRatio = (float)sourceFrequency / (float)targetFrequency;
 
         var requiredSize = ResampledSampleCount(sourceLength, sourceFrequency, targetFrequency);
-        if (requiredSize < targetLength)
+        if (targetLength < requiredSize)
             throw new ArgumentException(
                 $"target's length of '{targetLength}' does not meet the minimum length of '{requiredSize}'.");
 

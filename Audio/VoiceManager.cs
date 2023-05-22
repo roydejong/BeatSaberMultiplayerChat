@@ -143,10 +143,10 @@ public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
         }
         else
         {
-            copySourceBuffer = _resampleBuffer;
             EnsureResampleBufferSize(AudioResample.ResampledSampleCount(samples.Length, captureFrequency, outputFrequency));
-            copySourceLength = AudioResample.Resample(samples, _resampleBuffer,
-                captureFrequency, outputFrequency);
+
+            copySourceBuffer = _resampleBuffer;
+            copySourceLength = AudioResample.Resample(samples, _resampleBuffer, captureFrequency, outputFrequency);
         }
 
         // Continuously write to encode buffer until it reaches the target frame length, then encode
