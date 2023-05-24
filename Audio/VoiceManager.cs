@@ -126,7 +126,7 @@ public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
 
     #region Encode / Send
     
-    public static int GetFrameLength(int bitrate) => bitrate / (1000 / MsPerFrame);
+    public static int GetFrameLength(int frequency) => frequency / (1000 / MsPerFrame);
     public static int GetFrameLength(SamplingFrequency frequency) => GetFrameLength((int)frequency);
 
     private static SamplingFrequency GetEncodeFrequency(int inputFrequency)
