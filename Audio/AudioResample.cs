@@ -33,82 +33,64 @@ namespace MultiplayerChat.Audio;
 
 public static class AudioResample
 {
-    public static int Resample(float[] source, float[] target, int sourceFrequency,
-        int outputFrequency, int outputChannels = 1)
+    public static int ResampledSampleCount(int sampleCount, int sourceFrequency, int targetFrequency)
     {
-        if (sourceFrequency == outputFrequency)
+        return (int)((float)sampleCount * (float)targetFrequency / (float)sourceFrequency);
+    }
+
+    public static int Resample(float[] source, float[] target, int sourceFrequency, int targetFrequency)
+    {
+        int sourceLength = source.Length;
+        int targetLength = target.Length;
+
+        if (sourceFrequency == targetFrequency)
             throw new ArgumentException("Source and target frequencies cannot be the same");
 
-        var ratio = sourceFrequency / (float)outputFrequency;
+        float sampleRatio = (float)sourceFrequency / (float)targetFrequency;
 
-        var sourceLength = source.Length;
-        var targetLength = target.Length;
+        var requiredSize = ResampledSampleCount(sourceLength, sourceFrequency, targetFrequency);
+        if (targetLength < requiredSize)
+            throw new ArgumentException(
+                $"target's length of '{targetLength}' does not meet the minimum length of '{requiredSize}'.");
 
-        var length = 0;
-        
-        if (ratio % 1f <= float.Epsilon)
+        var writtenLength = 0;
+        var remainder = sampleRatio % 1.0f;
+        // basically an integer
+        if (remainder < float.Epsilon)
         {
-            var intRatio = Mathf.RoundToInt(ratio);
-            var sizeRequired = sourceLength * intRatio * outputChannels;
-            
-            if (sizeRequired > target.Length)
-                throw new ArgumentException(
-                    $"target's length of '{target.Length}' does not meet the minimum length of '{sizeRequired}'.");
-            
-            for (var i = 0; i < (targetLength / outputChannels) && (i * intRatio) < sourceLength; i++)
+            int intSampleRatio = Mathf.RoundToInt(sampleRatio);
+            for (int i = 0; i < targetLength && i * intSampleRatio < sourceLength; i++)
             {
-                for (var j = 0; j < outputChannels; j++)
-                {
-                    var targetIndex = i * outputChannels + j;
-                    var sourceSample = source[i * intRatio];
-                    target[targetIndex] = sourceSample;
-                    length++;
-                }
+                target[i] = source[i * intSampleRatio];
+                writtenLength++;
             }
         }
         else
         {
-            if (ratio > 1f)
+            // we need more samples!
+            if (targetFrequency > sourceFrequency)
             {
-                var sizeRequired = Mathf.CeilToInt(sourceLength * ratio);
-                
-                if (sizeRequired > target.Length)
-                    throw new ArgumentException(
-                        $"target's length of '{target.Length}' does not meet the minimum length of '{sizeRequired}'.");
-                
-                for (var i = 0; i < (targetLength / outputChannels) && Mathf.CeilToInt(i * ratio) < sourceLength; i++)
+                for (int i = 0; i < targetLength && Mathf.CeilToInt(i * sampleRatio) < sourceLength; i++)
                 {
-                    for (var j = 0; j < outputChannels; j++)
-                    {
-                        var targetIndex = i * outputChannels + j;
-                        var sourceSample = Mathf.Lerp(source[Mathf.FloorToInt(i * ratio)],
-                            source[Mathf.CeilToInt(i * ratio)], ratio % 1);
-                        target[targetIndex] = sourceSample;
-                        length++;
-                    }
+                    var lower = Mathf.FloorToInt(i * sampleRatio);
+                    var upper = Mathf.CeilToInt(i * sampleRatio);
+                    var sample = Mathf.Lerp(source[lower], source[upper], remainder);
+                    target[i] = sample;
+                    writtenLength++;
                 }
             }
+            // we need less samples!
             else
             {
-                var sizeRequired = Mathf.FloorToInt(sourceLength * ratio);
-                
-                if (sizeRequired > target.Length)
-                    throw new ArgumentException(
-                        $"target's length of '{target.Length}' does not meet the minimum length of '{sizeRequired}'.");
-                
-                for (var i = 0; i < (targetLength / outputChannels) && Mathf.FloorToInt(i * ratio) < sourceLength; i++)
+                for (int i = 0; i < targetLength && Mathf.FloorToInt(i * sampleRatio) < sourceLength; i++)
                 {
-                    for (var j = 0; j < outputChannels; j++)
-                    {
-                        var targetIndex = i * outputChannels + j;
-                        var sourceSample = source[Mathf.FloorToInt(i * ratio)];
-                        target[targetIndex] = sourceSample;
-                        length++;
-                    }
+                    var sampleIdx = Mathf.FloorToInt(i * sampleRatio);
+                    target[i] = source[sampleIdx];
+                    writtenLength++;
                 }
             }
         }
-
-        return length;
+        
+        return writtenLength;
     }
 }

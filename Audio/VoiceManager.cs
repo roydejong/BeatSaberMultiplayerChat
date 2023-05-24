@@ -25,7 +25,7 @@ public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
     private readonly Encoder _opusEncoder;
     private readonly Decoder _opusDecoder;
     
-    private readonly float[] _resampleBuffer;
+    private float[] _resampleBuffer;
     private readonly float[] _encodeSampleBuffer;
     private readonly byte[] _encodeOutputBuffer;
     private int _encodeSampleIndex;
@@ -117,6 +117,14 @@ public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
 
     #region Encode / Send
 
+    private void EnsureResampleBufferSize(int minimumSize)
+    {
+        if (_resampleBuffer.Length < minimumSize)
+        {
+            _resampleBuffer = new float[minimumSize];
+        }
+    }
+
     private void HandleMicrophoneFragment(float[] samples, int captureFrequency)
     {
         // Apply gain
@@ -135,9 +143,10 @@ public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
         }
         else
         {
+            EnsureResampleBufferSize(AudioResample.ResampledSampleCount(samples.Length, captureFrequency, outputFrequency));
+
             copySourceBuffer = _resampleBuffer;
-            copySourceLength = AudioResample.Resample(samples, _resampleBuffer,
-                captureFrequency, outputFrequency);
+            copySourceLength = AudioResample.Resample(samples, _resampleBuffer, captureFrequency, outputFrequency);
         }
 
         // Continuously write to encode buffer until it reaches the target frame length, then encode
