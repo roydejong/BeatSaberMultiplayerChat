@@ -9,8 +9,8 @@ public class PlayerVoicePlayer : IDisposable
 {
     #region Base
     
-    private static readonly int ClipSampleSize = (int)VoiceManager.OpusFrequency; // 1 full second worth of samples
-    private static readonly int ClipFeedSize = VoiceManager.FrameLength;
+    private static readonly int ClipSampleSize = (int)VoiceManager.DecodeFrequency; // 1 full second worth of samples
+    private static readonly int ClipFeedSize = VoiceManager.MaxFrameLength; // max and decode are the same (20ms@48khz)
     private static readonly float[] EmptyClipSamples = new float[ClipSampleSize];
     
     public string PlayerUserId { get; private set; }
@@ -60,7 +60,7 @@ public class PlayerVoicePlayer : IDisposable
         _audioSource = null;
         _streamBuffer = new FifoFloatStream();
         _audioClip = AudioClip.Create("JitterBufferClip", ClipSampleSize, (int) VoiceManager.OpusChannels,
-            (int) VoiceManager.OpusFrequency, false);
+            (int) VoiceManager.DecodeFrequency, false);
         _playbackBuffer = new float[ClipFeedSize];
 
         StopImmediate();

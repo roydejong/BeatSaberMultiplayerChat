@@ -5,6 +5,7 @@ using MultiplayerChat.Config;
 using MultiplayerChat.Core;
 using MultiplayerChat.Network;
 using MultiplayerCore.Networking;
+using SiraUtil.Logging;
 using UnityEngine;
 using UnityOpus;
 using Zenject;
@@ -15,15 +16,20 @@ namespace MultiplayerChat.Audio;
 // ReSharper disable once ClassNeverInstantiated.Global
 public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
 {
-    
+    [Inject] private readonly SiraLog _logger = null!;
     [Inject] private readonly PluginConfig _pluginConfig = null!;
     [Inject] private readonly ChatManager _chatManager = null!;
     [Inject] private readonly MicrophoneManager _microphoneManager = null!;
     [Inject] private readonly IMultiplayerSessionManager _multiplayerSession = null!;
     [Inject] private readonly MpPacketSerializer _packetSerializer = null!;
 
-    private readonly Encoder _opusEncoder;
+    private Encoder? _opusEncoder;
     private readonly Decoder _opusDecoder;
+
+    private int _captureFrequency;
+    private SamplingFrequency _encodeFrequency;
+
+    public int EncodeFrameLength { get; private set; } = GetFrameLength(SamplingFrequency.Frequency_48000);
     
     private float[] _resampleBuffer;
     private readonly float[] _encodeSampleBuffer;
@@ -33,11 +39,16 @@ public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
     private readonly float[] _decodeSampleBuffer;
 
     public const NumChannels OpusChannels = NumChannels.Mono;
-    public static readonly SamplingFrequency OpusFrequency = SamplingFrequency.Frequency_48000;
+    public static readonly SamplingFrequency DecodeFrequency = SamplingFrequency.Frequency_48000;
     public const int OpusComplexity = 10;
     public const int Bitrate = 96000;
-    public const int FrameLength = 960; // = 20ms per voice fragment
-    public const int FrameByteSize = FrameLength * sizeof(float);
+    public const int MsPerFrame = 20;
+    
+    /// <summary>
+    /// Max frame length, in samples, supported by Opus.
+    /// This is 20ms @ 48 kHz.
+    /// </summary>
+    public const int MaxFrameLength = 960;
 
     public bool IsTransmitting { get; private set; }
 
@@ -52,17 +63,15 @@ public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
 
     public VoiceManager()
     {
-        _opusEncoder = new(OpusFrequency, OpusChannels, OpusApplication.VoIP)
-        {
-            Bitrate = Bitrate,
-            Complexity = OpusComplexity,
-            Signal = OpusSignal.Voice
-        };
-        _opusDecoder = new(OpusFrequency, OpusChannels);
+        _opusEncoder = null;
+        _opusDecoder = new(DecodeFrequency, OpusChannels);
 
-        _resampleBuffer = new float[FrameLength];
-        _encodeSampleBuffer = new float[FrameLength];
-        _encodeOutputBuffer = new byte[FrameByteSize];
+        _captureFrequency = 0;
+        _encodeFrequency = SamplingFrequency.Frequency_48000;
+
+        _resampleBuffer = new float[MaxFrameLength]; // resized automatically (EnsureResampleBufferSize)
+        _encodeSampleBuffer = new float[MaxFrameLength]; 
+        _encodeOutputBuffer = new byte[MaxFrameLength * sizeof(float)]; 
         _encodeSampleIndex = 0;
 
         _decodeSampleBuffer = new float[Decoder.maximumPacketDuration * (int) OpusChannels];
@@ -101,7 +110,7 @@ public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
         _microphoneManager.FragmentReadyEvent -= HandleMicrophoneFragment;
         _microphoneManager.CaptureEndEvent -= HandleMicrophoneEnd;
 
-        _opusEncoder.Dispose();
+        _opusEncoder?.Dispose();
         _opusDecoder.Dispose();
 
         IsLoopbackTesting = false;
@@ -116,7 +125,22 @@ public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
     }
 
     #region Encode / Send
+    
+    public static int GetFrameLength(int bitrate) => bitrate / (1000 / MsPerFrame);
+    public static int GetFrameLength(SamplingFrequency frequency) => GetFrameLength((int)frequency);
 
+    private static SamplingFrequency GetEncodeFrequency(int inputFrequency)
+    {
+        return inputFrequency switch
+        {
+            > 24000 => SamplingFrequency.Frequency_48000,
+            > 16000 => SamplingFrequency.Frequency_24000,
+            > 12000 => SamplingFrequency.Frequency_16000,
+            > 8000 => SamplingFrequency.Frequency_12000,
+            _ => SamplingFrequency.Frequency_8000
+        };
+    }
+    
     private void EnsureResampleBufferSize(int minimumSize)
     {
         if (_resampleBuffer.Length < minimumSize)
@@ -130,23 +154,44 @@ public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
         // Apply gain
         AudioGain.Apply(samples, _pluginConfig.MicrophoneGain);
         
-        // If frequency does not match target, resample audio
-        var outputFrequency = (int)OpusFrequency;
+        // (Re)initialize encoder as needed
+        if (_opusEncoder == null || _captureFrequency != captureFrequency)
+        {
+            _captureFrequency = captureFrequency;
+            _encodeFrequency = GetEncodeFrequency(captureFrequency);
 
+            EncodeFrameLength = GetFrameLength(_encodeFrequency);
+            
+            _opusEncoder?.Dispose();
+            _opusEncoder = new Encoder(_encodeFrequency, OpusChannels, OpusApplication.VoIP)
+            {
+                Bitrate = Bitrate,
+                Complexity = OpusComplexity,
+                Signal = OpusSignal.Voice
+            };
+
+            _logger.Info($"Initialized Opus encoder (captureFrequency={captureFrequency}, " +
+                         $"encodeFrequency={_encodeFrequency}, " +
+                         $"encodeFrameLength={EncodeFrameLength})");
+        }
+        
+        // If encode frequency is not exact, resample audio
+        var encodeFrequencyInt = (int)_encodeFrequency;
+        
         float[] copySourceBuffer;
         int copySourceLength;
 
-        if (captureFrequency == outputFrequency)
+        if (captureFrequency == encodeFrequencyInt)
         {
             copySourceBuffer = samples;
             copySourceLength = samples.Length;
         }
         else
         {
-            EnsureResampleBufferSize(AudioResample.ResampledSampleCount(samples.Length, captureFrequency, outputFrequency));
+            EnsureResampleBufferSize(AudioResample.ResampledSampleCount(samples.Length, captureFrequency, encodeFrequencyInt));
 
             copySourceBuffer = _resampleBuffer;
-            copySourceLength = AudioResample.Resample(samples, _resampleBuffer, captureFrequency, outputFrequency);
+            copySourceLength = AudioResample.Resample(samples, _resampleBuffer, captureFrequency, encodeFrequencyInt);
         }
 
         // Continuously write to encode buffer until it reaches the target frame length, then encode
@@ -154,12 +199,12 @@ public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
         {
             _encodeSampleBuffer[_encodeSampleIndex++] = copySourceBuffer[i];
 
-            if (_encodeSampleIndex != FrameLength)
+            if (_encodeSampleIndex != EncodeFrameLength)
                 continue;
 
             HandleEncodedFrame
             (
-                _opusEncoder.Encode(_encodeSampleBuffer, FrameLength, _encodeOutputBuffer)
+                _opusEncoder.Encode(_encodeSampleBuffer, EncodeFrameLength, _encodeOutputBuffer)
             );
             _encodeSampleIndex = 0;
         }

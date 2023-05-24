@@ -63,8 +63,8 @@ public class MpcVoicePacket : MpcBasePacket, IPoolablePacket
 
     #region Byte Pool
 
-    protected static readonly ArrayPool<byte> BytePool = ArrayPool<byte>.GetPool(VoiceManager.FrameByteSize);
-    // each individual frame *should* be smaller than FrameByteSize, because that refers to unencoded data...
+    // Frame size should be ~240 bytes based on 20ms @ 96000 bitrate, but may vary in practice
+    protected static readonly ArrayPool<byte> BytePool = ArrayPool<byte>.GetPool(512);
 
     public void AllocatePooledBuffer(int encodedSize)
     {
@@ -73,7 +73,7 @@ public class MpcVoicePacket : MpcBasePacket, IPoolablePacket
         Data = BytePool.Spawn();
 
         if (Data.Length < encodedSize)
-            throw new InvalidOperationException("this should never happen: rented buffer is too smol");
+            throw new InvalidOperationException($"Rented buffer is too small (need={encodedSize}, got={Data.Length})");
         
         _isRentedBuffer = true;
         _bufferContentSize = encodedSize;
