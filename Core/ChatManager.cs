@@ -161,8 +161,11 @@ public class ChatManager : IInitializable, IDisposable
     #region API - Player States
 
     public void SetLocalPlayerIsSpeaking(bool isSpeaking)
-        => SetPlayerIsSpeaking(_sessionManager.localPlayer.userId, isSpeaking);
-    
+    {
+        if (_sessionManager.localPlayer != null) // may be null on disconnect handler
+            SetPlayerIsSpeaking(_sessionManager.localPlayer.userId, isSpeaking);
+    }
+
     public void SetPlayerIsSpeaking(string? userId, bool isSpeaking)
     {
         if (userId == null)
