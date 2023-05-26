@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -22,6 +22,7 @@ namespace MultiplayerChat.UI.Lobby;
 public class ChatViewController : BSMLAutomaticViewController
 {
     [Inject] private readonly ChatManager _chatManager = null!;
+    [Inject] private readonly QuickChatModal _quickChatModal = null!;
 
 #pragma warning disable CS0649
     [UIComponent("ChatViewBg")] private Backgroundable? _chatViewBg;
@@ -59,6 +60,13 @@ public class ChatViewController : BSMLAutomaticViewController
         FillChat();
         
         _chatInput!.modalKeyboard.keyboard.EnterPressed += HandleKeyboardInput; 
+    }
+
+    [UIAction("OpenQuickChat")]
+    private void OpenQuickChat()
+    {
+        _quickChatModal.transform.SetParent(transform, false);
+        _quickChatModal.Show();
     }
 
     protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
@@ -113,7 +121,7 @@ public class ChatViewController : BSMLAutomaticViewController
         
         // > Stretch the input element to span the full width
         var valuePickerRect = (_chatInput.transform.Find("ValuePicker").transform as RectTransform)!;
-        valuePickerRect.offsetMin = new Vector2(-105f, 0f);
+        valuePickerRect.offsetMin = new Vector2(-85f, 0f);
         
         // > Make the background look nice
         var buttonLeftSide = valuePickerRect.Find("DecButton") as RectTransform;
