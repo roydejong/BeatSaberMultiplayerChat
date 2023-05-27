@@ -59,7 +59,7 @@ namespace MultiplayerChat.UI.Lobby
             // add our event
             _modal!.blockerClickedEvent += HandleBlockerClicked;
 
-            // change the background sprite to be an octagon, TODO: higher resolution sprite (192 x 192 not enough)
+            // change the background sprite to be an octagon
             var bg = _modal.GetComponentInChildren<ImageView>(true);
             bg.sprite = GetEmbeddedSprite("MultiplayerChat.Assets.BG_Mask.png");
 
@@ -88,7 +88,7 @@ namespace MultiplayerChat.UI.Lobby
             var offsetVector = new Vector2(0, 27.5f);
             var center = new Vector2(0, 0);
 
-            // load the sprite, TODO: find a better way of accessing the sprite
+            // load the sprite
             Sprite radialButtonSprite = GetEmbeddedSprite("MultiplayerChat.Assets.RadialButton.png");
 
             for (int i = 0; i < 8; i++)
