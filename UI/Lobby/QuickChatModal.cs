@@ -39,7 +39,7 @@ namespace MultiplayerChat.UI.Lobby
         public void Dispose()
         {
             if (_modal != null)
-                Destroy(_modal);
+                Destroy(_modal.gameObject);
         }
 
         #region Show/Hide API
