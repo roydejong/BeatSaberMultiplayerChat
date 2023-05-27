@@ -1,6 +1,7 @@
-﻿using MultiplayerChat.Audio;
+using MultiplayerChat.Audio;
 using MultiplayerChat.Config;
 using MultiplayerChat.Core;
+using MultiplayerChat.Models;
 using Zenject;
 
 namespace MultiplayerChat.Installers;
@@ -22,5 +23,7 @@ public class MpcAppInstaller : Installer
         
         Container.BindInterfacesAndSelfTo<ChatManager>().AsSingle();
         Container.BindInterfacesAndSelfTo<VoiceManager>().FromNewComponentOnNewGameObject().AsSingle();
+
+        Container.BindInterfacesAndSelfTo<QuickChatOptions>().AsSingle();
     }
 }

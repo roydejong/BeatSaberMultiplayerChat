@@ -1,4 +1,4 @@
-﻿using MultiplayerChat.Core;
+using MultiplayerChat.Core;
 using MultiplayerChat.UI.Hud;
 using MultiplayerChat.UI.Lobby;
 using MultiplayerChat.UI.ModSettings;
@@ -20,6 +20,7 @@ public class MpcMenuInstaller : Installer
         
         // UI - Lobby
         Container.Bind<ChatViewController>().FromNewComponentAsViewController().AsSingle();
+        Container.BindInterfacesAndSelfTo<QuickChatModal>().FromNewComponentOnNewGameObject().AsSingle();
         
         // Core
         Container.BindInterfacesAndSelfTo<LobbyIntegrator>().AsSingle();

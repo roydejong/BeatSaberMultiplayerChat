@@ -15,14 +15,16 @@
         </vertical>
     </horizontal>
     <vertical pref-height="10" min-height="10"/> <!-- pad -->
-    <horizontal>
+    <horizontal spacing="1">
         <horizontal>
             <image preserve-aspect="true" preferred-width="7" preferred-height="7" max-width="7"
                    max-height="7" source="MultiplayerChat.Assets.Keyboard.png"/>
         </horizontal>
-        <horizontal pad-left="8">
+        <horizontal pad-left="6">
             <string-setting id="ChatMessageInput" font-color="#666" text="Send message"/>
         </horizontal>
-    </horizontal>
-
+		<horizontal>
+			<button text="QuickChat" on-click="OpenQuickChat"/>
+		</horizontal>
+	</horizontal>
 </vertical>
