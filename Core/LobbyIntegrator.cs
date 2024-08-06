@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BeatSaber.AvatarCore;
 using HMUI;
 using IPA.Utilities;
 using MultiplayerChat.Audio;

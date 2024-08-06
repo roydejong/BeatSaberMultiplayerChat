@@ -1,4 +1,5 @@
 ﻿using System;
+using BeatSaber.AvatarCore;
 using MultiplayerChat.Audio;
 using SiraUtil.Affinity;
 using Zenject;
