@@ -3,10 +3,10 @@ using MultiplayerCore.Networking.Abstractions;
 
 namespace MultiplayerChat.Network;
 
-public class MpcBasePacket : MpPacket
+public class MpChatBasePacket : MpPacket
 {
     /// <summary>
-    /// The MPC protocol version used by the client.
+    /// The MPChat protocol version used by the client.
     /// Automatically set for outgoing packets.
     /// </summary>
     /// <see cref="MpcVersionInfo.ProtocolVersion"/>

@@ -5,7 +5,7 @@ namespace MultiplayerChat.Models;
 public class ChatPlayer
 {
     public readonly IConnectedPlayer Player;
-    public readonly MpcCapabilitiesPacket Capabilities;
+    public readonly MpChatCapabilitiesPacket Capabilities;
 
     public string UserId => Player.userId;
     public string UserName => Player.userName;
@@ -15,7 +15,7 @@ public class ChatPlayer
     public bool IsSpeaking;
     public bool IsMuted;
 
-    public ChatPlayer(IConnectedPlayer player, MpcCapabilitiesPacket capabilities)
+    public ChatPlayer(IConnectedPlayer player, MpChatCapabilitiesPacket capabilities)
     {
         Player = player;
         Capabilities = capabilities;

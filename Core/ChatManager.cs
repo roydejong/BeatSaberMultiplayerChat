@@ -22,7 +22,7 @@ public class ChatManager : IInitializable, IDisposable
     [Inject] private readonly MicrophoneManager _microphoneManager = null!;
     [Inject] private readonly InputManager _inputManager = null!;
 
-    private MpcCapabilitiesPacket _localCapabilities = null!;
+    private MpChatCapabilitiesPacket _localCapabilities = null!;
     private Dictionary<string, ChatPlayer> _chatPlayers = null!;
 
     public bool SessionConnected { get; private set; }
@@ -51,7 +51,7 @@ public class ChatManager : IInitializable, IDisposable
         if (_config.MutedUserIds == null)
             _config.MutedUserIds = new();
         
-        _localCapabilities = new MpcCapabilitiesPacket()
+        _localCapabilities = new MpChatCapabilitiesPacket()
         {
             CanTextChat = TextChatEnabled,
             CanReceiveVoiceChat = VoiceChatEnabled,
@@ -67,8 +67,8 @@ public class ChatManager : IInitializable, IDisposable
         _sessionManager.playerConnectedEvent += HandleSessionPlayerConnected;
         _sessionManager.playerDisconnectedEvent += HandleSessionPlayerDisconnected;
 
-        _packetSerializer.RegisterCallback<MpcCapabilitiesPacket>(HandleCapabilitiesPacket);
-        _packetSerializer.RegisterCallback<MpcTextChatPacket>(HandleTextChat);
+        _packetSerializer.RegisterCallback<MpChatCapabilitiesPacket>(HandleCapabilitiesPacket);
+        _packetSerializer.RegisterCallback<MpChatTextChatPacket>(HandleTextChat);
     }
 
     public void Dispose()
@@ -77,8 +77,8 @@ public class ChatManager : IInitializable, IDisposable
         _sessionManager.disconnectedEvent -= HandleSessionDisconnected;
         _sessionManager.playerConnectedEvent -= HandleSessionPlayerConnected;
 
-        _packetSerializer.UnregisterCallback<MpcCapabilitiesPacket>();
-        _packetSerializer.UnregisterCallback<MpcTextChatPacket>();
+        _packetSerializer.UnregisterCallback<MpChatCapabilitiesPacket>();
+        _packetSerializer.UnregisterCallback<MpChatTextChatPacket>();
 
         SessionConnected = false;
 
@@ -122,7 +122,7 @@ public class ChatManager : IInitializable, IDisposable
         if (!SessionConnected || !TextChatEnabled || string.IsNullOrWhiteSpace(text))
             return;
 
-        var chatPacket = new MpcTextChatPacket()
+        var chatPacket = new MpChatTextChatPacket()
         {
             Text = text
         };
@@ -247,7 +247,7 @@ public class ChatManager : IInitializable, IDisposable
 
     #region Packet handlers
 
-    private void HandleCapabilitiesPacket(MpcCapabilitiesPacket packet, IConnectedPlayer sender)
+    private void HandleCapabilitiesPacket(MpChatCapabilitiesPacket packet, IConnectedPlayer sender)
     {
         // Another player that has MPC installed has announced their capabilities to us
 
@@ -285,7 +285,7 @@ public class ChatManager : IInitializable, IDisposable
         ChatPlayerUpdateEvent?.Invoke(this, chatPlayer);
     }
 
-    private void HandleTextChat(MpcTextChatPacket packet, IConnectedPlayer sender)
+    private void HandleTextChat(MpChatTextChatPacket packet, IConnectedPlayer sender)
     {
         if (!SessionConnected || !TextChatEnabled)
             return;

@@ -8,7 +8,7 @@ namespace MultiplayerChat.Network;
 /// <summary>
 /// Unreliable packet containing a Opus-encoded voice fragment.
 /// </summary>
-public class MpcVoicePacket : MpcBasePacket, IPoolablePacket
+public class MpChatVoicePacket : MpChatBasePacket, IPoolablePacket
 {
     /// <summary>
     /// Opus-encoded audio fragment (48kHz, 1 channel).
@@ -43,9 +43,9 @@ public class MpcVoicePacket : MpcBasePacket, IPoolablePacket
 
     #region Packet Pool
     
-    protected static PacketPool<MpcVoicePacket> Pool => ThreadStaticPacketPool<MpcVoicePacket>.pool;
+    protected static PacketPool<MpChatVoicePacket> Pool => ThreadStaticPacketPool<MpChatVoicePacket>.pool;
 
-    public static MpcVoicePacket Obtain() => Pool.Obtain();
+    public static MpChatVoicePacket Obtain() => Pool.Obtain();
     
     public void Release()
     {

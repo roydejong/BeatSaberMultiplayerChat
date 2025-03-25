@@ -90,7 +90,7 @@ public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
         _microphoneManager.FragmentReadyEvent += HandleMicrophoneFragment;
         _microphoneManager.CaptureEndEvent += HandleMicrophoneEnd;
 
-        _packetSerializer.RegisterCallback<MpcVoicePacket>(HandleVoicePacket);
+        _packetSerializer.RegisterCallback<MpChatVoicePacket>(HandleVoicePacket);
     }
 
     public void Update()
@@ -224,7 +224,7 @@ public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
         if (encodedLength <= 0)
             return;
 
-        var voicePacket = MpcVoicePacket.Obtain();
+        var voicePacket = MpChatVoicePacket.Obtain();
 
         try
         {
@@ -255,7 +255,7 @@ public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
 
     #region Decode / Receive
 
-    private void HandleVoicePacket(MpcVoicePacket packet, IConnectedPlayer? source)
+    private void HandleVoicePacket(MpChatVoicePacket packet, IConnectedPlayer? source)
     {
         if (!_pluginConfig.EnableVoiceChat)
             return;
@@ -328,7 +328,7 @@ public class VoiceManager : MonoBehaviour, IInitializable, IDisposable
         if (_multiplayerSession.isConnected)
         {
             // Empty packet to signal end of transmission 
-            var endPacket = MpcVoicePacket.Obtain();
+            var endPacket = MpChatVoicePacket.Obtain();
 
             try
             {

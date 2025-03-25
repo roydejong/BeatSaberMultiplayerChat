@@ -6,7 +6,7 @@ namespace MultiplayerChat.Network;
 /// Reliable packet sent to each player indicating that they have the mod, and which features are supported and enabled.
 /// Could be sent as an update when already previously sent.
 /// </summary>
-public class MpcCapabilitiesPacket : MpcBasePacket
+public class MpChatCapabilitiesPacket : MpChatBasePacket
 {
     /// <summary>
     /// Is text chat supported and enabled?
