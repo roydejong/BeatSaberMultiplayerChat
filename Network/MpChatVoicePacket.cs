@@ -11,6 +11,10 @@ namespace MultiplayerChat.Network;
 public class MpChatVoicePacket : MpChatBasePacket, IPoolablePacket
 {
     /// <summary>
+    /// Rolling sequence number of the audio fragment (modulo 256).
+    /// </summary>
+    public uint Index;
+    /// <summary>
     /// Opus-encoded audio fragment (48kHz, 1 channel).
     /// If null/empty, this indicates the end of a transmission.
     /// </summary>
@@ -24,13 +28,15 @@ public class MpChatVoicePacket : MpChatBasePacket, IPoolablePacket
     public override void Serialize(NetDataWriter writer)
     {
         base.Serialize(writer);
+        
+        writer.PutVarUInt(Index);
 
         if (Data == null || _bufferContentSize == 0)
         {
-            writer.Put(0); // int length
+            writer.Put(0);
             return;
         }
-            
+        
         writer.PutBytesWithLength(Data, 0, DataLength);
     }
 
@@ -38,7 +44,18 @@ public class MpChatVoicePacket : MpChatBasePacket, IPoolablePacket
     {
         base.Deserialize(reader);
         
-        Data = reader.GetBytesWithLength();
+        Index = reader.GetVarUInt();
+        
+        var length = reader.GetInt();
+
+        if (length == 0)
+        {
+            ReturnPooledBuffer();
+            return;
+        }
+        
+        AllocatePooledBuffer(length);
+        reader.GetBytes(Data, length);
     }
 
     #region Packet Pool
