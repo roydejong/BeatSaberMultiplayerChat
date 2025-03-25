@@ -27,25 +27,25 @@ public class ModSettingsViewController : BSMLAutomaticViewController
     [Inject] private readonly SoundNotifier _soundNotifier = null!;
     [Inject] private readonly InputManager _inputManager = null!;
 
-    [UIComponent("BtnTestMic")] private Button _btnTestMic = null!;
-    [UIComponent("DropdownNotification")] private DropDownListSetting _dropdownNotification = null!;
-    [UIComponent("ToggleVoice")] private ToggleSetting _toggleVoice = null!;
-    [UIComponent("DropdownMic")] private DropDownListSetting _dropdownMic = null!;
-    [UIComponent("SliderMicGain")] private SliderSetting _sliderMicGain = null!;
-    [UIComponent("ImgTestMic")] private ImageView _imgTestMic = null!;
-    [UIComponent("DropdownActivation")] private DropDownListSetting _dropdownActivation = null!;
-    [UIComponent("DropdownKeybind")] private DropDownListSetting _dropdownKeybind = null!;
-    [UIComponent("DropdownController")] private DropDownListSetting _dropdownController = null!;
-    [UIComponent("DropdownControllerAlt")] private DropDownListSetting _dropdownControllerAlt = null!;
-    [UIComponent("ActivationText")] private CurvedTextMeshPro _activationText = null!;
-    [UIComponent("TogglePlayerBubbles")] private ToggleSetting _togglePlayerBubbles = null!;
-    [UIComponent("ToggleCenterBubbles")] private ToggleSetting _toggleCenterBubbles = null!;
-    [UIComponent("ToggleHud")] private ToggleSetting _toggleHud = null!;
-    [UIComponent("SliderHudOpacity")] private SliderSetting _sliderHudOpacity = null!;
-    [UIComponent("SliderHudOffsetCamX")] private SliderSetting _sliderHudOffsetCamX = null!;
-    [UIComponent("SliderHudOffsetCamY")] private SliderSetting _sliderHudOffsetCamY = null!;
-    [UIComponent("SliderHudOffsetCamZ")] private SliderSetting _sliderHudOffsetCamZ = null!;
-    [UIComponent("BtnResetHudOffset")] private Button _btnResetHudOffset = null!;
+    [UIComponent("BtnTestMic")] private readonly Button _btnTestMic = null!;
+    [UIComponent("DropdownNotification")] private readonly DropDownListSetting _dropdownNotification = null!;
+    [UIComponent("ToggleVoice")] private readonly ToggleSetting _toggleVoice = null!;
+    [UIComponent("DropdownMic")] private readonly DropDownListSetting _dropdownMic = null!;
+    [UIComponent("SliderMicGain")] private readonly SliderSetting _sliderMicGain = null!;
+    [UIComponent("ImgTestMic")] private readonly ImageView _imgTestMic = null!;
+    [UIComponent("DropdownActivation")] private readonly DropDownListSetting _dropdownActivation = null!;
+    [UIComponent("DropdownKeybind")] private readonly DropDownListSetting _dropdownKeybind = null!;
+    [UIComponent("DropdownController")] private readonly DropDownListSetting _dropdownController = null!;
+    [UIComponent("DropdownControllerAlt")] private readonly DropDownListSetting _dropdownControllerAlt = null!;
+    [UIComponent("ActivationText")] private readonly CurvedTextMeshPro _activationText = null!;
+    [UIComponent("TogglePlayerBubbles")] private readonly ToggleSetting _togglePlayerBubbles = null!;
+    [UIComponent("ToggleCenterBubbles")] private readonly ToggleSetting _toggleCenterBubbles = null!;
+    [UIComponent("ToggleHud")] private readonly ToggleSetting _toggleHud = null!;
+    [UIComponent("SliderHudOpacity")] private readonly SliderSetting _sliderHudOpacity = null!;
+    [UIComponent("SliderHudOffsetCamX")] private readonly SliderSetting _sliderHudOffsetCamX = null!;
+    [UIComponent("SliderHudOffsetCamY")] private readonly SliderSetting _sliderHudOffsetCamY = null!;
+    [UIComponent("SliderHudOffsetCamZ")] private readonly SliderSetting _sliderHudOffsetCamZ = null!;
+    [UIComponent("BtnResetHudOffset")] private readonly Button _btnResetHudOffset = null!;
 
     private bool _bsmlReady = false;
 
@@ -147,7 +147,7 @@ public class ModSettingsViewController : BSMLAutomaticViewController
         // Voice
         _toggleVoice.Interactable = !_voiceManager.IsLoopbackTesting;
         _dropdownMic.Interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting;
-        _sliderMicGain.Interactable = EnableVoiceChat;
+        //_sliderMicGain.Interactable = EnableVoiceChat;
         _dropdownActivation.Interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting && _microphoneManager.HaveSelectedDevice;
         _dropdownKeybind.Interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting && _microphoneManager.HaveSelectedDevice;
         _dropdownController.Interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting && _microphoneManager.HaveSelectedDevice;
@@ -195,10 +195,10 @@ public class ModSettingsViewController : BSMLAutomaticViewController
 
         var canSetHudOptions = EnableVoiceChat && EnableHud; 
         
-        _sliderHudOpacity.Interactable = canSetHudOptions;
-        _sliderHudOffsetCamX.Interactable = canSetHudOptions;
-        _sliderHudOffsetCamY.Interactable = canSetHudOptions;
-        _sliderHudOffsetCamZ.Interactable = canSetHudOptions;
+        //_sliderHudOpacity.Interactable = canSetHudOptions;
+        //_sliderHudOffsetCamX.Interactable = canSetHudOptions;
+        //_sliderHudOffsetCamY.Interactable = canSetHudOptions;
+        //_sliderHudOffsetCamZ.Interactable = canSetHudOptions;
         _btnResetHudOffset.interactable = canSetHudOptions;
     }
 
