@@ -9,12 +9,12 @@ public class MpChatBasePacket : MpPacket
     /// The MPChat protocol version used by the client.
     /// Automatically set for outgoing packets.
     /// </summary>
-    /// <see cref="MpcVersionInfo.ProtocolVersion"/>
+    /// <see cref="MpChatVersionInfo.ProtocolVersion"/>
     public uint ProtocolVersion;
 
     public override void Serialize(NetDataWriter writer)
     {
-        ProtocolVersion = MpcVersionInfo.ProtocolVersion;
+        ProtocolVersion = MpChatVersionInfo.ProtocolVersion;
         
         writer.PutVarUInt(ProtocolVersion);
     }

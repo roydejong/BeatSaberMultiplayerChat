@@ -97,8 +97,8 @@ public class ChatManager : IInitializable, IDisposable
         if (!TextChatEnabled)
             return;
 
-        ShowSystemMessage($"MultiplayerChat v{MpcVersionInfo.AssemblyVersion} " +
-                          $"<color=#95a5a6>({MpcVersionInfo.AssemblyProductVersion})</color>");
+        ShowSystemMessage($"MultiplayerChat v{MpChatVersionInfo.AssemblyVersion} " +
+                          $"<color=#95a5a6>({MpChatVersionInfo.AssemblyProductVersion})</color>");
     }
 
     /// <summary>
@@ -276,7 +276,7 @@ public class ChatManager : IInitializable, IDisposable
             if (packet.CanTextChat)
                 ShowSystemMessage($"Player connected to chat: {sender.userName}");
 
-            if (packet.ProtocolVersion > MpcVersionInfo.ProtocolVersion)
+            if (packet.ProtocolVersion > MpChatVersionInfo.ProtocolVersion)
                 ShowSystemMessage(
                     $"Player {sender.userName} is using a newer version of MultiplayerChat. " +
                     $"You should update for the best experience.");

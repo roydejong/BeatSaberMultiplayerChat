@@ -6,7 +6,7 @@ namespace MultiplayerChat.Network;
 /// <summary>
 /// Version information for the MultiplayerChat mod.
 /// </summary>
-public static class MpcVersionInfo
+public static class MpChatVersionInfo
 {
     /// <summary>
     /// The MPC protocol version, indicating compatibility across versions.
