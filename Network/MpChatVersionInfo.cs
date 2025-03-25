@@ -12,7 +12,7 @@ public static class MpChatVersionInfo
     /// The MPC protocol version, indicating compatibility across versions.
     /// This will be incremented whenever there is a change to networked features.
     /// </summary>
-    public const uint ProtocolVersion = 1;
+    public const uint ProtocolVersion = 2;
 
     /// <summary>
     /// Gets the product version / display version for this version of MPC.
