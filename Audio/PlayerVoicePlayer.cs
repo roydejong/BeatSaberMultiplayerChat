@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using BeatSaber.AvatarCore;
 using IPA.Utilities;
 using UnityEngine;
 

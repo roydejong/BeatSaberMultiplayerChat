@@ -15,7 +15,7 @@ public class InputManager : MonoBehaviour, IInitializable, IDisposable
     [Inject] private readonly SiraLog _log = null!;
     [Inject] private readonly PluginConfig _config = null!;
     [Inject] private readonly VoiceManager _voiceManager = null!;
-    [Inject] private readonly HapticFeedbackController _hapticFeedback = null!;
+    [Inject] private readonly HapticFeedbackManager _hapticFeedback = null!;
     [Inject] private readonly SoundNotifier _soundNotifier = null!;
 
     private static InputDevice? _leftController;

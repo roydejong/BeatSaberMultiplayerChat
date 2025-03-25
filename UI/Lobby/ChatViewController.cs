@@ -125,9 +125,8 @@ public class ChatViewController : BSMLAutomaticViewController
         
         // > Make the background look nice
         var buttonLeftSide = valuePickerRect.Find("DecButton") as RectTransform;
-        var buttonRightSide = valuePickerRect.Find("IncButton") as RectTransform;
         var valueText = valuePickerRect.Find("ValueText") as RectTransform;
-        
+
         var leftSideWidth = 0.05f;
 
         buttonLeftSide!.anchorMin = new Vector2(0.0f, 0.0f);
@@ -135,12 +134,6 @@ public class ChatViewController : BSMLAutomaticViewController
         buttonLeftSide.offsetMin = new Vector2(0.0f, 0.0f);
         buttonLeftSide.offsetMax = new Vector2(0.0f, 0.0f);
         buttonLeftSide.sizeDelta = new Vector2(0.0f, 0.0f);
-
-        buttonRightSide!.anchorMin = new Vector2(leftSideWidth, 0.0f);
-        buttonRightSide.anchorMax = new Vector2(1.0f, 1.0f);
-        buttonRightSide.offsetMin = new Vector2(0.0f, 0.0f);
-        buttonRightSide.offsetMax = new Vector2(0.0f, 0.0f);
-        buttonRightSide.sizeDelta = new Vector2(0.0f, 0.0f);
 
         valueText!.anchorMin = new Vector2(0.0f, 0.0f);
         valueText.anchorMax = new Vector2(1.0f, 1.0f);
@@ -152,16 +145,13 @@ public class ChatViewController : BSMLAutomaticViewController
         var bgLeft = buttonLeftSide.Find("BG").GetComponent<ImageView>(); 
         bgLeft.SetField("_skew", 0f);
         bgLeft.__Refresh();
-        
-        var bgRight = buttonRightSide.Find("BG").GetComponent<ImageView>();
-        bgRight.SetField("_skew", 0f);
-        bgRight.__Refresh();
 
-        // > Remove ugly edit icon
-        buttonRightSide.Find("EditIcon")?.gameObject.SetActive(false);
-        
-        // > Make placeholder text look like placeholder text
-        var valueTextMesh = valueText.GetComponent<CurvedTextMeshPro>();
+		// > Remove ugly edit icon
+		_chatInput.editButton.transform.Find("EditIcon")?.GetComponent<Image>().gameObject.SetActive(false);
+
+
+		// > Make placeholder text look like placeholder text
+		var valueTextMesh = valueText.GetComponent<CurvedTextMeshPro>();
         valueTextMesh.alignment = TextAlignmentOptions.Center;
         valueTextMesh.color = Color.gray;
         
