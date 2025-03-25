@@ -59,7 +59,7 @@ public class ChatViewController : BSMLAutomaticViewController
         ApplyUiMutations();
         FillChat();
         
-        _chatInput!.modalKeyboard.keyboard.EnterPressed += HandleKeyboardInput; 
+        _chatInput!.ModalKeyboard.Keyboard.EnterPressed += HandleKeyboardInput; 
     }
 
     [UIAction("OpenQuickChat")]
@@ -147,8 +147,7 @@ public class ChatViewController : BSMLAutomaticViewController
         bgLeft.__Refresh();
 
 		// > Remove ugly edit icon
-		_chatInput.editButton.transform.Find("EditIcon")?.GetComponent<Image>().gameObject.SetActive(false);
-
+		_chatInput.EditButton.transform.Find("EditIcon")?.GetComponent<Image>().gameObject.SetActive(false);
 
 		// > Make placeholder text look like placeholder text
 		var valueTextMesh = valueText.GetComponent<CurvedTextMeshPro>();
@@ -161,7 +160,7 @@ public class ChatViewController : BSMLAutomaticViewController
     private void ResetChatInputText()
     {
         _chatInput!.Text = ""; // keep internal value empty
-        _chatInput.text.text = ChatInputPlaceholderText; // keep face value set to placeholder
+        _chatInput.Text = ChatInputPlaceholderText; // keep face value set to placeholder
     }
 
     #endregion

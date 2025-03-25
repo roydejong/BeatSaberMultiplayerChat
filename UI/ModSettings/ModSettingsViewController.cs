@@ -140,18 +140,18 @@ public class ModSettingsViewController : BSMLAutomaticViewController
             return;
 
         // Text
-        _dropdownNotification.interactable = EnableTextChat;
-        _togglePlayerBubbles.interactable = EnableTextChat;
-        _toggleCenterBubbles.interactable = EnableTextChat;
+        _dropdownNotification.Interactable = EnableTextChat;
+        _togglePlayerBubbles.Interactable = EnableTextChat;
+        _toggleCenterBubbles.Interactable = EnableTextChat;
 
         // Voice
-        _toggleVoice.interactable = !_voiceManager.IsLoopbackTesting;
-        _dropdownMic.interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting;
-        _sliderMicGain.interactable = EnableVoiceChat;
-        _dropdownActivation.interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting && _microphoneManager.HaveSelectedDevice;
-        _dropdownKeybind.interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting && _microphoneManager.HaveSelectedDevice;
-        _dropdownController.interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting && _microphoneManager.HaveSelectedDevice;
-        _dropdownControllerAlt.interactable = _dropdownController.interactable;
+        _toggleVoice.Interactable = !_voiceManager.IsLoopbackTesting;
+        _dropdownMic.Interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting;
+        _sliderMicGain.Interactable = EnableVoiceChat;
+        _dropdownActivation.Interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting && _microphoneManager.HaveSelectedDevice;
+        _dropdownKeybind.Interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting && _microphoneManager.HaveSelectedDevice;
+        _dropdownController.Interactable = EnableVoiceChat && !_voiceManager.IsLoopbackTesting && _microphoneManager.HaveSelectedDevice;
+        _dropdownControllerAlt.Interactable = _dropdownController.Interactable;
         
         // [#6] In trigger mode, you can get stuck in settings - only allow binding to one controller, not both
         // "Alt" dropdown only has two controller options
@@ -191,14 +191,14 @@ public class ModSettingsViewController : BSMLAutomaticViewController
                                    $"\r\n<color=#3498db>{_inputManager.DescribeKeybindConfig()}</color>";
         
         // HUD
-        _toggleHud.interactable = EnableVoiceChat;
+        _toggleHud.Interactable = EnableVoiceChat;
 
         var canSetHudOptions = EnableVoiceChat && EnableHud; 
         
-        _sliderHudOpacity.interactable = canSetHudOptions;
-        _sliderHudOffsetCamX.interactable = canSetHudOptions;
-        _sliderHudOffsetCamY.interactable = canSetHudOptions;
-        _sliderHudOffsetCamZ.interactable = canSetHudOptions;
+        _sliderHudOpacity.Interactable = canSetHudOptions;
+        _sliderHudOffsetCamX.Interactable = canSetHudOptions;
+        _sliderHudOffsetCamY.Interactable = canSetHudOptions;
+        _sliderHudOffsetCamZ.Interactable = canSetHudOptions;
         _btnResetHudOffset.interactable = canSetHudOptions;
     }
 

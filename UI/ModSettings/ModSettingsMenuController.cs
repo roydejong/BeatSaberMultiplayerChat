@@ -24,15 +24,15 @@ public class ModSettingsMenuController : IInitializable, IDisposable
             interactable: true
         );
         
-        MenuButtons.instance.RegisterButton(_menuButton);
+        MenuButtons.Instance.RegisterButton(_menuButton);
     }
 
     public void Dispose()
     {
         if (_menuButton != null)
         {
-            if (MenuButtons.instance != null)
-                MenuButtons.instance.UnregisterButton(_menuButton);
+            if (MenuButtons.Instance != null)
+                MenuButtons.Instance.UnregisterButton(_menuButton);
             _menuButton = null;
         }
 

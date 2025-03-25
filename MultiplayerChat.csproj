@@ -4,7 +4,9 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>MultiplayerChat</AssemblyName>
-    <AssemblyVersion>0.2.0</AssemblyVersion>
+    <AssemblyVersion>0.3.0</AssemblyVersion>
+    <Version>0.3.0</Version>
+    <FileVersion>0.3.0</FileVersion>
     <TargetFramework>net472</TargetFramework>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>portable</DebugType>
@@ -29,8 +31,6 @@
     <PackageLicenseUrl>https://github.com/roydejong/BeatSaberMultiplayerChat/LICENSE.txt</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/roydejong/BeatSaberMultiplayerChat</RepositoryUrl>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <Version>0.2.0</Version>
-    <FileVersion>0.2.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <Optimize>false</Optimize>
@@ -50,6 +50,9 @@
     <Reference Include="0Harmony">
       <HintPath>$(BeatSaberDir)\Libs\0Harmony.dll</HintPath>
     </Reference>
+    <Reference Include="AdditionalContentModel.Interfaces">
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\AdditionalContentModel.Interfaces.dll</HintPath>
+    </Reference>
     <Reference Include="BeatmapCore">
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatmapCore.dll</HintPath>
       <Private>False</Private>
@@ -59,6 +62,12 @@
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.AvatarCore.dll</HintPath>
       <Private>False</Private>
       <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="BeatSaber.ViewSystem">
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.ViewSystem.dll</HintPath>
+    </Reference>
+    <Reference Include="BGLib.UnityExtension">
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BGLib.UnityExtension.dll</HintPath>
     </Reference>
     <Reference Include="BGNet">
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BGNet.dll</HintPath>
@@ -71,6 +80,9 @@
     <Reference Include="BSML">
       <HintPath>$(BeatSaberDir)\Plugins\BSML.dll</HintPath>
     </Reference>
+    <Reference Include="DataModels">
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\DataModels.dll</HintPath>
+    </Reference>
     <Reference Include="GameplayCore">
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\GameplayCore.dll</HintPath>
     </Reference>
@@ -79,6 +91,9 @@
     </Reference>
     <Reference Include="HMUI">
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\HMUI.dll</HintPath>
+    </Reference>
+    <Reference Include="Interactable">
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Interactable.dll</HintPath>
     </Reference>
     <Reference Include="IPA.Injector">
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\IPA.Injector.dll</HintPath>
@@ -97,7 +112,7 @@
     <Reference Include="Main" Publicize="true">
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Main.dll</HintPath>
     </Reference>
-    <Reference Include="mscorlib" />
+    <Reference Include="mscorlib"/>
     <Reference Include="MultiplayerCore">
       <HintPath>$(BeatSaberDir)\Plugins\MultiplayerCore.dll</HintPath>
     </Reference>
@@ -107,20 +122,20 @@
     <Reference Include="SiraUtil">
       <HintPath>$(BeatSaberDir)\Plugins\SiraUtil.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Reflection" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Security" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System"/>
+    <Reference Include="System.Configuration"/>
+    <Reference Include="System.Core"/>
+    <Reference Include="System.Data"/>
+    <Reference Include="System.IO.Compression"/>
+    <Reference Include="System.Net.Http"/>
+    <Reference Include="System.Numerics"/>
+    <Reference Include="System.Reflection"/>
+    <Reference Include="System.Runtime.Serialization"/>
+    <Reference Include="System.Security"/>
+    <Reference Include="System.Windows.Forms"/>
+    <Reference Include="System.Xaml"/>
+    <Reference Include="System.Xml"/>
+    <Reference Include="System.Xml.Linq"/>
     <Reference Include="Unity.TextMeshPro">
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Unity.TextMeshPro.dll</HintPath>
     </Reference>
@@ -177,21 +192,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Assets\BG_Mask.png" />
-    <EmbeddedResource Include="Assets\Chat.png" />
-    <EmbeddedResource Include="Assets\quickchat.json" />
-    <EmbeddedResource Include="Assets\RadialButton.png" />
-    <EmbeddedResource Include="Assets\UnreadBadge.png" />
-    <EmbeddedResource Include="UI\Lobby\QuickChatModal.bsml" />
-    <EmbeddedResource Include="Assets\Keyboard.png" />
-    <EmbeddedResource Include="Assets\MicOff.png" />
-    <EmbeddedResource Include="Assets\MicOn.png" />
-    <EmbeddedResource Include="UI\ModSettings\ModSettingsViewController.bsml" />
-    <EmbeddedResource Include="manifest.json" />
-    <EmbeddedResource Include="UI\Lobby\ChatViewController.bsml" />
-    <Content Include="README.md" />
-    <Content Include="Directory.Build.targets" />
-    <Content Include="TODO.md" />
+    <EmbeddedResource Include="Assets\BG_Mask.png"/>
+    <EmbeddedResource Include="Assets\Chat.png"/>
+    <EmbeddedResource Include="Assets\quickchat.json"/>
+    <EmbeddedResource Include="Assets\RadialButton.png"/>
+    <EmbeddedResource Include="Assets\UnreadBadge.png"/>
+    <EmbeddedResource Include="UI\Lobby\QuickChatModal.bsml"/>
+    <EmbeddedResource Include="Assets\Keyboard.png"/>
+    <EmbeddedResource Include="Assets\MicOff.png"/>
+    <EmbeddedResource Include="Assets\MicOn.png"/>
+    <EmbeddedResource Include="UI\ModSettings\ModSettingsViewController.bsml"/>
+    <EmbeddedResource Include="manifest.json"/>
+    <EmbeddedResource Include="UI\Lobby\ChatViewController.bsml"/>
+    <Content Include="README.md"/>
+    <Content Include="Directory.Build.targets"/>
+    <Content Include="TODO.md"/>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BeatSaberModdingTools.Tasks">
@@ -203,14 +218,14 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
   </ItemGroup>
   <Target Name="PreBuild" BeforeTargets="BeforeBuild" Condition="'$(NCRUNCH)' != '1'">
-    <Error Text="The BeatSaberModdingTools.Tasks nuget package doesn't seem to be installed." Condition="'$(BSMTTaskAssembly)' == ''" />
+    <Error Text="The BeatSaberModdingTools.Tasks nuget package doesn't seem to be installed." Condition="'$(BSMTTaskAssembly)' == ''"/>
     <GetCommitInfo ProjectDir="$(ProjectDir)">
-      <Output TaskParameter="CommitHash" PropertyName="CommitHash" />
-      <Output TaskParameter="Branch" PropertyName="GitBranch" />
-      <Output TaskParameter="Modified" PropertyName="GitModified" />
+      <Output TaskParameter="CommitHash" PropertyName="CommitHash"/>
+      <Output TaskParameter="Branch" PropertyName="GitBranch"/>
+      <Output TaskParameter="Modified" PropertyName="GitModified"/>
     </GetCommitInfo>
     <PropertyGroup Condition="'$(GitModified)' != 'Modified'">
       <InformationalVersion>$(VersionType)-$(GitBranch)-$(CommitHash)</InformationalVersion>
@@ -218,6 +233,6 @@
     <PropertyGroup Condition="'$(GitModified)' == 'Modified'">
       <InformationalVersion>$(VersionType)-$(GitBranch)-$(CommitHash)-modified</InformationalVersion>
     </PropertyGroup>
-    <Message Text="Product version: '$(InformationalVersion)'" Importance="high" />
+    <Message Text="Product version: '$(InformationalVersion)'" Importance="high"/>
   </Target>
 </Project>

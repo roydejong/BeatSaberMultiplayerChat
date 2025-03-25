@@ -185,7 +185,7 @@ public class LobbyIntegrator : IInitializable, IDisposable, IAffinity
         
         UpdatePlayerListState(userId, chatPlayer);
 
-        _hoverHintController.HideHintInstant();
+        _hoverHintController.HideHintInstant(null);
 
         if (!chatPlayer.IsMuted)
             return;
