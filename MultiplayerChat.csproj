@@ -160,8 +160,12 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
+        <EmbeddedResource Include="Assets\BG_Mask.png" />
         <EmbeddedResource Include="Assets\Chat.png" />
+        <EmbeddedResource Include="Assets\quickchat.json" />
+        <EmbeddedResource Include="Assets\RadialButton.png" />
         <EmbeddedResource Include="Assets\UnreadBadge.png" />
+        <EmbeddedResource Include="UI\Lobby\QuickChatModal.bsml" />
         <None Include="Assets\MicOn.ogg" />
         <None Include="Assets\MicOff.ogg" />
         <Content Include="Directory.Build.targets" />
@@ -172,7 +176,11 @@
         <EmbeddedResource Include="UI\ModSettings\ModSettingsViewController.bsml" />
         <EmbeddedResource Include="manifest.json" />
         <Content Include="README.md" />
+        <None Remove="Assets\BG_Mask.png" />
+        <None Remove="Assets\quickchat.json" />
+        <None Remove="Assets\RadialButton.png" />
         <None Remove="UI\Lobby\ChatViewController.bsml" />
+        <None Remove="UI\Lobby\QuickChatModal.bsml" />
         <EmbeddedResource Include="UI\Lobby\ChatViewController.bsml" />
     </ItemGroup>
     <ItemGroup>

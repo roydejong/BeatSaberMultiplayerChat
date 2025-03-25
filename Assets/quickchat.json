@@ -1,0 +1,92 @@
+﻿{
+  "Root": [
+    "Positive",
+    "Negative",
+    "Map",
+    "Difficulty",
+    "Mods",
+    "Funny",
+    "User",
+    "Platform"
+  ],
+  "Positive": [
+    "That was fun!",
+    "Again!",
+    "Congratulations!",
+    "Amazing!",
+    "Yes!",
+    "",
+    "",
+    ""
+  ],
+  "Negative": [
+    "Aww",
+    "I missed too much",
+    "That was hard",
+    "I have to go",
+    "No",
+    "",
+    "",
+    ""
+  ],
+  "Map": [
+    "Anyone got a similiar map?",
+    "Please pick my map!",
+    "",
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "Difficulty": [
+    "Please pick Easy",
+    "Please pick Normal",
+    "Please pick Hard",
+    "Please pick Expert",
+    "Please pick Expert+",
+    "",
+    "",
+    ""
+  ],
+  "Mods": [
+    "Anyone got Noodle?",
+    "Anyone got Mapping Ext?",
+    "",
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "Funny": [
+    "My arms are falling off!",
+    "Sexy jaroslav beck",
+    "I am on PSVR!",
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "User": [
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "Platform": [
+    "I am on Quest!",
+    "I am on Steam!",
+    "I am on Oculus PC!",
+    "",
+    "",
+    "",
+    "",
+    ""
+  ]
+}
