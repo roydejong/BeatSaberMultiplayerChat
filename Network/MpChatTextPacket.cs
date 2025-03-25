@@ -5,7 +5,7 @@ namespace MultiplayerChat.Network;
 /// <summary>
 /// Reliable packet containing a simple text chat message.
 /// </summary>
-public class MpChatTextChatPacket : MpChatBasePacket
+public class MpChatTextPacket : MpChatBasePacket
 {
     /// <summary>
     /// Raw chat message.

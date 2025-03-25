@@ -82,7 +82,7 @@ public class ChatMessage
         stripTags: true
     );
 
-    public static ChatMessage CreateFromPacket(MpChatTextChatPacket packet, IConnectedPlayer sender) => new
+    public static ChatMessage CreateFromPacket(MpChatTextPacket packet, IConnectedPlayer sender) => new
     (
         type: ChatMessageType.PlayerMessage,
         userId: sender.userId,

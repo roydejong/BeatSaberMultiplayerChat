@@ -68,7 +68,7 @@ public class ChatManager : IInitializable, IDisposable
         _sessionManager.playerDisconnectedEvent += HandleSessionPlayerDisconnected;
 
         _packetSerializer.RegisterCallback<MpChatCapabilitiesPacket>(HandleCapabilitiesPacket);
-        _packetSerializer.RegisterCallback<MpChatTextChatPacket>(HandleTextChat);
+        _packetSerializer.RegisterCallback<MpChatTextPacket>(HandleTextChat);
     }
 
     public void Dispose()
@@ -78,7 +78,7 @@ public class ChatManager : IInitializable, IDisposable
         _sessionManager.playerConnectedEvent -= HandleSessionPlayerConnected;
 
         _packetSerializer.UnregisterCallback<MpChatCapabilitiesPacket>();
-        _packetSerializer.UnregisterCallback<MpChatTextChatPacket>();
+        _packetSerializer.UnregisterCallback<MpChatTextPacket>();
 
         SessionConnected = false;
 
@@ -122,7 +122,7 @@ public class ChatManager : IInitializable, IDisposable
         if (!SessionConnected || !TextChatEnabled || string.IsNullOrWhiteSpace(text))
             return;
 
-        var chatPacket = new MpChatTextChatPacket()
+        var chatPacket = new MpChatTextPacket()
         {
             Text = text
         };
@@ -285,7 +285,7 @@ public class ChatManager : IInitializable, IDisposable
         ChatPlayerUpdateEvent?.Invoke(this, chatPlayer);
     }
 
-    private void HandleTextChat(MpChatTextChatPacket packet, IConnectedPlayer sender)
+    private void HandleTextChat(MpChatTextPacket packet, IConnectedPlayer sender)
     {
         if (!SessionConnected || !TextChatEnabled)
             return;
