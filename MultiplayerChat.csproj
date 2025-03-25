@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Library</OutputType>
@@ -126,16 +126,12 @@
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.dll</HintPath>
-      <Private>False</Private>
-      <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="UnityEngine.AudioModule">
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
-      <Private>False</Private>
-      <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="UnityEngine.ImageConversionModule">
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
@@ -181,20 +177,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Assets\BG_Mask.png" />
     <EmbeddedResource Include="Assets\Chat.png" />
+    <EmbeddedResource Include="Assets\quickchat.json" />
+    <EmbeddedResource Include="Assets\RadialButton.png" />
     <EmbeddedResource Include="Assets\UnreadBadge.png" />
-    <None Include="Assets\MicOn.ogg" />
-    <None Include="Assets\MicOff.ogg" />
-    <Content Include="Directory.Build.targets" />
-    <Content Include="TODO.md" />
+    <EmbeddedResource Include="UI\Lobby\QuickChatModal.bsml" />
     <EmbeddedResource Include="Assets\Keyboard.png" />
     <EmbeddedResource Include="Assets\MicOff.png" />
     <EmbeddedResource Include="Assets\MicOn.png" />
     <EmbeddedResource Include="UI\ModSettings\ModSettingsViewController.bsml" />
     <EmbeddedResource Include="manifest.json" />
-    <Content Include="README.md" />
-    <None Remove="UI\Lobby\ChatViewController.bsml" />
     <EmbeddedResource Include="UI\Lobby\ChatViewController.bsml" />
+    <Content Include="README.md" />
+    <Content Include="Directory.Build.targets" />
+    <Content Include="TODO.md" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BeatSaberModdingTools.Tasks">
